@@ -15,6 +15,7 @@ use App\Models\IdosoModel;
 use App\Models\ProfissionalModel;
 use App\Models\TelefoneModel;
 /*TESTE DO GIT HAHAHAHAHAHHAHAHAHAHHAHAHAHAHAHAHAHHAHAHAHHAHAHAHAHHAHAHAHSSS*/
+/*TUTORIAL LEGAL RSRS*/ 
 class ZelooController extends Controller
 {
     /**
