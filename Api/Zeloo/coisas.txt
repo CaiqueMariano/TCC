@@ -1,3 +1,36 @@
+Criar migration
+php artisan make:migration create_tbAvaliacaoContrato_table
+
+Criar Model
+php artisan make:model NomeModel​
+
+
+DELIMITER $$
+CREATE TRIGGER colocar_idoso
+AFTER INSERT ON tb_usuario
+FOR EACH ROW
+BEGIN 
+	IF NEW.tipoUsuario = 'idoso' THEN
+    INSERT INTO tb_idoso (idUsuario)
+    VALUES (NEW.idUsuario);
+    END IF;
+    END$$
+
+DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER colocar_familiar
+AFTER INSERT ON tb_usuario
+FOR EACH ROW
+BEGIN 
+	IF NEW.tipoUsuario = 'familiar' THEN
+    INSERT INTO tb_familiar (idUsuario)
+    VALUES (NEW.idUsuario);
+    END IF;
+    END$$
+
+DELIMITER ;
+
   public function loginUsuario(Request $request)
     {
         $usuario = UsuarioModel::where('telefoneUsuario', $request->telefoneUsuario)->first();

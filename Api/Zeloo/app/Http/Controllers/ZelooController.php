@@ -343,8 +343,9 @@ class ZelooController extends Controller
 
             $profissional->nomeProfissional = $request->nomeProfissional;
             $profissional->emailProfissional = $request->emailProfissional;
-            $profissional->idTelefoneUsuario = $request->idTelefoneUsuario;
-            $profissional->senhaProfissional = bcrypt($request->senhaProfissional); // Criptografar a senha
+            $profissional->telefoneProfissional = $request->telefoneProfissional;
+            $profissional->valorMin = $request->valorMin;
+            $profissional->senhaProfissional = bcrypt($request->senhaProfissional);
             $profissional->documentosProfissional = $request->documentosProfissional;
             $profissional->biografiaProfissional = $request->biografiaProfissional;
             $profissional->areaAtuacaoProfissional = $request->areaAtuacaoProfissional;

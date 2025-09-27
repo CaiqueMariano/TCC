@@ -13,5 +13,5 @@ class ProfissionalModel extends Model
 
     public $fillable = ['idProfissional', 'nomeProfissional', 'emailProfissional', 
     'telefoneUsuario', 'senhaProfissional', 'documentosProfissional', 
-    'biografiaProfissional', 'areaAtuacaoProfissional',	'servicosOferecidosProfissional'];
+    'biografiaProfissional','valorMin', 'areaAtuacaoProfissional',	'servicosOferecidosProfissional'];
 }

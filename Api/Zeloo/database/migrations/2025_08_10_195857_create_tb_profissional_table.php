@@ -21,7 +21,9 @@ return new class extends Migration
             $table->string('senhaProfissional');
             $table->integer('documentosProfissional');
             $table->string('biografiaProfissional');
+            $table->decimal('valorMin', 8, 2);
             $table->string('areaAtuacaoProfissional');
+
             $table->string('servicosOferecidosProfissional');
             $table->timestamps();
 
