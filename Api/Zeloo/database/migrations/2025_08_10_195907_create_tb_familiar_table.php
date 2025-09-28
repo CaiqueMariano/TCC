@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('parentescoFamiliar');
             $table->timestamps();
 
-
             $table->foreign('idUsuario') 
             ->references('idUsuario') 
             ->on('tb_usuario') 

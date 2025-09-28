@@ -1,0 +1,23 @@
+{
+  "nomeUsuario": "Carlos Mendes",
+  "telefoneUsuario": "11987654321",
+  "emailUsuario": "carlos.mendes@example.com",
+  "senhaUsuario": "senha123",
+  "dataNasc": "1995-06-15",
+  "tipoUsuario": "idoso"
+}
+
+
+{
+  "nomeUsuario": "Mariana Souza",
+  "telefoneUsuario": "21999887766",
+  "emailUsuario": "mariana.souza@example.com",
+  "senhaUsuario": "minhaSenha456",
+  "dataNasc": "2000-03-22",
+  "tipoUsuario": "familiar"
+
+}
+
+
+INSERTS 
+INSERT INTO `tb_idoso_familia`(`idIdoso`, `idFamiliar`, `created_at`, `updated_at`) VALUES ( , ,NOW(),NOW())

@@ -23,14 +23,7 @@ return new class extends Migration
             $table->string('senhaUsuario');
             $table->date('dataNasc');
             $table->string('tipoUsuario');
-
-            //Endereço
-            $table->string('ruaUsuario');
-            $table->string('numLogradouroUsuario');
-            $table->string('estadoUsuario');
-            $table->string('bairroUsuario');
-            $table->string('cepUsuario');
-            $table->string('cidadeUsuario');
+ 
 
 
             $table->timestamps();

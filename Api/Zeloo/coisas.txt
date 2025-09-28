@@ -1,5 +1,5 @@
 Criar migration
-php artisan make:migration create_tbAvaliacaoContrato_table
+php artisan make:migration create_tbContratoServico_table
 
 Criar Model
 php artisan make:model NomeModel​

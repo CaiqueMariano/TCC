@@ -13,27 +13,21 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tb_servico', function (Blueprint $table) {
-            $table->id('idServico');
-            $table->string('nomeServico');
+        Schema::create('tb_endereco_usuario', function (Blueprint $table) {
+            $table->id('idEnderecoUsuario');
             $table->unsignedBigInteger('idIdosoFamilia');
-            $table->string('tipoServico');
-            $table->string('descServico');
-            $table->date('dataServico');
-            $table->time('horaInicioServico');
-            $table->time('horaTerminoServico');
-            $table->unsignedBigInteger('idEnderecoUsuario');
-            $table->timestamps();
+            $table->unsignedBigInteger('idEndereco');
 
-
+      
             $table->foreign('idIdosoFamilia') 
             ->references('idIdosoFamilia') 
             ->on('tb_idoso_familia') 
             ->onDelete('cascade');
+            $table->timestamps();
 
-            $table->foreign('idEnderecoUsuario') 
-            ->references('idEnderecoUsuario') 
-            ->on('tb_endereco_usuario') 
+            $table->foreign('idEndereco') 
+            ->references('idEndereco') 
+            ->on('tb_endereco') 
             ->onDelete('cascade');
         });
     }
@@ -45,6 +39,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tb_servico');
+        Schema::dropIfExists('tb_endereco_usuario');
     }
 };

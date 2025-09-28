@@ -16,7 +16,7 @@ class UsuarioModel extends Model
     protected $primaryKey = 'idUsuario';
 
     public $fillable = ['idUsuario','nomeUsuario','telefoneUsuario','emailUsuario','senhaUsuario','dataNasc',
-    'tipoUsuario','ruaUsuario', 'numLogradouroUsuario', 'estadoUsuario','bairroUsuario', 'cepUsuario', 'cidadeUsuario'];
+    'tipoUsuario'];
 
 //public $timestamps = false;
 public function getAuthPassword()

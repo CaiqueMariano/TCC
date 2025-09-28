@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\AuthenticationException;
+use App\Models\servicoModel;
 use App\Models\User;
 use App\Models\UsuarioModel;
 use App\Models\Denuncias;
@@ -45,6 +46,12 @@ class ZelooController extends Controller
     {
         return view('login');
     }
+
+
+
+  
+    
+
     /*LOGIN ADM*/
 
     public function storeAdm(Request $request){
@@ -119,6 +126,38 @@ class ZelooController extends Controller
 
 
     /*Funcões da API*/ 
+
+
+      /*CRIACÃO DE SERVICO*/
+      public function storeServico(Request $request){
+        try{
+            $servico = new servicoModel();
+
+            $servico -> nomeServico =$request ->nomeServico;
+            $servico -> idIdosoFamilia = $request ->idIdosoFamilia;
+            $servico -> tipoServico = $request -> tipoServico;
+            $servico -> descServico = $request -> descServico;
+            $servico -> dataServico = $request -> dataServico;
+            $servico -> horaInicioServico = $request -> horaInicioServico;
+            $servico -> horaTerminoServico = $request -> horaTerminoServico;
+            $servico -> idEnderecoUsuario = $request -> idEnderecoUsuario;
+
+            $servico->save();
+
+            return response()->json([
+                'message'=> 'criou-se com sucesso! eba!',
+                'code' =>200
+            ]);
+
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar servico',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+      }
     public function updatePerfil(Request $request, $idUsuario){
         UsuarioModel::where('idUsuario', $idUsuario)->update([
             'nomeUsuario' => $request->nomeUsuario,
@@ -245,12 +284,6 @@ class ZelooController extends Controller
         $usuario->senhaUsuario = bcrypt($request->senhaUsuario);
         $usuario->dataNasc = $request->dataNasc;
         $usuario->tipoUsuario = $request->tipoUsuario;
-        $usuario->ruaUsuario = $request->ruaUsuario;
-        $usuario->numLogradouroUsuario = $request->numLogradouroUsuario;
-        $usuario->estadoUsuario = $request->estadoUsuario;
-        $usuario->bairroUsuario = $request->bairroUsuario;
-        $usuario->cepUsuario = $request->cepUsuario;
-        $usuario->cidadeUsuario = $request->cidadeUsuario;
 
         $usuario->save();
 
