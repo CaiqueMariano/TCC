@@ -21,3 +21,27 @@
 
 INSERTS 
 INSERT INTO `tb_idoso_familia`(`idIdoso`, `idFamiliar`, `created_at`, `updated_at`) VALUES ( , ,NOW(),NOW())
+
+INSERT INTO tb_endereco (
+    ruaUsuario,
+    numLogradouroUsuario,
+    estadoUsuario,
+    bairroUsuario,
+    cepUsuario,
+    cidadeUsuario,
+    created_at,
+    updated_at
+) VALUES (
+    'Rua das Flores',
+    '123',
+    'SP',
+    'Jardim Primavera',
+    '12345-678',
+    'São Paulo',
+    NOW(),
+    NOW()
+);
+
+
+
+INSERT INTO `tb_endereco_usuario`(`idIdosoFamilia`, `idEndereco`, `created_at`, `updated_at`) VALUES (1,1,NOW(),NOW())

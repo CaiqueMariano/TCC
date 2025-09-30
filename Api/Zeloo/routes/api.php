@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 /**API DE ARMAZENAR SERVICOS */
 Route::post('/storeServicos','App\Http\Controllers\ZelooController@storeServico');
+/**API DE buscar SERVICOS */ 
+Route::get('/buscarServicos','App\Http\Controllers\ZelooController@buscarServicos');
 
 Route::delete('/excluirPerfil/{idUsuario}','App\Http\Controllers\ZelooController@destroyPerfil');
 Route::put('/updatePerfil/{idUsuario}','App\Http\Controllers\ZelooController@updatePerfil');

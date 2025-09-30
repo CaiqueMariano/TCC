@@ -158,6 +158,9 @@ class ZelooController extends Controller
             ], 500);
         }
       }
+
+
+
     public function updatePerfil(Request $request, $idUsuario){
         UsuarioModel::where('idUsuario', $idUsuario)->update([
             'nomeUsuario' => $request->nomeUsuario,
@@ -193,7 +196,22 @@ class ZelooController extends Controller
         );
     }
         
-    
+    public function buscarServicos(){
+        $servicos = servicoModel::all();
+
+        if(!$servicos){
+            return response()->json([
+                'success' => false,
+                'message' => 'erro'
+            ], 404);
+        }
+
+        return response()->json([
+            'success'=> true,
+            'message'=> 'sucesso ao buscar serviços' ,
+            'data' => $servicos
+        ], 200);
+    }
 
 
     public function buscarDados($idUsuario){
