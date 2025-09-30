@@ -10,21 +10,25 @@ const { height } = Dimensions.get('window');
 
 
 import servico from "./src/screens/servico";
-
+import disponivel from "./src/screens/disponivel";
+import Login from "./src/screens/Login";
+import { UserProvider } from "./userContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// No futuro sera configuracoes e notificacoes
+
 
 export default function App() {
   return (
-   
+   <UserProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="servico0" component={servico} />
+        <Stack.Screen name="login" component={Login} />   
+        <Stack.Screen name="Servicos Disponiveis" component={disponivel} />
+        <Stack.Screen name="servico" component={servico} />   
       </Stack.Navigator>
     </NavigationContainer>
-  
+  </UserProvider>
   );
 }

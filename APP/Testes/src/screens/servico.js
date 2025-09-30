@@ -12,20 +12,7 @@ export default function servico() {
   const [horaTerminoServico, setHoraTerminoServico] = useState('');
   const [idEnderecoUsuario, setIdEnderecoUsuario] = useState('');
 
-  const handleSubmit = () => {
-    // Aqui você pode pegar as variáveis e enviar para sua API
-    const data = {
-      nomeServico,
-      idIdosoFamilia,
-      tipoServico,
-      descServico,
-      dataServico,
-      horaInicioServico,
-      horaTerminoServico,
-      idEnderecoUsuario,
-    };
-    console.log('Enviar dados:', data);
-  };
+
 
 
   const enviarDados = async () => {
