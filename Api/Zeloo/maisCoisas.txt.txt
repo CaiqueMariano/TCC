@@ -45,3 +45,26 @@ INSERT INTO tb_endereco (
 
 
 INSERT INTO `tb_endereco_usuario`(`idIdosoFamilia`, `idEndereco`, `created_at`, `updated_at`) VALUES (1,1,NOW(),NOW())
+
+{
+"nomeServico":"TESTE",
+"idIdosoFamilia":"1",	
+"tipoServico":"TESTE",
+"descServico":"TESTE",
+"dataServico":"2000-01-01",
+"horaInicioServico":"9:00",
+"horaTerminoServico":"10:00",	
+"idEnderecoUsuario":"1"
+}
+
+{
+  "nomeProfissional": "João Silva",
+  "emailProfissional": "joao.silva@email.com",
+  "telefoneProfissional": "+5511999999999",
+  "senhaProfissional": "senhaSegura123",
+  "documentosProfissional": "1234567890",
+  "biografiaProfissional": "Profissional com 10 anos de experiência na área.",
+  "valorMin": 150.00,
+  "areaAtuacaoProfissional": "Desenvolvimento de Software",
+  "servicosOferecidosProfissional":"Consultoria técnica"
+  }

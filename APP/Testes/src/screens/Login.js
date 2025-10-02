@@ -13,8 +13,8 @@ export default function Login({navigation}) {
 
   const [abrir, setAbrir] = useState(false);
   const [valor, setValor] = useState(null);
-  const [telefoneUsuario, setTelefoneUsuario] = useState("");
-  const [senhaUsuario,setSenhaUsuario] = useState("");
+  const [emailProfissional, setTelefoneUsuario] = useState("");
+  const [senhaProfissional,setSenhaUsuario] = useState("");
   const [items, setItems] = useState([
     { label: 'Idoso', value: 'ido' },
     { label: 'Familia', value: 'fam' },
@@ -22,14 +22,14 @@ export default function Login({navigation}) {
 
   const enviarLogin = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/api/login`, {
-        telefoneUsuario,
-        senhaUsuario
+      const response = await axios.post(`http://localhost:8000/api/loginFree`, {
+        emailProfissional,
+        senhaProfissional
       });
   
       if (response.data.success) {
         setUser(response.data.data);
-        navigation.navigate("servico");
+        navigation.navigate("disponivel");
       } else {
         console.log("Erro", response.data.message);
       

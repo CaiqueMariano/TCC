@@ -14,6 +14,7 @@ use App\Models\Denuncias;
 use App\Models\FamiliarModel;
 use App\Models\IdosoModel;
 use App\Models\ProfissionalModel;
+use App\Models\ProfissionalServicoModel;
 use App\Models\TelefoneModel;
 /*TESTE DO GIT HAHAHAHAHAHHAHAHAHAHHAHAHAHAHAHAHAHHAHAHAHHAHAHAHAHHAHAHAHSSS*/
 /*TUTORIAL LEGAL RSRS*/ 
@@ -214,6 +215,24 @@ class ZelooController extends Controller
     }
 
 
+    //Buscar dados Profssional
+
+    public function buscarProfssional($idProfissional){
+        $profissional = ProfissionalModel::find($idProfissional);
+        if(!$profissional){
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuário não encontrado'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $profissional
+        ], 200);
+    }
+
+    //Buscar dados dados usuario
     public function buscarDados($idUsuario){
 
         $usuario =  UsuarioModel::find($idUsuario);
@@ -232,6 +251,8 @@ class ZelooController extends Controller
         
     }
 
+    /**Login Idoso/Familiar */
+
     public function loginUsuario(Request $request)
     {
         $usuario = UsuarioModel::where('telefoneUsuario', $request->telefoneUsuario)->first();
@@ -243,12 +264,39 @@ class ZelooController extends Controller
         ], 401);
     }
 
+
     return response()->json([
         'success' => true,
         'message' => 'Login realizado com sucesso',
         'data' => $usuario
     ]);
     }
+
+
+
+
+        /**Login FreeLancer */
+
+        public function loginFree(Request $request)
+        {
+            $usuario = ProfissionalModel::where('emailProfissional', $request->emailProfissional)->first();
+    
+        if (!$usuario || !Hash::check($request->senhaProfissional, $usuario->senhaProfissional)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'E-mail ou senha incorretos'
+            ], 401);
+        }
+
+        
+    return response()->json([
+        'success' => true,
+        'message' => 'Login realizado com sucesso',
+        'data' => $usuario
+    ]);
+    }
+
+    
 
      public function indexApi()
     {
@@ -351,6 +399,19 @@ class ZelooController extends Controller
             ], 500);
         }
     }
+
+    //API Profissional vai ta Aceitando
+
+public function aceita(Request $request){
+    $aceita =  new ProfissionalServicoModel();
+
+    $aceita -> idProfissional = $request->idProfissional;
+    $aceita -> idServico = $request->idServico;
+    $aceita -> precoPersonalizado;
+
+}
+
+
 
     public function storeIdosoApi(Request $request)
     {

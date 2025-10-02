@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useEffect, useState, UseContext } from 'react';
+import { View, Text, FlatList, StyleSheet, SafeAreaView, Pressable } from 'react-native';
 import axios from 'axios';
-export default function disponivel() {
+import { UserContext } from "./../../userContext";
 
+
+export default function disponivel() {
+  const { user } = useContext(UserContext);
+  console.log(user);
     const [servicos, setServicos] = useState({
+        idServico: "",
         nomeServico: "",
         tipoServico: "",
         descServico: "",
@@ -14,12 +19,16 @@ export default function disponivel() {
 
     });
   
-
+const aceitando ={
+  
+}
   const renderItem = ({ item }) => (
     <View style={styles.card}>
+      <Pressable onPress={}>
       <Text style={styles.titulo}>{item.nomeServico}</Text>
       <Text style={styles.categoria}>{item.tipoServico}</Text>
       <Text style={styles.descricao}>{item.descServico}</Text>
+      </Pressable>
     </View>
   );
 

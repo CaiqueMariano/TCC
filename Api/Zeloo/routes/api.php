@@ -24,14 +24,32 @@ Route::post('/storeServicos','App\Http\Controllers\ZelooController@storeServico'
 /**API DE buscar SERVICOS */ 
 Route::get('/buscarServicos','App\Http\Controllers\ZelooController@buscarServicos');
 
+//Select Profissional
+Route::get('/buscarProfissional/{idProfissional}','App\Http\Controllers\ZelooController@buscarProfissional');
+
+/**Excluir o Perfil */
 Route::delete('/excluirPerfil/{idUsuario}','App\Http\Controllers\ZelooController@destroyPerfil');
+
+/**Editar Perfil */
 Route::put('/updatePerfil/{idUsuario}','App\Http\Controllers\ZelooController@updatePerfil');
+
+//Select do perfil
 Route::get('/buscarDados/{idUsuario}','App\Http\Controllers\ZelooController@buscarDados');
+
+/**Login Idoso/Familiar */
 Route::post('/login','App\Http\Controllers\ZelooController@loginUsuario');
+/**Login Profissional */
+Route::post('/loginFree','App\Http\Controllers\ZelooController@loginFree');
+
+//Cadastro adm
 Route::post('/cadastroAdm','App\Http\Controllers\ZelooController@storeAdm');
+
 Route::get('/usuario','App\Http\Controllers\ZelooController@indexApi');
+
 Route::post('/usuario','App\Http\Controllers\ZelooController@storeUsuarioApi');
 Route::post('/familiar','App\Http\Controllers\ZelooController@storeFamiliarApi');
 Route::post('/idoso','App\Http\Controllers\ZelooController@storeIdosoApi');
-Route::post('/Profissional','App\Http\Controllers\ZelooController@storeProfissionalApi');
+
+//Cadastro Profissional
+Route::post('/profissional','App\Http\Controllers\ZelooController@storeProfissionalApi');
 Route::post('/telefone','App\Http\Controllers\ZelooController@storeTelefoneApi');

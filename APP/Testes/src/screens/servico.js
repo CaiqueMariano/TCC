@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
 import axios from 'axios';
+import { UserContext } from "./../../userContext";
 
 export default function servico() {
+
+//
+
+
+
+  /* Colocar servicos 
   const [nomeServico, setNomeServico] = useState('');
   const [idIdosoFamilia, setIdIdosoFamilia] = useState('');
   const [tipoServico, setTipoServico] = useState('');
@@ -31,7 +38,7 @@ export default function servico() {
       catch(error){
         console.error(error);
       }
-    };
+    };*/
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
