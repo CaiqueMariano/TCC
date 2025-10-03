@@ -18,14 +18,19 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//Aceitar os Servicos
+Route::post('/aceita','App\Http\Controllers\ZelooController@aceita');
 
 /**API DE ARMAZENAR SERVICOS */
 Route::post('/storeServicos','App\Http\Controllers\ZelooController@storeServico');
 /**API DE buscar SERVICOS */ 
 Route::get('/buscarServicos','App\Http\Controllers\ZelooController@buscarServicos');
 
-//Select Profissional
+//Select Profissional criarContrato
 Route::get('/buscarProfissional/{idProfissional}','App\Http\Controllers\ZelooController@buscarProfissional');
+
+//CRIAR  CONTRATO
+Route::post('/contrato','App\Http\Controllers\ZelooController@criarContrato');
 
 /**Excluir o Perfil */
 Route::delete('/excluirPerfil/{idUsuario}','App\Http\Controllers\ZelooController@destroyPerfil');
