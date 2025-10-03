@@ -10,6 +10,7 @@ class ProfissionalModel extends Model
     use HasFactory;
 
      protected $table = 'tb_profissional';
+     protected $primaryKey = 'idProfissional';
 
     public $fillable = ['idProfissional', 'nomeProfissional', 'emailProfissional', 
     'telefoneUsuario', 'senhaProfissional', 'documentosProfissional', 

@@ -11,6 +11,7 @@ use App\Models\servicoModel;
 use App\Models\User;
 use App\Models\UsuarioModel;
 use App\Models\Denuncias;
+use App\Models\ContratoModel;
 use App\Models\FamiliarModel;
 use App\Models\IdosoModel;
 use App\Models\ProfissionalModel;
@@ -217,7 +218,7 @@ class ZelooController extends Controller
 
     //Buscar dados Profssional
 
-    public function buscarProfssional($idProfissional){
+    public function buscarProfissional($idProfissional){
         $profissional = ProfissionalModel::find($idProfissional);
         if(!$profissional){
             return response()->json([
@@ -368,6 +369,36 @@ class ZelooController extends Controller
     }
 }
 
+
+//CRIAR CONTRATO
+public function criarContrato(Request $request)
+{
+    try {
+        $contrato = new ContratoModel();
+
+        $contrato->idProfissionalServico = $request->idProfissionalServico;
+        $contrato->dataInicioContrato = date('Y-m-d'); 
+        $contrato->statusContrato = 'inativo';
+        $contrato->obsContrato = '-';
+
+
+        $contrato->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contrato criado com sucesso',
+            'data' => $contrato
+        ], 201);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao criar Contrato',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
   public function storeFamiliarApi(Request $request)
     {
         try {
@@ -403,11 +434,49 @@ class ZelooController extends Controller
     //API Profissional vai ta Aceitando
 
 public function aceita(Request $request){
+   try{
+   
     $aceita =  new ProfissionalServicoModel();
 
     $aceita -> idProfissional = $request->idProfissional;
     $aceita -> idServico = $request->idServico;
-    $aceita -> precoPersonalizado;
+    $aceita -> precoPersonalizado = $request->precoPersonalizado;
+
+
+    $aceita->save();
+
+
+           $contrato = new ContratoModel();
+           $contrato->idProfissionalServico = $aceita->idProfissionalServico; 
+           $contrato->dataInicioContrato = date('Y-m-d');
+           $contrato->statusContrato = 'inativo';
+           $contrato->obsContrato = '-';
+           $contrato->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'aceitado e contrato criado :D',
+        'data' => [
+            'profissionalServico' => $aceita,
+            'contrato' => $contrato
+        ]
+    ], 201);
+    
+
+} catch (\Illuminate\Validation\ValidationException $e) {
+return response()->json([
+    'success' => false,
+    'message' => 'Erro de validação',
+    'errors' => $e->errors()
+], 422);
+
+} catch (\Exception $e) {
+return response()->json([
+    'success' => false,
+    'message' => 'Erro interno do servidor',
+    'error' => $e->getMessage()
+], 500);
+}
 
 }
 
