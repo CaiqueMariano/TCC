@@ -160,7 +160,67 @@ class ZelooController extends Controller
         }
       }
 
+      // CRIAÇÃO DO PAGAMENTO
+        public function storePagamento(Request $request){
+            try{
+                $pagamento = new servicomodel();
 
+                $pagamento -> idContrato = $request ->idContrato;
+                $pagamento -> tipoPagamento = $request -> tipoPagamento;
+                $pagamento -> valorPagamento = $request -> valorPagamento;
+                $pagamento -> dataPagamento = $request -> dataPagamento;
+                $pagamento -> statusPagamento = $request -> statusPagamento;
+
+            
+            $pagamento->save();
+
+             return response()->json([
+                'message'=> 'criou-se com sucesso! eba!',
+                'code' =>200
+            ]);    
+            }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar realizar pagamento',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    
+/*
+       // duas opçoes de api de tipo de pagamento
+
+     public function storetipoPagamento(Request $request){
+        try{
+              $tipopagamento = new servicomodel();
+              
+              $tipopagamento -> tipopagamento = $request ->tipopagamento;
+          $tipopagamento->save();
+
+            return response()->json([
+                'message'=> 'criou-se com sucesso! eba!',
+                'code' =>200
+        ]);
+    
+     }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao selecionar tipo de pagamento',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+        */
+
+   // CRIAÇÃO  tipo de Pagamento 
+      public function tiposPagamento(){
+        $tipoPagamento = ['Cartão de Crédito', 'Cartão débito','Boleto Bancário','Pix','Dinheiro'];
+        return response()-> json([
+            'sucess' => true,
+            'data' => $tipoPagamento,
+            'code' => 200
+        ]);      }
 
     public function updatePerfil(Request $request, $idUsuario){
         UsuarioModel::where('idUsuario', $idUsuario)->update([

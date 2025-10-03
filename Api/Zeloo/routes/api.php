@@ -36,6 +36,12 @@ Route::put('/updatePerfil/{idUsuario}','App\Http\Controllers\ZelooController@upd
 //Select do perfil
 Route::get('/buscarDados/{idUsuario}','App\Http\Controllers\ZelooController@buscarDados');
 
+// pagamento
+Route::post('/pagamento','App\Http\Controllers\ZellooController@storePagamento');
+
+//tipo de pagamentp
+Route::post('/tipoPagamento','App\Http\Controllers\Zelloocontroller@storeTipoPagamento');
+
 /**Login Idoso/Familiar */
 Route::post('/login','App\Http\Controllers\ZelooController@loginUsuario');
 /**Login Profissional */
