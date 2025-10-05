@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\AuthenticationException;
 use App\Models\servicoModel;
 use App\Models\User;
+use App\Models\IdosoFamiliaModel;
 use App\Models\UsuarioModel;
 use App\Models\Denuncias;
 use App\Models\ContratoModel;
@@ -129,14 +130,19 @@ class ZelooController extends Controller
 
     /*Funcões da API*/ 
 
-
       /*CRIACÃO DE SERVICO*/
-      public function storeServico(Request $request){
+      public function storeServicoFamiliar(Request $request){
         try{
-            $servico = new servicoModel();
+          
 
+            $idUsuario = $request->idUsuario;
+            $familiar = FamiliarModel::where('idUsuario', $idUsuario)->first();
+            $familia = IdosoFamiliaModel::where('idFamiliar', $familiar->idFamiliar)->first();
+
+
+            $servico = new servicoModel();
             $servico -> nomeServico =$request ->nomeServico;
-            $servico -> idIdosoFamilia = $request ->idIdosoFamilia;
+            $servico->idIdosoFamilia = $familia->idIdosoFamilia;
             $servico -> tipoServico = $request -> tipoServico;
             $servico -> descServico = $request -> descServico;
             $servico -> dataServico = $request -> dataServico;
@@ -162,6 +168,73 @@ class ZelooController extends Controller
       }
 
 
+
+      /*CRIACÃO DE SERVICO*/
+      public function storeServico(Request $request){
+        try{
+          
+
+            $idUsuario = $request->idUsuario;
+            $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+            $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
+
+
+            $servico = new servicoModel();
+            $servico -> nomeServico =$request ->nomeServico;
+            $servico->idIdosoFamilia = $familia->idIdosoFamilia;
+            $servico -> tipoServico = $request -> tipoServico;
+            $servico -> descServico = $request -> descServico;
+            $servico -> dataServico = $request -> dataServico;
+            $servico -> horaInicioServico = $request -> horaInicioServico;
+            $servico -> horaTerminoServico = $request -> horaTerminoServico;
+            $servico -> idEnderecoUsuario = $request -> idEnderecoUsuario;
+
+            $servico->save();
+
+            return response()->json([
+                'message'=> 'criou-se com sucesso! eba!',
+                'code' =>200
+            ]);
+
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar servico',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+      }
+
+
+      //CRIA FAMILAI
+      public function criarFamilia(Request $request){
+        
+
+        $idUsuarioFamiliar = $request->idUsuarioFamiliar;
+        $familiar = FamiliarModel::where('idUsuario', $idUsuarioFamiliar)->first();
+
+        $idUsuarioIdoso = $request->idUsuarioIdoso;
+        $idoso = IdosoModel::where('idUsuario', $idUsuarioIdoso)->first();
+
+        $atualizado = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)
+        ->update([
+            'idFamiliar' => $familiar->idFamiliar
+        ]);
+
+    if ($atualizado) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Idoso vinculado com sucesso ao familiar!'
+        ]);
+    } else {
+        return response()->json([
+            'success' => false,
+            'message' => 'Não foi possível atualizar o vínculo.'
+        ], 400);
+    }
+       
+    }
 
     public function updatePerfil(Request $request, $idUsuario){
         UsuarioModel::where('idUsuario', $idUsuario)->update([
@@ -196,6 +269,26 @@ class ZelooController extends Controller
             'message'=> 'Dados excluídos com sucesso',
             'code'=>200]
         );
+    }
+
+
+    //Buscar proffiosnais
+
+    public function selectProfissional(){
+        $profissional = ProfissionalModel::all();
+
+        if(!$profissional){
+            return response()->json([
+                'success' => false,
+                'message' => 'erro'
+            ], 404);
+        }
+
+        return response()->json([
+            'success'=> true,
+            'message'=> 'sucesso ao buscar profissionais' ,
+            'data' => $profissional
+        ], 200);
     }
         
     public function buscarServicos(){
@@ -234,6 +327,25 @@ class ZelooController extends Controller
     }
 
     //Buscar dados dados usuario
+
+    public function buscarIdoso($telefoneUsuario){
+
+        $usuario = UsuarioModel::firstWhere('telefoneUsuario', $telefoneUsuario);
+
+        if(!$usuario){
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuário não encontrado'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $usuario
+        ], 200);
+        
+    }
+
     public function buscarDados($idUsuario){
 
         $usuario =  UsuarioModel::find($idUsuario);
@@ -347,7 +459,6 @@ class ZelooController extends Controller
 
         $usuario->nomeUsuario = $request->nomeUsuario;
         $usuario->telefoneUsuario = $request->telefoneUsuario;
-        $usuario->emailUsuario = $request->emailUsuario;
         $usuario->senhaUsuario = bcrypt($request->senhaUsuario);
         $usuario->dataNasc = $request->dataNasc;
         $usuario->tipoUsuario = $request->tipoUsuario;
@@ -398,6 +509,9 @@ public function criarContrato(Request $request)
         ], 500);
     }
 }
+
+//CRIAR FAMILIASSS
+
 
   public function storeFamiliarApi(Request $request)
     {

@@ -18,9 +18,11 @@ import colors from './src/screens/colors';
 import Conta from "./src/screens/Conta";
 import configuracoes from "./src/screens/configuracoes";
 import Contratar from "./src/screens/Contratar";
+import HomeFamiliar from './src/screens/homeFamiliar';
+import Adicionar from './src/screens/Adicionar';
 import { UserProvider } from "./src/screens/userContext";
-
-
+import Contrato from './src/screens/Contrato';
+import Servico from './src/screens/Servico'
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -84,14 +86,20 @@ export default function App() {
     <UserProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+      
         <Stack.Screen name="BemVindo" component={BemVindo} />
+        <Stack.Screen name="Adicionar" component={Adicionar} />
         <Stack.Screen name="Conta" component={Conta} />
-        <Stack.Screen name="Contratar" component={Contratar} />
+        <Stack.Screen name="Home" component={TabRoutes} />
+        <Stack.Screen name="Servico" component={Servico} />
+        <Stack.Screen name="homeFamiliar" component={HomeFamiliar} />
+        
+        <Stack.Screen name="Contrato" component={Contrato} />
         <Stack.Screen name="configuracoes" component={configuracoes} />
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
-        <Stack.Screen name="Home" component={TabRoutes} />
+       
       </Stack.Navigator>
     </NavigationContainer>
     </UserProvider>

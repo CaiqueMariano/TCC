@@ -4,7 +4,7 @@ import colors from './colors';
 
 const { width, height } = Dimensions.get("window");
 
-export default function Home({ navigation }) {
+export default function Contratar({ navigation }) {
   return (
     <View style={styles.container}>
 

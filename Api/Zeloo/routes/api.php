@@ -26,11 +26,17 @@ Route::post('/storeServicos','App\Http\Controllers\ZelooController@storeServico'
 /**API DE buscar SERVICOS */ 
 Route::get('/buscarServicos','App\Http\Controllers\ZelooController@buscarServicos');
 
+//Buscar profissionais
+Route::get('/selectProfissional','App\Http\Controllers\ZelooController@selectProfissional');
+
 //Select Profissional criarContrato
 Route::get('/buscarProfissional/{idProfissional}','App\Http\Controllers\ZelooController@buscarProfissional');
 
-//CRIAR  CONTRATO
+//CRIAR  CONTRATO 
 Route::post('/contrato','App\Http\Controllers\ZelooController@criarContrato');
+
+//CRIAR FAMILIA
+Route::post('/criarFamilia','App\Http\Controllers\ZelooController@criarFamilia');
 
 /**Excluir o Perfil */
 Route::delete('/excluirPerfil/{idUsuario}','App\Http\Controllers\ZelooController@destroyPerfil');
@@ -40,6 +46,10 @@ Route::put('/updatePerfil/{idUsuario}','App\Http\Controllers\ZelooController@upd
 
 //Select do perfil
 Route::get('/buscarDados/{idUsuario}','App\Http\Controllers\ZelooController@buscarDados');
+
+//Buscar idoso
+Route::get('/buscarIdoso/{telefoneUsuario}','App\Http\Controllers\ZelooController@buscarIdoso');
+
 
 /**Login Idoso/Familiar */
 Route::post('/login','App\Http\Controllers\ZelooController@loginUsuario');

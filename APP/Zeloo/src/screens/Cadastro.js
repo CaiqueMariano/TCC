@@ -1,21 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from "react-native";
 import colors from "./colors";
 import { TextInput } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as ImagePicker from 'expo-image-picker';
-
+import axios from "axios";
+import { UserContext } from "./userContext";
+import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get("window");
 
 export default function Cadastro({ navigation }) {
+  const { setUser } = useContext(UserContext);
   const [etapa, setEtapa] = useState(1);
-
   const [mostrarSenha, setMostrarSenha] = useState(false);
-
   const [nomeUsuario, setNomeUsuario] = useState("");
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
   const [senhaUsuario, setSenhaUsuario] = useState("");
-  const [dataNascUsuario,setDataNascUsuario] = useState("");
+  const [tipoUsuario, setTipoUsuario] = useState('');
+  const [dataNasc,setDataNascUsuario] = useState("");
 
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState('idoso');
@@ -101,6 +103,34 @@ export default function Cadastro({ navigation }) {
     </View>
   );
 
+
+  const enviarDados = async () => {
+    try{
+
+      const partes = dataNasc.split('/');
+    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+      const response =  await axios.post(`http://localhost:8000/api/usuario`,{nomeUsuario,telefoneUsuario, senhaUsuario,tipoUsuario:value,dataNasc: dataFormatada});
+
+      if(response.data.success){
+        setUser(response.data.data);
+        navigation.navigate("Home");
+      }else{
+     
+        console.log("Erro", response.data.message);
+      
+      }
+    }
+      catch(error){
+        if (error.response) {
+          console.error("Erro do servidor:", error.response.data);
+        } else if (error.request) {
+          console.error("Sem resposta do servidor:", error.request);
+        } else {
+          console.error("Erro na requisição:", error.message);
+        }
+      }
+    };
+
   return (
     <View style={styles.container}>
       <View style={styles.Form1}></View>
@@ -138,7 +168,8 @@ export default function Cadastro({ navigation }) {
         secureTextEntry={!mostrarSenha}
       />
       <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
-        <Text style={styles.senhaToggle}>{mostrarSenha ? '🙈' : '👁️'}</Text>
+        <Text style={styles.senhaToggle}>{mostrarSenha ? <Ionicons size={25} name="eye-outline"></Ionicons>
+ : <Ionicons name="eye-off-outline" size={25}/> }</Text>
       </TouchableOpacity>
     </View>
 
@@ -162,7 +193,7 @@ export default function Cadastro({ navigation }) {
           style={styles.input} 
           placeholder="Data de nascimento" 
           keyboardType="numeric"
-          value={dataNascUsuario}
+          value={dataNasc}
           onChangeText={formatarData}
           />
 
@@ -211,7 +242,7 @@ export default function Cadastro({ navigation }) {
           </View>
 
           <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={() => alert("Cadastro finalizado!")}>
+            <TouchableOpacity style={styles.bFoto} onPress={enviarDados}>
               <Text style={styles.buttonText}>Finalizar</Text>
             </TouchableOpacity>
           </View>
