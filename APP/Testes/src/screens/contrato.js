@@ -56,6 +56,7 @@ const aceitando = async(idServico)=>{
 
   if(response.data.success){
     console.log(response.data.message);
+    
   }else{
     console.log(response.data.message)
   }
