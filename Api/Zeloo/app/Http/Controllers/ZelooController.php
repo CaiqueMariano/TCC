@@ -86,8 +86,10 @@ class ZelooController extends Controller
     /*BANIR USUARIO*/
     public function destroyUsuario($idUsuario)
     {
+
+        
         if (Denuncias::exists()) {
-            UsuarioModel::where('idUsuario', '=', $idUsuario)->delete();
+            UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'inativo']);
 
             return redirect()->route('denuncias')
                             ->with('success', 'Usuário banido com sucesso');
@@ -101,6 +103,7 @@ class ZelooController extends Controller
         if(Denuncias::exists()){
         $usuarios = DB::table('denuncias')
         ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
+        ->where('tb_usuario.statusUsuario', '=', 'ativo')
         ->select(
             'tb_usuario.idUsuario',
             'tb_usuario.nomeUsuario',
@@ -369,6 +372,21 @@ class ZelooController extends Controller
     }
 
 
+//LISTAR CONTRATOS
+    public function vizualizarContrato($idProfissional){
+        $contratos = DB::table('tb_contrato')
+        ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
+        ->where('tb_profissional_servico.idProfissional', $idProfissional)
+        ->select('tb_contrato.*')
+        ->get();
+
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contratos encontrados',
+            'data'=> $contratos
+        ],200);
+    }
     //Buscar dados Profssional
 
     public function buscarProfissional($idProfissional){
@@ -430,7 +448,7 @@ class ZelooController extends Controller
     {
         $usuario = UsuarioModel::where('telefoneUsuario', $request->telefoneUsuario)->first();
 
-    if (!$usuario || !Hash::check($request->senhaUsuario, $usuario->senhaUsuario)) {
+    if (!$usuario || !Hash::check($request->senhaUsuario, $usuario->senhaUsuario) || $usuario->statusUsuario === 'inativo') {
         return response()->json([
             'success' => false,
             'message' => 'Telefone ou senha incorretos'
@@ -519,9 +537,11 @@ class ZelooController extends Controller
 
         $usuario->nomeUsuario = $request->nomeUsuario;
         $usuario->telefoneUsuario = $request->telefoneUsuario;
+        $usuario->emailUsuario = '-';
         $usuario->senhaUsuario = bcrypt($request->senhaUsuario);
         $usuario->dataNasc = $request->dataNasc;
         $usuario->tipoUsuario = $request->tipoUsuario;
+        $usuario->statusUsuario = 'ativo';
 
         $usuario->save();
 
@@ -705,7 +725,7 @@ return response()->json([
             $profissional->biografiaProfissional = $request->biografiaProfissional;
             $profissional->areaAtuacaoProfissional = $request->areaAtuacaoProfissional;
             $profissional->servicosOferecidosProfissional = $request->servicosOferecidosProfissional;
-
+       
             $profissional->save();
 
             return response()->json([

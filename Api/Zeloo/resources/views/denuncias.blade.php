@@ -226,6 +226,30 @@
     <!--CARDS DO BIXOOO!!!-->
 
     @foreach ($usuarios as $usuario)
+
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Nome</th>
+      <th scope="col">Motivo Denúncia</th>
+      <th scope="col">Banir Usuario</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">{{$usuario->idUsuario}}</th>
+      <td>{{$usuario->nomeUsuario}}</td>
+      <td>{{$usuario->motivoDenuncia}}</td>
+      <td><a href="#" 
+   class="btn btn-primary" 
+   onclick="abrirModalBanir('{{ $usuario->idUsuario }}', '{{ $usuario->nomeUsuario }}', '{{ $usuario->tipoUsuario }}', '{{$usuario->motivoDenuncia}}', '{{$usuario->descDenuncia}}', '{{$usuario->evidenciaDenuncia}}')">
+   Banir
+</a></td>
+    </tr>
+  </tbody>
+</table>
+    <!--
     <div class="card">
   <h5 class="card-header">{{$usuario->idUsuario}}</h5>
   <div class="card-body">
@@ -246,7 +270,7 @@
 <BR>
 
         </div>
-    </div>
+    </div>-->
     @endforeach
 
     <div class="d-flex justify-content-center">

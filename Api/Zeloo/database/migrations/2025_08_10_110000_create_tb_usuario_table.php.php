@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('telefoneUsuario')->unique();
             $table->string('emailUsuario')->unique();
             $table->string('senhaUsuario');
+            $table->string('statusUsuario');
             $table->date('dataNasc');
             $table->string('tipoUsuario');
  
