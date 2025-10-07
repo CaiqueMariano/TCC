@@ -7,7 +7,7 @@ export default function Cadastro() {
   const navigation = useNavigation();
   return (
     <ImageBackground
-      source={require('../assets/screenshot.jpeg')}
+      source={require('../assets/fundoLIlas.jpg')}
       style={styles.background}
       resizeMode="cover"
     >
@@ -44,10 +44,18 @@ export default function Cadastro() {
           <View style={styles.buttonRow}>
             <TouchableOpacity style={[styles.button, styles.buttonSecondary]} onPress={() => navigation.goBack()}>
               <Text style={[styles.buttonText, styles.buttonTextSecondary]}>Cancelar</Text>
+
+                </TouchableOpacity>
+           
+
+
+            <TouchableOpacity
+              style={[styles.button, styles.buttonPrimary]}
+              onPress={() => navigation.navigate('CadastroEndereco')}
+            >
+              <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, styles.buttonPrimary]}>
-              <Text style={styles.buttonText}>Cadastrar</Text>
-            </TouchableOpacity>
+
           </View>
         </View>
         <StatusBar style="light" />
@@ -93,6 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#111',
+    fontFamily: 'Arial',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -103,6 +112,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.95)',
     borderWidth: 1,
     borderColor: '#ddd',
+    borderRadius: 10,
     paddingHorizontal: 12,
     color: '#111',
     marginBottom: 16,
@@ -122,14 +132,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonSecondary: {
-    backgroundColor: 'transparent',
+    
     borderWidth: 1,
-    borderColor: '#0a84ff',
+    borderColor: '#fff',
     marginRight: 8,
     flex: 1,
   },
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#CF9FE5',
     marginLeft: 8,
     flex: 1,
   },
@@ -137,9 +147,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Arial',
+    fontWeight: 'bold',
   },
   buttonTextSecondary: {
-    color: '#0a84ff',
+    color: '#BC66E5',
+    fontFamily: 'Arial',
+    fontWeight: 'bold',
   },
 });
 
