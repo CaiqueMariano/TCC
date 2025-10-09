@@ -94,7 +94,6 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
 
   return (
 <View style={styles.container} >
- {user.tipoUsuario ==="idoso" ?(
   <View>
    <View style={styles.Form1}></View>
    <Image 
@@ -154,36 +153,6 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
    </TouchableOpacity>
    </ScrollView>
    </View>
- ):(
-  <View style={styles.content}>
-  {/* Card Serviço */}
-  <View style={styles.serviceCard}>
-    <Text style={styles.serviceTitle}>Serviço em Andamento</Text>
-    <View style={styles.caregiverInfo}>
-      <CaregiverAvatar />
-      <View>
-        <Text style={styles.caregiverName}>Nome Sobrenome</Text>
-        <RatingDots />
-      </View>
-    </View>
-  </View>
-
-  {/* Botões de ação */}
-  <View style={styles.buttonGrid}>
-    <ActionButton iconName="users" text="Cuidadores" />
-    <ActionButton iconName="heart" text="Favoritos" iconStyle={{ color: 'black' }} />
-    <ActionButton iconName="comment-dots" text="Conversas" />
-    <ActionButton onPress={() => navigation.navigate('Adicionar')} iconName="link" text="Adicionar Idoso" />
-  </View>
-
-  {/* Ícone volume */}
-  <View style={styles.volumeIconContainer}>
-    <Ionicons name="volume-medium-outline" size={40} color="#000" />
-  </View>
-</View>
- )
-
- }
 </View>
   );
 }
