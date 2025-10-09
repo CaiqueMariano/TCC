@@ -18,7 +18,18 @@
 
 }
 
+//ADM
 
+{
+  "name": "Mariana Souza",
+  "email": "adm@gmail.com",
+  "password": "123"
+
+}
+
+//DENUNCIAS
+
+INSERT INTO `denuncias`(`idUsuario`, `motivoDenuncia`, `descDenuncia`, `evidenciaDenuncia`) VALUES (1,'Assedio','JIJIDJW','ISJCIHCI'), (2,'Assedio','JIJIDJW','ISJCIHCI');
 INSERTS 
 INSERT INTO `tb_idoso_familia`(`idIdoso`, `idFamiliar`, `created_at`, `updated_at`) VALUES ( , ,NOW(),NOW())
 

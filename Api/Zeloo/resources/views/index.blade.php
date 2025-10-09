@@ -141,21 +141,19 @@
 </head>
 <body>
          <!-- Navbar -->
-     <nav class="navbar navbar-expand-lg navbar-light sticky-top" id="mainNavbar">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top" id="mainNavbar">
         <div class="container">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-brand" href="#">
                 <img src="{{url('images/zeloo-light.png')}}" alt="Zeloo" height="40">
             </a>
-            <!-- Botão do menu mobile -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <!-- Itens do menu -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{url('/dashboard')}}">
+                        <a class="nav-link active" href="{{url('/dashboard')}}">
                             <i class="bi bi-speedometer2 me-1"></i>
                             Dashboard
                         </a>
@@ -166,17 +164,22 @@
                             Analisar Denúncias
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url('denunciados')}}">
+                            <i class="bi bi-shield-exclamation me-1"></i>
+                            Analisar Respostas
+                        </a>
+                    </li>
                    
+                    
                 </ul>
                 <a class="nav-link" href="{{url('/logoutUser')}}">
                            <t class="logout"> LOGOUT</t>
                 </a>
-                
             </div>
         </div>
     </nav>
-
-
 
          <!-- Header da Seção -->
      <div class="container-fluid bg-light py-3">

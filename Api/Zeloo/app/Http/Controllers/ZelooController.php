@@ -90,7 +90,20 @@ class ZelooController extends Controller
         
         if (Denuncias::exists()) {
             UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'inativo']);
+           
+            return redirect()->route('denuncias')
+                            ->with('success', 'Usuário banido com sucesso');
+        } else {
+            return redirect()->route('registro'); 
+        }
+    }
+    public function desbanirUsuario($idUsuario)
+    {
 
+        
+        if (Denuncias::exists()) {
+            UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'ativo']);
+            Denuncias::where('idUsuario', '=', $idUsuario)->delete();
             return redirect()->route('denuncias')
                             ->with('success', 'Usuário banido com sucesso');
         } else {
@@ -143,7 +156,7 @@ class ZelooController extends Controller
         ->paginate(10);
 
 
-        return view('denuncias', compact('usuarios'));
+        return view('responder-denuncia', compact('usuarios'));
         }else{
             return view('nenhum-registro');
         }

@@ -196,13 +196,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{url('/dashboard')}}">
+                        <a class="nav-link" href="{{url('/dashboard')}}">
                             <i class="bi bi-speedometer2 me-1"></i>
                             Dashboard
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('denuncias')}}">
+                        <a class="nav-link active" href="{{url('denuncias')}}">
                             <i class="bi bi-shield-exclamation me-1"></i>
                             Analisar Denúncias
                         </a>
