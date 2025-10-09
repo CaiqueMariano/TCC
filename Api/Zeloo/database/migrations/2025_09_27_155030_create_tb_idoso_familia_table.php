@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('tb_idoso_familia', function (Blueprint $table) {
             $table->id('idIdosoFamilia');
             $table->unsignedBigInteger('idIdoso');
-            $table->unsignedBigInteger('idFamiliar');
+            $table->unsignedBigInteger('idFamiliar')->nullable();
             $table->timestamps();
 
 

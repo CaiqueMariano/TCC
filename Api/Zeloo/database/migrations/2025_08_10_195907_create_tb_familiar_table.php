@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('tb_familiar', function (Blueprint $table) {
             $table->id('idFamiliar');
             $table->unsignedBigInteger('idUsuario');
-            $table->string('parentescoFamiliar');
+            $table->string('parentescoFamiliar')->nullable();
             $table->timestamps();
 
             $table->foreign('idUsuario') 

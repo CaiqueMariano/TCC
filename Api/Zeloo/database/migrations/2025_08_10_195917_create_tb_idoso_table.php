@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('tb_idoso', function (Blueprint $table) {
             $table->id('idIdoso');
             $table->unsignedBigInteger('idUsuario');
-            $table->string('necessidadesEspeciais');
+            $table->string('necessidadesEspeciais')->nullable();
             $table->timestamps();
 
 

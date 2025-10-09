@@ -225,7 +225,7 @@
 
     <!--CARDS DO BIXOOO!!!-->
 
-    @foreach ($usuarios as $usuario)
+
 
     <table class="table">
   <thead>
@@ -238,6 +238,7 @@
   </thead>
   <tbody>
     <tr>
+        @foreach ($usuarios as $usuario)
       <th scope="row">{{$usuario->idUsuario}}</th>
       <td>{{$usuario->nomeUsuario}}</td>
       <td>{{$usuario->motivoDenuncia}}</td>

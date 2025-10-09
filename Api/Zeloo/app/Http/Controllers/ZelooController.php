@@ -97,6 +97,8 @@ class ZelooController extends Controller
             return redirect()->route('registro'); 
         }
     }
+
+
 /*VER DENUCNIAS*/
     public function denuncias(){
 
@@ -121,6 +123,32 @@ class ZelooController extends Controller
             return view('nenhum-registro');
         }
     }
+
+    //VER DENUNCIADOS
+     public function denunciados(){
+
+        if(Denuncias::exists()){
+        $usuarios = DB::table('denuncias')
+        ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
+        ->where('tb_usuario.statusUsuario', '=', 'inativo')
+        ->select(
+            'tb_usuario.idUsuario',
+            'tb_usuario.nomeUsuario',
+            'tb_usuario.tipoUsuario',
+            'denuncias.motivoDenuncia',
+            'denuncias.descDenuncia',
+            'denuncias.evidenciaDenuncia'
+
+        )
+        ->paginate(10);
+
+
+        return view('denuncias', compact('usuarios'));
+        }else{
+            return view('nenhum-registro');
+        }
+    }
+
 
     public function banir(){
         return view('banir');
@@ -530,6 +558,8 @@ class ZelooController extends Controller
         //
     }
 
+
+    //CRIANDO O USUARIO
     public function storeUsuarioApi(Request $request)
 {
     try {
@@ -537,13 +567,36 @@ class ZelooController extends Controller
 
         $usuario->nomeUsuario = $request->nomeUsuario;
         $usuario->telefoneUsuario = $request->telefoneUsuario;
-        $usuario->emailUsuario = '-';
         $usuario->senhaUsuario = bcrypt($request->senhaUsuario);
         $usuario->dataNasc = $request->dataNasc;
         $usuario->tipoUsuario = $request->tipoUsuario;
         $usuario->statusUsuario = 'ativo';
 
         $usuario->save();
+
+//SE FOR IDOSO VAI PRA TABELA IDOSO
+        if($usuario->tipoUsuario === 'idoso')
+        {
+        $idoso = new IdosoModel();
+        $idoso->idUsuario = $usuario->idUsuario;
+
+        $idoso->save();
+
+        //O IDOSO VAI PRA TAEBLA FAMILIA
+        $idosoFamilia = new IdosoFamiliaModel();
+
+        $idosoFamilia->idIdoso = $idoso->idIdoso;
+
+        $idosoFamilia->save();
+        }else{
+
+            //SE FOR FAMILIAR ELE VAI PRA TABELA FAMILIAR
+            $familiar = new FamiliarModel();
+            $familiar-> idUsuario = $usuario->idUsuario;
+
+            $familiar -> save();
+        }
+
 
         return response()->json([
             'success' => true,

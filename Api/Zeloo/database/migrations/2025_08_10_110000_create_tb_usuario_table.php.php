@@ -19,7 +19,7 @@ return new class extends Migration
             $table->id('idUsuario');
             $table->string('nomeUsuario');
             $table->string('telefoneUsuario')->unique();
-            $table->string('emailUsuario')->unique();
+            $table->string('emailUsuario')->nullable();
             $table->string('senhaUsuario');
             $table->string('statusUsuario');
             $table->date('dataNasc');
