@@ -1,68 +1,99 @@
 import React, { useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Platform, StyleSheet, TextInput, Pressable, FlatList, Modal, Dimensions } from "react-native";
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import colors from "./colors";
-import { TextInput } from "react-native";
-import DropDownPicker from 'react-native-dropdown-picker';
-import * as ImagePicker from 'expo-image-picker';
-import axios from "axios";
-import { Checkbox } from 'react-native-paper';
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
-import { Platform } from "react-native";
+import DropDownPicker from 'react-native-dropdown-picker';
+import { Checkbox } from 'react-native-paper';
+
 const { width, height } = Dimensions.get("window");
 
 export default function Cadastro({ navigation }) {
   const { setUser } = useContext(UserContext);
   const [etapa, setEtapa] = useState(1);
-  const [horarioIn, setHorarioIn] = useState('');
-  const [horarioT, setHorarioT] = useState('');
-  const [data,setData] = useState("");
-  const [enderecoUsuario,setEnderecoUsuario] = useState("");
-  const [textoE, setTextoE] = useState('');
-  const [abrirE, setAbrirE] = useState(false);
-  const [texto, setTexto] = useState("Nenhum detalhe foi especificado");
 
+  const [data, setData] = useState("");
+  const [horarioIn, setHorarioIn] = useState("");
+  const [horarioT, setHorarioT] = useState("");
+  const [abrir, setAbrir] = useState(false);
+
+  // Checkboxes aqui 
   const [checked1, setChecked1] = useState(false);
   const [checked2, setChecked2] = useState(false);
   const [checked3, setChecked3] = useState(false);
   const [checked4, setChecked4] = useState(false);
-  const [abrir, setAbrir] = useState(false);
-  const nomeServicosSelecionados = [];
+  const [abrirOutro, setAbrirOutro] = useState(false);
+  const [textoOutro, setTextoOutro] = useState("");
 
-  if (checked1) nomeServicosSelecionados.push('Alimentação');
-  if (checked2) nomeServicosSelecionados.push('Higiene Pessoal');
-  if (checked3) nomeServicosSelecionados.push('Medicação');
-  if (checked4) nomeServicosSelecionados.push('Locomoção');
-  if (abrir && texto.trim() !== '') nomeServicosSelecionados.push(texto.trim());
-  const [checkedE, setCheckedE] = useState(false);
+  // Endereços aqui 
+  const [modalVisivel, setModalVisivel] = useState(false);
+  const [tipoEndereco, setTipoEndereco] = useState(null);
+  const [enderecoUsuario, setEnderecoUsuario] = useState("");
+  const [enderecoOrigem, setEnderecoOrigem] = useState("");
+  const [enderecoDestino, setEnderecoDestino] = useState("");
+  const [enderecosCadastrados, setEnderecosCadastrados] = useState([
+    { id: 1, nome: "Casa", endereco: "Rua das Flores, 123" },
+    { id: 2, nome: "Hospital", endereco: "Hospital Central, 45" },
+  ]);
 
-    const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('idoso');
-    const [items, setItems] = useState([
-      { label: 'Idoso', value: 'idoso' },
-      { label: 'Familiar', value: 'familiar' },
-    ]);
+  //Dropdownzin aqui
+  const [genero, setGenero] = useState(null);
+  const [openGenero, setOpenGenero] = useState(false);
+  const [itemsGenero, setItemsGenero] = useState([
+    { label: 'Homem', value: 'homem' },
+    { label: 'Mulher', value: 'mulher' },
+    { label: 'Tanto faz', value: 'tanto_faz' },
+  ]);
 
-  const formatarData = (texto) => {
-  // Remove tudo que não é número
-  let numeros = texto.replace(/\D/g, '');
+  const totalEtapas = 5;
 
-  // Limita a 8 dígitos
-  if (numeros.length > 8) numeros = numeros.slice(0, 8);
+  const formatarData = (date) => {
+    const dia = date.getDate().toString().padStart(2, "0");
+    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
+    const ano = date.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  };
 
-  // Formata DD/MM/AAAA
-  if (numeros.length >= 5) {
-    numeros = numeros.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
-  } else if (numeros.length >= 3) {
-    numeros = numeros.replace(/(\d{2})(\d{1,2})/, '$1/$2');
-  }
+  const formatarHora = (date) => {
+    const hora = date.getHours().toString().padStart(2, "0");
+    const minuto = date.getMinutes().toString().padStart(2, "0");
+    return `${hora}:${minuto}`;
+  };
 
-  setDataNascUsuario(numeros);
+  const abrirDatePicker = () => {
+    if (Platform.OS === "web") {
+      const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
+      if (dataSelecionada) {
+        const [ano, mes, dia] = dataSelecionada.split("-");
+        setData(`${dia}/${mes}/${ano}`);
+      }
+    } else {
+      DateTimePickerAndroid.open({
+        value: new Date(),
+        mode: "date",
+        onChange: (event, selectedDate) => {
+          if (selectedDate) setData(formatarData(selectedDate));
+        },
+      });
+    }
+  };
 
-
-};
-
-  const totalEtapas = 3;
+  const abrirTimePicker = (setHorario) => {
+    if (Platform.OS === "web") {
+      const hora = prompt("Digite o horário (hh:mm):");
+      if (hora) setHorario(hora);
+    } else {
+      DateTimePickerAndroid.open({
+        value: new Date(),
+        mode: "time",
+        is24Hour: true,
+        onChange: (event, selectedDate) => {
+          if (selectedDate) setHorario(formatarHora(selectedDate));
+        },
+      });
+    }
+  };
 
   const Progresso = () => (
     <View style={styles.progressContainer}>
@@ -78,87 +109,75 @@ export default function Cadastro({ navigation }) {
     </View>
   );
 
- //esse goBack faz volta pra tela anterior
+  const nomeServicosSelecionados = [];
+  if (checked1) nomeServicosSelecionados.push('Acompanhamento Médico');
+  if (checked2) nomeServicosSelecionados.push('Acompanhamento Domiciliar');
+  if (checked3) nomeServicosSelecionados.push('Locomoção');
+  if (checked4) nomeServicosSelecionados.push('Outro');
+  if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+
   return (
     <View style={styles.container}>
+      
       <View style={styles.nav}>
-        <TouchableOpacity onPress={() => navigation.goBack()}> 
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
-        </TouchableOpacity> 
-    
-
+        </TouchableOpacity>
         <Text style={styles.navTitulo}>Agendamento</Text>
-
-        <TouchableOpacity onPress={() =>navigation.navigate('configuracoes')}>
+        <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
           <Ionicons name="settings-outline" size={28} color={colors.preto} />
         </TouchableOpacity>
-      </View> 
+      </View>
 
-    
+      {etapa === 1 && (
+        <View style={styles.form}>
+          <Progresso />
+          <Text style={styles.title}>Sobre o Serviço, Responda:</Text>
+          <Image source={require('../../assets/images/cronograma.png')} style={styles.image} />
 
-{etapa === 1 && (
-  <View style={styles.form}>
-    <Progresso />
+          <TouchableOpacity style={styles.input} onPress={abrirDatePicker}>
+            <Text style={styles.inputText}>{data || "Escolha a Data"}</Text>
+          </TouchableOpacity>
 
-              <Text style={styles.title}>Sobre o Serviço, Responda:</Text>
-    <Image
-      source={require('../../assets/images/cronograma.png')}
-      style={styles.image}
-    />
+          <TouchableOpacity style={styles.input} onPress={() => abrirTimePicker(setHorarioIn)}>
+            <Text style={styles.inputText}>{horarioIn || "Horário de Início"}</Text>
+          </TouchableOpacity>
 
-    <TextInput
-      style={styles.input}
-      placeholder="Qual vai ser a Data?"
-      onChangeText={setData}
-    />
+          <TouchableOpacity style={styles.input} onPress={() => abrirTimePicker(setHorarioT)}>
+            <Text style={styles.inputText}>{horarioT || "Horário de Término"}</Text>
+          </TouchableOpacity>
 
-    <TextInput
-      style={styles.input}
-      placeholder="Qual o Horário de Inicio?"
-      onChangeText={setHorarioIn}
-    />
-
-    <TextInput
-      style={styles.input}
-      placeholder="Qual o Horário de Término?"
-      onChangeText={setHorarioT}
-    />
-
-
-    <View style={styles.botoes}>
-      <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
-        <Text style={styles.buttonText}>Próximo</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-)}
-
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+              <Text style={styles.buttonText}>Próximo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
 
       {etapa === 2 && (
         <View style={styles.form}>
           <Progresso />
-          <Text style={styles.title}>Qual o Endereço do Serviço?</Text>
-            <Image
-              source={require('../../assets/images/mapa.png')}
-              style={styles.image}
-            />
+          <Text style={styles.title}>Dentre essas opções, para que precisa de um cuidador?</Text>
+          <Image source={require('../../assets/images/cuidador.png')} style={styles.image} />
 
-          <TextInput 
-          style={styles.input} 
-          placeholder="Casa (endereço ja cadastrado)" 
-          value={enderecoUsuario}
-          onChangeText={enderecoUsuario}
-          />
-
-          <TouchableOpacity 
-            style={styles.outros}
-            onPress={() => setAbrir(!abrir)}
-          >
-            <Text style={styles.outrosText}>Adicionar Endereço </Text>
-            <Ionicons name="add-circle" size={32} color= "#a4e9e5" />
-          </TouchableOpacity>
-
-
+          <View style={styles.checkboxContainer}>
+            {[ 
+              { label: "Acompanhamento Médico", checked: checked1, setChecked: setChecked1 },
+              { label: "Acompanhamento Domiciliar", checked: checked2, setChecked: setChecked2 },
+              { label: "Locomoção", checked: checked3, setChecked: setChecked3 },
+              { label: "Outro", checked: checked4, setChecked: setChecked4 },
+            ].map((item, i) => (
+              <View key={i} style={styles.checkboxes}>
+                <Checkbox
+                  status={item.checked ? 'checked' : 'unchecked'}
+                  onPress={() => item.setChecked(!item.checked)}
+                  color={colors.azul}
+                />
+                <Text style={styles.checkOpicoes}>{item.label}</Text>
+              </View>
+            ))}
+          </View>
 
 
           <View style={styles.botoes}>
@@ -174,221 +193,363 @@ export default function Cadastro({ navigation }) {
 
       {etapa === 3 && (
         <View style={styles.form}>
-            <Progresso />
-          <Text style={styles.title}>Para que precisa de um cuidador?</Text>
+          <Progresso />
+            <Text style={styles.title}>Nos de uma breve descrição do que precisa</Text> 
+            <Image source={require('../../assets/images/idoso.png')} style={styles.image} />
 
-    <Image
-      source={require('../../assets/images/cuidador.png')}
-      style={styles.image}
-    />
-
-          <View style={styles.checkboxContainer}>
-             
-             <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked1 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked1(!checked1)}
-                  color={colors.azul}
-                />
-                <Text style={styles.checkOpicoes}>Acompanhamento Médico</Text>
-              </View>
-             
-              <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked2 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked2(!checked2)}
-                  color={colors.azul}
-                />
-                <Text style={styles.checkOpicoes}>Acompanhamento Domiciliar</Text>
-              </View>
-
-              <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked3 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked3(!checked3)}
-                  color={colors.azul}
-                />
-                <Text style={styles.checkOpicoes}>Acompanhamento Médico</Text>
-              </View>
-            </View>
-
-          <TouchableOpacity 
-            style={styles.outros}
-            onPress={() => setAbrir(!abrir)}
-          >
-            <Text style={styles.outrosText}>Outros Cuidados </Text>
-            <Ionicons name="add-circle" size={32} color= "#a4e9e5" />
-          </TouchableOpacity>
-
+            <TextInput
+              style={styles.inputDescricao}
+              placeholder="Descreva suas necessidades..."
+              value={textoOutro}
+              onChangeText={setTextoOutro}
+              multiline={true}          
+              numberOfLines={4}          
+              textAlignVertical="top"
+            />
 
           <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={()=>navigation.navigate('Home')}>
-              <Text style={styles.buttonText}>Finalizar</Text>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+              <Text style={styles.buttonText}>Próximo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        )}
+
+      {etapa === 4 && (
+        <View style={styles.form}>
+          <Progresso />
+          <Text style={styles.title}>Qual o Endereço do Serviço?</Text>
+          <Image source={require('../../assets/images/mapa.png')} style={styles.image} />
+
+          {checked3 ? (
+            <>
+              <Pressable onPress={() => { setTipoEndereco("origem"); setModalVisivel(true); }}>
+                <View pointerEvents="none">
+                  <TextInput 
+                    style={styles.input} 
+                    placeholder="Endereço de Origem" 
+                    value={enderecoOrigem} 
+                    editable={false} 
+                />
+                </View>
+              </Pressable>
+              <Pressable onPress={() => { setTipoEndereco("destino"); setModalVisivel(true); }}>
+                <View pointerEvents="none">
+                  <TextInput 
+                    style={styles.input} 
+                    placeholder="Endereço de Destino"
+                    value={enderecoDestino} 
+                    editable={false} 
+                />
+                </View>
+              </Pressable>
+            </>
+          ) : (
+            <Pressable onPress={() => { setTipoEndereco("usuario"); setModalVisivel(true); }}>
+              <View pointerEvents="none">
+                <TextInput 
+                  style={styles.input} 
+                  placeholder="Selecione um endereço" 
+                  value={enderecoUsuario} 
+                  editable={false} 
+                />
+              </View>
+            </Pressable>
+          )}
+
+          <Modal visible={modalVisivel} transparent animationType="slide" onRequestClose={() => setModalVisivel(false)}>
+            <View style={styles.modalFundo}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitulo}>Escolha um endereço</Text>
+                <FlatList
+                  data={enderecosCadastrados}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.enderecoItem}
+                      onPress={() => {
+                        if (tipoEndereco === "usuario") setEnderecoUsuario(item.endereco);
+                        if (tipoEndereco === "origem") setEnderecoOrigem(item.endereco);
+                        if (tipoEndereco === "destino") setEnderecoDestino(item.endereco);
+                        setModalVisivel(false);
+                      }}
+                    >
+                      <Text style={styles.enderecoNome}>{item.nome}</Text>
+                      <Text style={styles.enderecoTexto}>{item.endereco}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+
+                <TouchableOpacity style={styles.outros} onPress={() => setAbrir(!abrir)} > 
+                  <Text style={styles.outrosText}>Adicionar novo Endereço </Text> <Ionicons name="add-circle" size={32} color= "#a4e9e5" />
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.fecharModal} onPress={() => setModalVisivel(false)}>
+                  <Text style={styles.fecharText}>Fechar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(5)}>
+              <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
+
+      {etapa === 5 && (
+        <View style={styles.form}>
+          <Progresso />
+            <Text style={styles.title}>Tem Preferencia de Gênero?</Text> 
+            <Image source={require('../../assets/images/sexologia.png')} style={styles.image} />
+
+              <DropDownPicker
+                open={openGenero}
+                value={genero}
+                items={itemsGenero}
+                setOpen={setOpenGenero}
+                setValue={setGenero}
+                setItems={setItemsGenero}
+                placeholder="Selecione uma opção"
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+              />
+
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Finalizar</Text>
+            </TouchableOpacity>
+          </View>
+
+
+        </View>
+        )}
     </View>
+
+    
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.branco,
-    alignItems: "center",
-   
-  },
-  nav: {
-    width: "100%",
-    paddingTop: Platform.OS === "web" ? 20 : 45,
-    paddingBottom: Platform.OS === "web" ? 10 : 10,
-    paddingHorizontal: Platform.OS === "web" ? 40 : 20,
-    height: Platform.OS === "web" ? height * 0.12 : height * 0.1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: colors.azul,
-  },
-  navTitulo: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: colors.preto,
-  },
-  image: {
-    width: 120,
-    height: 120,
-    marginBottom: 40,
-  },
-  botoes: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "80%",
-    marginBottom: 15,
-  },
-  bFoto: {
-    flex: 1,
-    height: 50,
-    backgroundColor: colors.azul,
-    borderColor: colors.preto,
-    borderWidth: 2,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
-    marginHorizontal: 5,
-     marginTop: 10,
-  },
-  progressContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 50,
-    gap: 10,
-    position: 'relative', // importante
-    zIndex: 20,           // maior que logo
-  },
-  progressStep: {
-    width: 40,
-    height: 8,
-    borderRadius: 5,
-  },
-  form: {
-    width: "100%",
-    alignItems: "center",
-    marginTop: 60, 
-  },
-  outros: { 
-    justifyContent: 'flex-start',
-    flexDirection: 'row',
-    marginBottom: 10,
-    marginLeft: 30,
-  },
-  outrosText: {
-    fontSize: 20,
-    color: colors.preto,
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    alignItems: "center" 
   },
 
-  input: {
-    width: width * 0.8,
-    height: 50,
-    borderWidth: 2,
-    borderColor: colors.preto,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 20,
-    fontSize: 16,
-    backgroundColor: colors.branco,
+  nav: { 
+    width: "100%", 
+    paddingTop: Platform.OS === "web" ? 20 : 45, 
+    paddingBottom: 10, 
+    paddingHorizontal: Platform.OS === "web" ? 40 : 20, 
+    height: Platform.OS === "web" ? height * 0.12 : height * 0.1, 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    backgroundColor: colors.azul 
   },
-  button: {
-    width: width * 0.5,
-    height: 50,
-    backgroundColor: colors.azul,
-    borderColor: colors.preto,
-    borderWidth: 2,
-    justifyContent: "center",
+
+  navTitulo: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    color: colors.preto 
+  },
+
+  form: { 
+    width: "100%", 
+    alignItems: "center", 
+    marginTop: 60 
+  },
+
+  title: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    marginBottom: 20, 
+    color: colors.preto ,
     alignItems: "center",
-    borderRadius: 10,
+    textAlign: "center",
+    padding: 10,
+  },
+
+  image: { 
+    width: 120, 
+    height: 120, 
+    marginBottom: 40
+   },
+  input: { 
+    width: width * 0.8, 
+    height: 50, 
+    borderWidth: 2, 
+    borderColor: colors.preto, 
+    borderRadius: 10, 
+    paddingHorizontal: 15, 
+    marginBottom: 20, 
+    justifyContent: "center", 
+    backgroundColor: colors.branco
+   },
+
+   inputDescricao: { 
+    width: width * 0.8, 
+    height: 90, 
+    borderWidth: 2, 
+    borderColor: colors.preto, 
+    borderRadius: 10, 
+    paddingHorizontal: 15, 
+    marginBottom: 20, 
+    justifyContent: "center", 
+    backgroundColor: colors.branco
+   },
+
+  inputText: { 
+    fontSize: 16 
+  },
+
+  botoes: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    width: width * 0.8, 
+    marginBottom: 15 
+  },
+
+  bFoto: { 
+    flex: 1, 
+    height: 50, 
+    backgroundColor: colors.azul, 
+    borderColor: colors.preto, 
+    borderWidth: 2, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    borderRadius: 10, 
+    marginHorizontal: 5, 
+    marginTop: 10 
+  },
+
+  buttonText: { 
+    color: colors.preto, 
+    fontSize: 18,
+     fontWeight: "600" 
+  },
+
+  progressContainer: { 
+    flexDirection: "row", 
+    justifyContent: "center", 
+    marginBottom: 50, 
+    gap: 10 
+  },
+
+  progressStep: { 
+    width: 40, 
+    height: 8, 
+    borderRadius: 5 
+  },
+
+  checkboxContainer: { 
+    flexDirection: "column", 
+    alignItems: 'center', 
+    marginBottom: 10 
+  },
+
+  checkboxes: { 
+    flexDirection: 'row', 
+    alignItems: 'center',
+     marginBottom: 12 
+  },
+
+  checkOpicoes: { 
+    fontSize: 20, 
+    color: colors.preto, 
+    width: 250 
+  },
+  outros: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginLeft: 30, 
+    marginBottom: 10, 
     marginTop: 10,
   },
-  buttonText: {
-    color: colors.preto,
-    fontSize: 18,
-    fontWeight: "600",
+  outrosText: { 
+    fontSize: 20, 
+    color: colors.preto 
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-    color: colors.preto,
+  modalFundo: { 
+    flex: 1, 
+    backgroundColor: "rgba(0,0,0,0.5)", 
+    justifyContent: "center", 
+    alignItems: "center" 
   },
-  dropdowncontainer: {
-  width: width * 0.8,
-  alignItems: 'center',  
-  marginBottom: 20,
-},
+  modalContainer: { 
+    width: "85%", 
+    backgroundColor: colors.branco, 
+    borderRadius: 15,
+    padding: 20, 
+    alignItems: "center"
+  },
+
+  modalTitulo: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    color: colors.preto, 
+    marginBottom: 15 
+  },
+
+  enderecoItem: {
+    width: "100%", 
+    paddingVertical: 10, 
+    borderBottomWidth: 1, 
+    borderColor: colors.cinza
+  },
+
+  enderecoNome: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    color: colors.preto
+  },
+
+  enderecoTexto: { 
+    fontSize: 16, 
+    color: colors.preto, 
+    opacity: 0.7 
+  },
+  fecharModal: { 
+    marginTop: 15, 
+    backgroundColor: colors.azul,
+    paddingVertical: 10, 
+    paddingHorizontal: 30, 
+    borderRadius: 10 
+  },
+  fecharText: { 
+    color: colors.preto, 
+    fontSize: 16, 
+    fontWeight: "bold" 
+  },
   dropdown: {
     backgroundColor: colors.branco,
-    width: width * 0.8,
     borderWidth: 2,
     borderColor: colors.preto,
     borderRadius: 10,
+    width: '80%',
     marginBottom: 20,
+    zIndex: 1000, 
+    alignSelf: 'center',
   },
   dropDownContainer: {
     backgroundColor: colors.branco,
     borderWidth: 2,
     borderColor: colors.preto,
     borderRadius: 10,
-    width: width * 0.8,
-    zIndex: 2,
+    width: '80%',
+     alignSelf: 'center',
   },
-    checkboxContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-
-  checkboxes: {
-    flexDirection: 'row',   
-    alignItems: 'center',   
-    marginBottom: 12,     
-  },
-
-  checkboxContainerE: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-
-  checkOpicoes: {
-    fontSize: 20,
-    color: colors.preto,
-    width: 210,
-  },
-
-  outrosText: {
-    fontSize: 20,
-    color: colors.preto,
-  },
-
 
 });
