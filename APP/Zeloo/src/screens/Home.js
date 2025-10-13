@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { UserContext } from "./userContext";
 import axios from "axios";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-
+import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 
 export default function Home ({ navigation, route }) {
@@ -67,7 +67,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
   });
   useEffect (() =>{
     if(user){
-    axios.get(`http://localhost:8000/api/buscarDados/${user.idUsuario}`)
+    axios.get(`${API_URL}/api/buscarDados/${user.idUsuario}`)
     .then(response =>{
       const dados = response.data.data;
       

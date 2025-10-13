@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, StyleSheet, Image, ScrollView } from 'react-native';
 import colors from './colors';
 import axios from 'axios';
-
+import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 
 export default function Contrato({ navigation }) {
@@ -13,7 +13,7 @@ export default function Contrato({ navigation }) {
         nomeProfissional: ""
     });
     useEffect(()=>{
-        axios.get(`http://localhost:8000/api/selectProfissional`)
+        axios.get(`${API_URL}/api/selectProfissional`)
         .then(response => setProfissional(response.data.data))
         .catch(error => console.log("ERRO", error));
       },[])

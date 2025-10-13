@@ -8,6 +8,7 @@ import axios from "axios";
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get("window");
+import { API_URL } from '../screens/link';
 
 export default function Cadastro({ navigation }) {
   const { setUser } = useContext(UserContext);
@@ -109,7 +110,7 @@ export default function Cadastro({ navigation }) {
 
       const partes = dataNasc.split('/');
     const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
-      const response =  await axios.post(`http://localhost:8000/api/usuario`,{nomeUsuario,telefoneUsuario, senhaUsuario,tipoUsuario:value,dataNasc: dataFormatada});
+      const response =  await axios.post(`${API_URL}/api/usuario`,{nomeUsuario,telefoneUsuario, senhaUsuario,tipoUsuario:value,dataNasc: dataFormatada});
 
       if(response.data.success){
         setUser(response.data.data);

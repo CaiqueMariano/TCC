@@ -4,6 +4,7 @@ import { View, Text, StyleSheet,TouchableOpacity, TextInput, Alert, Button,Dimen
 import DropDownPicker from 'react-native-dropdown-picker';
 import colors from './colors';
 import { UserContext } from "./userContext";
+import { API_URL } from '../screens/link';
 
 
 const { width, height } = Dimensions.get("window");
@@ -22,7 +23,7 @@ export default function Login({navigation}) {
 
   const enviarLogin = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/api/login`, {
+      const response = await axios.post(`${API_URL}/api/login`, {
         telefoneUsuario,
         senhaUsuario
       });

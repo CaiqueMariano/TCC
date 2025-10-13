@@ -5,7 +5,7 @@ import {Calendar, CalendarList, Agenda, LocaleConfig} from 'react-native-calenda
 import axios from 'axios';
 import colors from './colors';
 import { UserContext } from "./userContext";
-
+import { API_URL } from '../screens/link';
 
 const { width, height } = Dimensions.get("window");
 
@@ -117,7 +117,7 @@ export default function Login({route}) {
 
   const editarPerfilInfo = async () =>{
     try{
-      const response = await axios.put(`http://localhost:8000/api/updatePerfil/${user.idUsuario}`, {
+      const response = await axios.put(`${API_URL}/api/updatePerfil/${user.idUsuario}`, {
         nomeUsuario, telefoneUsuario, emailUsuario, dataNasc:dataSelecionada,
         ruaUsuario, numLogradouroUsuario, estadoUsuario:valorEs, bairroUsuario, cepUsuario, cidadeUsuario
         
@@ -141,7 +141,7 @@ export default function Login({route}) {
 
   useEffect (() =>{
     if(user){
-    axios.get(`http://localhost:8000/api/buscarDados/${user.idUsuario}`)
+    axios.get(`${API_URL}/api/buscarDados/${user.idUsuario}`)
     .then(response =>{
       const dados = response.data.data;
       

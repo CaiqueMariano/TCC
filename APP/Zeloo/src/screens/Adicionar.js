@@ -4,6 +4,7 @@ import colors from './colors';
 import { UserContext } from "./userContext";
 import axios from "axios";
 const { width, height } = Dimensions.get("window");
+import { API_URL } from '../screens/link';
 
 export default function Adicionar ({ navigation }) {
     const { user } = useContext(UserContext);
@@ -16,7 +17,7 @@ export default function Adicionar ({ navigation }) {
 
       const[botao,setBotao] = useState(false);
     const buscarIdoso = async() =>{
-      await axios.get(`http://localhost:8000/api/buscarIdoso/${telefoneUsuario}`)
+      await axios.get(`${API_URL}/api/buscarIdoso/${telefoneUsuario}`)
         .then(response =>{
             const dados = response.data.data;
             setUsuario(dados);

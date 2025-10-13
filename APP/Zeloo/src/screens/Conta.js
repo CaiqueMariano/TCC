@@ -4,7 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from 'axios';
 import colors from './colors';
 import { UserContext } from "./userContext";
-
+import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 export default function Conta({route, navigation}){
   
@@ -13,7 +13,7 @@ export default function Conta({route, navigation}){
 
     const excluirPerfil = async()=>{
         try{
-           await axios.delete(`http://localhost:8000/api/excluirPerfil/${user.idUsuario}`);
+           await axios.delete(`${API_URL}/api/excluirPerfil/${user.idUsuario}`);
            setMostrarExcluir(false);
            navigation.navigate("BemVindo");
     

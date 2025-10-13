@@ -7,6 +7,7 @@ import { UserContext } from "./userContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import axios from 'axios';
+import { API_URL } from '../screens/link';
 LocaleConfig.locales['pt'] = {
   monthNames: [
     'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -94,7 +95,7 @@ const [horaTerminoServico, sethoraTerminoServico] = ('10:00:00');
   
     try {
       const response = await axios.post(
-        'http://localhost:8000/api/storeServicos',
+        `${API_URL}/api/storeServicos`,
         {
           nomeServico,
           idUsuario:user.idUsuario,
