@@ -253,7 +253,7 @@ contractTitle: {
   fontSize: 16,
   fontWeight: 'bold',
   color: '#000',
-  marginBottom: 10,
+  marginTop: 10,
 },
 
 contractInfo: {
@@ -264,7 +264,7 @@ contractInfo: {
   paddingHorizontal: 12,
   width: 300,
   height: 70,
-  marginBottom: 8,
+  marginTop: 8,
 },
 
 contractIcon: {
@@ -304,6 +304,7 @@ viewMoreButton: {
   borderRadius: 12,
   alignItems: 'center',
   paddingVertical: 8,
+  marginBottom: 10,
 },
 
 viewMoreText: {
