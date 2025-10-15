@@ -24,7 +24,7 @@ import { UserProvider } from "./src/screens/userContext";
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+/*const Tab = createBottomTabNavigator();
 
 // No futuro sera configuracoes e notificacoes
 function TabRoutes() {
@@ -79,7 +79,7 @@ function TabRoutes() {
 
     </Tab.Navigator>
   );
-}
+}*/
 
 export default function App() {
   return (
@@ -90,7 +90,7 @@ export default function App() {
         <Stack.Screen name="BemVindo" component={BemVindo} />
         <Stack.Screen name="Adicionar" component={Adicionar} />
         <Stack.Screen name="Conta" component={Conta} />
-        <Stack.Screen name="Home" component={TabRoutes} />
+        <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Servico" component={Servico} />
         <Stack.Screen name="homeFamiliar" component={HomeFamiliar} />
         

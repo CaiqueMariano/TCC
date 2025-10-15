@@ -9,7 +9,7 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get("window");
 
-export default function Home ({ navigation, route }) {
+export default function Home ({ navigation}) {
 
   //FAMILIAR CONSTS
   // 🔹 Componente Bolinha Animada
@@ -155,7 +155,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
     </View>
 
     {/* BOTÃO PERFIL */}
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Perfil')}>
       <Image source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
       <Text style={styles.cardText}>Seu Perfil</Text>
     </TouchableOpacity>
@@ -189,10 +189,11 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#fff',
     display:'hidden' ,
+   
   },
   Logo: {
     left: -210,
-    top: -124,
+    top: -110,
     position: 'absolute',
   },
   Form1: {
@@ -214,17 +215,15 @@ logout: {
   borderColor: '#ccc'
 },
 grid: {
-  
   marginTop: '35%',
   alignItems: 'center',
   overflow: 'hidden',
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'center',
-  gap: 15,
+  gap: 20,
 },
 card: {
- 
   width: 150,
   height: 100,
   backgroundColor: '#a4e9e5',
@@ -238,13 +237,14 @@ card: {
   overflow: 'visible', // garante que o ícone pode “sair”
 },
 cardcontratro: {
-  width: 340,
+  width: 345,
   height: 170,
   backgroundColor: '#a4e9e5',
   borderRadius: 20,
   alignItems: 'center',
   justifyContent: 'center',
-  margin: 12,
+  marginBottom: 20,
+  marginTop: 16,
   elevation: 5,
   paddingVertical: 15,
   paddingHorizontal: 10,
@@ -334,6 +334,7 @@ scrollContainer: {
   alignItems: 'center',
   paddingVertical: 20,
   paddingBottom: 60, // evita corte no fim
+  
 },
 
 favoritosContainer: {
