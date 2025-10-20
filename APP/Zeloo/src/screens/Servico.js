@@ -1,88 +1,53 @@
-import React, { useState, useContext } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Modal,Image, TouchableOpacity, TextInput, Platform } from 'react-native';
-import { Checkbox } from 'react-native-paper';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useContext } from "react";
+import { View, Text, TouchableOpacity, Image, Platform, StyleSheet, TextInput, Pressable, FlatList, Modal, Dimensions } from "react-native";
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
+import colors from "./colors";
 import { UserContext } from "./userContext";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import axios from 'axios';
-import { API_URL } from '../screens/link';
-LocaleConfig.locales['pt'] = {
-  monthNames: [
-    'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'
-  ],
-  monthNamesShort: [
-    'Jan','Fev','Mar','Abr','Mai','Jun',
-    'Jul','Ago','Set','Out','Nov','Dez'
-  ],
-  dayNames: [
-    'Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'
-  ],
-  dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
-  today: 'Hoje'
-};
+import { Ionicons } from '@expo/vector-icons';
+import DropDownPicker from 'react-native-dropdown-picker';
+import { Checkbox } from 'react-native-paper';
 
-LocaleConfig.defaultLocale = 'pt';
+const { width, height } = Dimensions.get("window");
 
-import colors from './colors';
+export default function Cadastro({ navigation }) {
+  const { setUser } = useContext(UserContext);
+  const [etapa, setEtapa] = useState(1);
 
-export default function Servico({navigation}) {
-    const { user } = useContext(UserContext);
-  const [modalVisible, setModalVisible] = useState(true);
-  const [modal2Visible, setModal2Visible] = useState(false);
-  const [modal3Visible, setModal3Visible] = useState(false);
-  const [modal4Visible, setModal4Visible] = useState(false);
-  const [modal5Visible, setModal5Visible] = useState(false);
-  const [modal6Visible, setModal6Visible] = useState(false);
+  const [data, setData] = useState("");
+  const [horarioIn, setHorarioIn] = useState("");
+  const [horarioT, setHorarioT] = useState("");
+  const [abrir, setAbrir] = useState(false);
 
-
-  const [texto, setTexto] = useState("Nenhum detalhe foi especificado");
-
-
-  const [textoE, setTextoE] = useState('');
-  const [abrirE, setAbrirE] = useState(false);
-
-  // Calendário
-  const [selected, setSelected] = useState({});
-  // Horario
-  const [horaInicio, setHoraInicio] = useState(null);
-  const [Mostrar, setMostrar] = useState(false);
-  const [horaFim, setHoraFim] = useState(null);
-  const [MostrarFim, setMostrarFim] = useState(false);
-const [horaInicioServico, sethoraInicioServico] = ('9:00:00');
-const [horaTerminoServico, sethoraTerminoServico] = ('10:00:00');
-  const onChangeInicio = (event, selectedTime) => {
-  const currentTime = selectedTime || horaInicio;
-  if (Platform.OS === 'android') setMostrar(false);
-  setHoraInicio(currentTime);
-  };
-
-  //Endereço
-  const [clicado, setClicado] = useState(false);
-
-
-  const onChangeFim = (event, selectedTime) => {
-  const currentTime = selectedTime || horaFim;
-  if (Platform.OS === 'android') setMostrarFim(false);
-  setHoraFim(currentTime);
-  };
+  // Checkboxes aqui 
   const [checked1, setChecked1] = useState(false);
   const [checked2, setChecked2] = useState(false);
   const [checked3, setChecked3] = useState(false);
   const [checked4, setChecked4] = useState(false);
-  const [abrir, setAbrir] = useState(false);
-  const nomeServicosSelecionados = [];
+  const [abrirOutro, setAbrirOutro] = useState(false);
+  const [textoOutro, setTextoOutro] = useState("");
 
-  if (checked1) nomeServicosSelecionados.push('Alimentação');
-  if (checked2) nomeServicosSelecionados.push('Higiene Pessoal');
-  if (checked3) nomeServicosSelecionados.push('Medicação');
-  if (checked4) nomeServicosSelecionados.push('Locomoção');
-  if (abrir && texto.trim() !== '') nomeServicosSelecionados.push(texto.trim());
-  const [checkedE, setCheckedE] = useState(false);
+  // Endereços aqui 
+  const [modalVisivel, setModalVisivel] = useState(false);
+  const [tipoEndereco, setTipoEndereco] = useState(null);
+  const [enderecoUsuario, setEnderecoUsuario] = useState("");
+  const [ruaUsuario, setRuaUsuario] = useState("");
+  const [enderecoOrigem, setEnderecoOrigem] = useState("");
+  const [enderecoDestino, setEnderecoDestino] = useState("");
+  const [enderecosCadastrados, setEnderecosCadastrados] = useState([
+    { id: 1, nome: "Casa", endereco: "Rua das Flores, 123" },
+    { id: 2, nome: "Hospital", endereco: "Hospital Central, 45" },
+  ]);
 
+  // Campos do novo endereço
+const [numLogradouroUsuario, setNumLogradouroUsuario] = useState("");
+const [bairroUsuario, setBairroUsuario] = useState("");
+const [cidadeUsuario, setCidadeUsuario] = useState("");
+const [estadoUsuario, setEstadoUsuario] = useState("");
+const [complementoEndereco, setComplementoEndereco] = useState("");
+const [cepUsuario, setCepUsuario] = useState("");
+const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
 
+/*
   const enviarDados = async () => {
     setModal5Visible(false);
     setModal6Visible(true);
@@ -113,685 +78,700 @@ const [horaTerminoServico, sethoraTerminoServico] = ('10:00:00');
         navigation.navigate('Home');
       } else {
         console.log('Erro:', response.data.message);
+
       }
-    } catch (error) {
-      console.error(error);
+    }*/
+  //Dropdownzin aqui
+  const [genero, setGenero] = useState(null);
+  const [openGenero, setOpenGenero] = useState(false);
+  const [itemsGenero, setItemsGenero] = useState([
+    { label: 'Homem', value: 'homem' },
+    { label: 'Mulher', value: 'mulher' },
+    { label: 'Tanto faz', value: 'tanto_faz' },
+  ]);
+
+   const [modalFinal, setModalFinal] = useState(false);
+
+  const totalEtapas = 5;
+
+  const formatarData = (date) => {
+    const dia = date.getDate().toString().padStart(2, "0");
+    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
+    const ano = date.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  };
+
+  const formatarHora = (date) => {
+    const hora = date.getHours().toString().padStart(2, "0");
+    const minuto = date.getMinutes().toString().padStart(2, "0");
+    return `${hora}:${minuto}`;
+  };
+
+  const abrirDatePicker = () => {
+    if (Platform.OS === "web") {
+      const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
+      if (dataSelecionada) {
+        const [ano, mes, dia] = dataSelecionada.split("-");
+        setData(`${dia}/${mes}/${ano}`);
+      }
+    } else {
+      DateTimePickerAndroid.open({
+        value: new Date(),
+        mode: "date",
+        onChange: (event, selectedDate) => {
+          if (selectedDate) setData(formatarData(selectedDate));
+        },
+      });
     }
   };
+
+  const abrirTimePicker = (setHorario) => {
+    if (Platform.OS === "web") {
+      const hora = prompt("Digite o horário (hh:mm):");
+      if (hora) setHorario(hora);
+    } else {
+      DateTimePickerAndroid.open({
+        value: new Date(),
+        mode: "time",
+        is24Hour: true,
+        onChange: (event, selectedDate) => {
+          if (selectedDate) setHorario(formatarHora(selectedDate));
+        },
+      });
+    }
+  };
+
+  const Progresso = () => (
+    <View style={styles.progressContainer}>
+      {Array.from({ length: totalEtapas }).map((_, index) => (
+        <View
+          key={index}
+          style={[
+            styles.progressStep,
+            { backgroundColor: etapa > index ? colors.azul : colors.cinza },
+          ]}
+        />
+      ))}
+    </View>
+  );
+
+  const nomeServicosSelecionados = [];
+  if (checked1) nomeServicosSelecionados.push('Acompanhamento Médico');
+  if (checked2) nomeServicosSelecionados.push('Acompanhamento Domiciliar');
+  if (checked3) nomeServicosSelecionados.push('Locomoção');
+  if (checked4) nomeServicosSelecionados.push('Outro');
+  if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+
   return (
     <View style={styles.container}>
-     
+      
+      <View style={styles.nav}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
+        </TouchableOpacity>
+        <Text style={styles.navTitulo}>Solicitação</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+          <Ionicons name="settings-outline" size={28} color={colors.preto} />
+        </TouchableOpacity>
+      </View>
 
-          {/* Agendamento - modal */}
+            <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+              <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+            </TouchableOpacity>
+          
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Escolha os cuidados que você precisa:</Text>
-            
-            <View style={styles.checkboxContainer}>
-             
-             <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked1 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked1(!checked1)}
-                  color={colors.preto}
-                />
-                <Text style={styles.checkOpicoes}>🍕Aliementação</Text>
-              </View>
-             
-              <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked2 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked2(!checked2)}
-                  color={colors.preto}
-                />
-                <Text style={styles.checkOpicoes}>🚽Higiene Pessoal</Text>
-              </View>
+      {etapa === 1 && (
+        <View style={styles.form}>
+          <Progresso />
+          <Text style={styles.title}>Sobre o Serviço, Responda:</Text>
+          <Image source={require('../../assets/images/cronograma.png')} style={styles.image} />
 
-              <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked3 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked3(!checked3)}
-                  color={colors.preto}
-                />
-                <Text style={styles.checkOpicoes}>💊Medicação</Text>
-              </View>
-
-              <View style={styles.checkboxes}>
-                <Checkbox
-                  status={checked4 ? 'checked' : 'unchecked'}
-                  onPress={() => setChecked4(!checked4)}
-                  color={colors.preto}
-                />
-                <Text style={styles.checkOpicoes}>🚗Locomoção</Text>
-              </View>
-            </View>
-
-          <TouchableOpacity 
-            style={styles.outros}
-            onPress={() => setAbrir(!abrir)}
-          >
-            <Text style={styles.outrosText}>Outros Cuidados </Text>
-            <Ionicons name="add-circle" size={32} color= "#6d9693" />
+          <TouchableOpacity style={styles.input} onPress={abrirDatePicker}>
+            <Text style={styles.inputText}>{data || "Escolha a Data"}</Text>
           </TouchableOpacity>
 
-          
-            <TextInput
-              style={styles.input}
-              placeholder="Descreva"
-              onChangeText={setTexto}
-              multiline={true}
-              numberOfLines={4}
-              textAlignVertical="top"
-              scrollEnabled={true}
-            />
-      
-          <View style={styles.butoes}>
-            <TouchableOpacity
-              style={styles.buttonF}
-              onPress={() => {
-                setModalVisible(false)
-                setModal2Visible(false);
-                setModal3Visible(false);
-                setModal4Visible(false);
-                setModal5Visible(false);
-                navigation.navigate('Home')
-              }}
-            >
-              <Text style={styles.buttonText}>Fechar</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.input} onPress={() => abrirTimePicker(setHorarioIn)}>
+            <Text style={styles.inputText}>{horarioIn || "Horário de Início"}</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.buttonP}
-              onPress={() => {
-                setModalVisible(false);
-                setModal2Visible(true);
-                
-              }}
-            >
+          <TouchableOpacity style={styles.input} onPress={() => abrirTimePicker(setHorarioT)}>
+            <Text style={styles.inputText}>{horarioT || "Horário de Término"}</Text>
+          </TouchableOpacity>
+
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
-            </View>
           </View>
         </View>
-      </Modal>
+      )}
 
-       {/* Escolha a data do serviço - Modal 2*/}
+      {etapa === 2 && (
+        <View style={styles.form}>
+          <Progresso />
+          <Text style={styles.title}>Dentre essas opções, para que precisa de um cuidador?</Text>
+          <Image source={require('../../assets/images/cuidador.png')} style={styles.image} />
 
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modal2Visible}
-        onRequestClose={() => setModal2Visible(false)}
-      >
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Escolha a data do serviço</Text>
+          <View style={styles.checkboxContainer}>
+            {[ 
+              { label: "Acompanhamento Médico", checked: checked1, setChecked: setChecked1 },
+              { label: "Acompanhamento Domiciliar", checked: checked2, setChecked: setChecked2 },
+              { label: "Locomoção", checked: checked3, setChecked: setChecked3 },
+              { label: "Outro", checked: checked4, setChecked: setChecked4 },
+            ].map((item, i) => (
+              <View key={i} style={styles.checkboxes}>
+                <Checkbox
+                  status={item.checked ? 'checked' : 'unchecked'}
+                  onPress={() => item.setChecked(!item.checked)}
+                  color={colors.azul}
+                />
+                <Text style={styles.checkOpicoes}>{item.label}</Text>
+              </View>
+            ))}
+          </View>
 
-            <Calendar
-              onDayPress={day => {
-                setSelected(prev => {
-                  const newSelected = { ...prev };
-                  if (newSelected[day.dateString]) {
-                    delete newSelected[day.dateString]; // desmarca se já estiver marcado
-                  } else {
-                    newSelected[day.dateString] = { selected: true, marked: true, selectedColor: 'blue' };
-                  }
-                  return newSelected;
-                });
-              }}
-              markedDates={selected}
-            />
+
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(1)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+              <Text style={styles.buttonText}>Próximo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {etapa === 3 && (
+        <View style={styles.form}>
+          <Progresso />
+            <Text style={styles.title}>Nos de uma breve descrição do que precisa</Text> 
+            <Image source={require('../../assets/images/idoso.png')} style={styles.image} />
 
             <TextInput
-              style={styles.inputC}
-              editable={false}
-              placeholder="Data Escolhida 📅"
-              value={
-                Object.keys(selected)[0]
-                  ? new Date(Object.keys(selected)[0]).toLocaleDateString('pt-BR')
-                  : ''
-              }
+              style={styles.inputDescricao}
+              placeholder="Descreva suas necessidades..."
+              value={textoOutro}
+              onChangeText={setTextoOutro}
+              multiline={true}          
+              numberOfLines={4}          
+              textAlignVertical="top"
             />
 
-            <View style={styles.butoes}>
-              <TouchableOpacity
-                  style={styles.buttonV} 
-                  onPress={() => {
-                    setModal2Visible(false)
-                    setModalVisible(true)
-                  }}
-                >
-                <Text style={styles.buttonText}>Voltar</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                  style={styles.buttonP}
-                  onPress={() => {
-                     setModal2Visible(false)
-                     setModal4Visible(false)
-                     setModal5Visible(false)
-                     setModal3Visible(true)
-                  }}
-                >
-                <Text style={styles.buttonText}>Próximo</Text>
-              </TouchableOpacity>
-              </View>
-            </View>
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+              <Text style={styles.buttonText}>Próximo</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
+        </View>
+        )}
 
-      {/* horario - Modal 3 */}
+      {etapa === 4 && (
+        <View style={styles.form}>
+          <Progresso />
+          <Text style={styles.title}>Qual o Endereço do Serviço?</Text>
+          <Image source={require('../../assets/images/mapa.png')} style={styles.image} />
 
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modal3Visible}
-            onRequestClose={() => setModal3Visible(false)}
-          >
-              <View style={styles.modalBackground}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.modalText}>Escolha o Horario</Text>
-
-                  <Text style={styles.checkOpicoes}>Horario de Inicio</Text>
-                  <TouchableOpacity onPress={() => setMostrar(true)}>
-                    {Mostrar && (
-                      <DateTimePicker
-                        value={horaInicio || new Date()} // garante que sempre tenha uma data
-                        mode="time"
-                        is24Hour={true}  
-                        display="spinner" 
-                        onChange={onChangeInicio}
-                      />
-                    )}
-                    <TextInput
-                      style={styles.input}
-                      editable={false}
-                      placeholder="Inicio 🕐"
-                      value={
-                        horaInicio
-                          ? horaInicio.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                          : ''
-                      }
-                    />
-                  </TouchableOpacity>
-
-                  <Text style={styles.checkOpicoes}>Horario de Término</Text>
-                  <TouchableOpacity onPress={() => setMostrarFim(true)}>
-                    {MostrarFim && (
-                      <DateTimePicker
-                        value={horaFim || new Date()} // mesma lógica para fim
-                        mode="time"
-                        is24Hour={true}  
-                        display="spinner" 
-                        onChange={onChangeFim}
-                      />
-                    )}
-                    <TextInput
-                      style={styles.input}
-                      editable={false}
-                      placeholder="Término 🕐"
-                      value={
-                        horaFim
-                          ? horaFim.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                          : ''
-                      }
-                    />
-                  </TouchableOpacity>
-
-                  <View style={styles.butoes}>
-                    <TouchableOpacity
-                      style={styles.buttonV}
-                      onPress={() => {
-                        setModal3Visible(false);
-                        setModal2Visible(true);
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Voltar</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.buttonP}
-                      onPress={() => {
-                        setModal3Visible(false);
-                        setModal4Visible(true);
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Próximo</Text>
-                    </TouchableOpacity>
-                  </View>
+          {checked3 ? (
+            <>
+              <Pressable onPress={() => { setTipoEndereco("origem"); setModalVisivel(true); }}>
+                <View pointerEvents="none">
+                  <TextInput 
+                    style={styles.input} 
+                    placeholder="Endereço de Origem" 
+                    value={enderecoOrigem} 
+                    editable={false} 
+                />
                 </View>
+              </Pressable>
+              <Pressable onPress={() => { setTipoEndereco("destino"); setModalVisivel(true); }}>
+                <View pointerEvents="none">
+                  <TextInput 
+                    style={styles.input} 
+                    placeholder="Endereço de Destino"
+                    value={enderecoDestino} 
+                    editable={false} 
+                />
+                </View>
+              </Pressable>
+            </>
+          ) : (
+            <Pressable onPress={() => { setTipoEndereco("usuario"); setModalVisivel(true); }}>
+              <View pointerEvents="none">
+                <TextInput 
+                  style={styles.input} 
+                  placeholder="Selecione um endereço" 
+                  value={enderecoUsuario} 
+                  editable={false} 
+                />
               </View>
-          </Modal>
+            </Pressable>
+          )}
 
-          {/* Local do serviço - Modal 4*/}
+<Modal visible={modalVisivel} transparent animationType="slide" onRequestClose={() => setModalVisivel(false)}>
+  <View style={styles.modalFundo}>
+    <View style={styles.modalContainer}>
+      {!abrir ? (
+        <>
+          <Text style={styles.modalTitulo}>Escolha um endereço</Text>
 
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modal4Visible}
-            onRequestClose={() => setModal4Visible(false)}
-          >
-              <View style={styles.modalBackground}>
-                <View style={styles.modalContent}>
-                  <Text style={styles.modalText}>Escolha o Endereço do serviço</Text>
+          <FlatList
+            data={enderecosCadastrados}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.enderecoItem}
+                onPress={() => {
+                  if (tipoEndereco === "usuario") setEnderecoUsuario(item.endereco);
+                  if (tipoEndereco === "origem") setEnderecoOrigem(item.endereco);
+                  if (tipoEndereco === "destino") setEnderecoDestino(item.endereco);
+                  setModalVisivel(false);
+                }}
+              >
+                <Text style={styles.enderecoNome}>{item.nome}</Text>
+                <Text style={styles.enderecoTexto}>{item.endereco}</Text>
+              </TouchableOpacity>
+            )}
+          />
 
+          <TouchableOpacity style={styles.outros} onPress={() => setAbrir(true)}>
+            <Text style={styles.outrosText}>Adicionar novo Endereço</Text>
+            <Ionicons name="add-circle" size={32} color="#a4e9e5" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.fecharModal} onPress={() => setModalVisivel(false)}>
+            <Text style={styles.fecharText}>Fechar</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          <Text style={styles.modalTitulo}>Cadastrar novo endereço</Text>
           
-          <TouchableOpacity onPress={() => setClicado(!clicado)}>
-              <View style={[styles.EndereçoContainer, clicado && styles.EnderVerde]}>
-                <Text style={styles.Endereço}> 🏠 Endereço Padrão</Text>
-              </View>
-        </TouchableOpacity>
-                 
 
-                      <TouchableOpacity 
-                        style={styles.outros}
-                        onPress={() => setAbrirE(!abrirE)}
-                      >
-                        <Text style={styles.outrosText}>Outro Endereço </Text>
-                        <Ionicons name="add-circle" size={32} color= "#6d9693" />
-                      </TouchableOpacity>
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Nome do endereço (ex: Casa, Trabalho)"
+            value={nomeNovoEndereco}
+            onChangeText={setNomeNovoEndereco}
+          />
 
-                      {abrirE && (
-                        <TextInput
-                          style={styles.input}
-                          placeholder="Digite ou fale o Endereço"
-                          value={textoE}
-                          onChangeText={setTextoE}
-                          multiline={true}
-                          numberOfLines={4}
-                          textAlignVertical="top"
-                          scrollEnabled={true}
-                        />
-                      )}
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="CEP"
+            keyboardType="numeric"
+            value={cepUsuario}
+            onChangeText={setCepUsuario}
+          />
 
-                  <View style={styles.butoes}>
-                    <TouchableOpacity
-                      style={styles.buttonV}
-                      onPress={() => {
-                        setModal4Visible(false);
-                        setModal3Visible(true);
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Voltar</Text>
-                    </TouchableOpacity>
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Rua / Avenida"
+            value={ruaUsuario}
+            onChangeText={setRuaUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Número"
+            keyboardType="numeric"
+            value={numLogradouroUsuario}
+            onChangeText={setNumLogradouroUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Bairro"
+            value={bairroUsuario}
+            onChangeText={setBairroUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Complemento (Apto, Casa, Bloco...)"
+            value={complementoEndereco}
+            onChangeText={setComplementoEndereco}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Cidade"
+            value={cidadeUsuario}
+            onChangeText={setCidadeUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Estado"
+            value={estadoUsuario}
+            onChangeText={setEstadoUsuario}
+          />
 
-                    <TouchableOpacity
-                      style={styles.buttonP}
-                      onPress={() => {
-                        setModal4Visible(false);
-                        setModal5Visible(true);
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Próximo</Text>
-                    </TouchableOpacity>
-                  </View>
+          <View style={styles.botoesAdd}>
+            <TouchableOpacity
+              style={styles.bFoto}
+              onPress={() => {
+                if (
+                  nomeNovoEndereco.trim() &&
+                  ruaUsuario.trim() &&
+                  numLogradouroUsuario.trim() &&
+                  bairroUsuario.trim() &&
+                  complementoEndereco.trim() &&
+                  cidadeUsuario.trim() &&
+                  estadoUsuario.trim() &&
+                  cepUsuario.trim()
+                ) {
+                  const novo = {
+                    id: enderecosCadastrados.length + 1,
+                    nome: nomeNovoEndereco,
+                    endereco: `${ruaUsuario}, ${numLogradouroUsuario}`,
+                  };
+                  setEnderecosCadastrados((prev) => [...prev, novo]); //atualizando a lista
+                  setNomeNovoEndereco("");
+                  setRuaUsuario("");
+                  setNumLogradouroUsuario("");
+                  setBairroUsuario("");
+                  setCidadeUsuario("");
+                  setComplementoEndereco("");
+                  setCepUsuario("");
+                  setEstadoUsuario("");
+                  setAbrir(false);
+                } else {
+                  alert("Preencha todos os campos antes de salvar!");
+                }
+
+              }}
+            >
+              <Text style={styles.buttonText}>Salvar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bFoto, { backgroundColor: colors.cinza }]}
+              onPress={() => setAbrir(false)}
+            >
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+    </View>
+  </View>
+</Modal>
+
+
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(5)}>
+              <Text style={styles.buttonText}>Próximo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {etapa === 5 && (
+        <View style={styles.form}>
+          <Progresso />
+            <Text style={styles.title}>Tem Preferencia de Gênero?</Text> 
+            <Image source={require('../../assets/images/sexologia.png')} style={styles.image} />
+
+              <DropDownPicker
+                open={openGenero}
+                value={genero}
+                items={itemsGenero}
+                setOpen={setOpenGenero}
+                setValue={setGenero}
+                setItems={setItemsGenero}
+                placeholder="Selecione uma opção"
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+              />
+
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.bFoto} onPress={() =>  setModalFinal(true)}>
+              <Text style={styles.buttonText}>Finalizar</Text>
+            </TouchableOpacity>
+          </View>
+
+          <Modal visible={modalFinal} transparent animationType="slide" onRequestClose={() => setModalFinal(false)}>
+            <View style={styles.modalFundo}>
+              <View style={styles.modalContainer}>
+
+                <Text style={styles.modalTitulo}>Solicitação Feita com Sucesso!</Text>
+                <Text style={styles.modalSubTitulo}>Você receberá uma notificação quando um cuidador aceitar sua solicitação!</Text>
+
+                <View style={styles.botoes}>
+                  <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.buttonText}>Entendi</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
+            </View>
           </Modal>
 
-          {/* Confirmação - Modal 5*/}
 
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modal5Visible}
-            onRequestClose={() => setModal5Visible(false)}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalText}>Confirmação</Text>
-
-          <View style={styles.perfil}>
-              {/*} <Image
-                source={ require('./assets/images/perfil.png') }
-                style={styles.foto}
-              />*/}
-              <Text style={styles.nome}>Alyssa de Alveredo</Text>
-            </View>
-
-            <Text style={styles.info}>Data:</Text>
-
-              <Text style={styles.dataTexto}>
-                {Object.keys(selected)[0]
-                  ? new Date(Object.keys(selected)[0]).toLocaleDateString('pt-BR')
-                  : 'Data 📅'}
-              </Text>
-
-              <Text style={styles.nome}>Horario:</Text>
-
-              <Text style={styles.horarioTexto}>
-                {horaInicio && horaFim
-                  ? `${horaInicio.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${horaFim.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                  : 'Horário 🕐'}
-              </Text>
-
-              
-
-              <Text style={styles.nome}>Local:</Text>
-
-              <Text style={styles.nome}>Cuidados:</Text>
-                
-             <View style={styles.butoes}>
-                    <TouchableOpacity
-                      style={styles.buttonV}
-                      onPress={() => {
-                        setModal5Visible(false);
-                        setModal4Visible(true);
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Voltar</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.buttonP}
-                      onPress={enviarDados}
-                    >
-                      <Text style={styles.buttonText}>Confirmar</Text>
-                    </TouchableOpacity>
-                  </View>
-              </View>
-            </View>
-           
-          </Modal>
-
-      {/* PRONTO  - Modal 6*/}
-
-        <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modal6Visible}
-            onRequestClose={() => setModal6Visible(false)}
-          >
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContent}>
-                <Text style={styles.modalText}>Seu serviço foi enviado com sucesso!</Text>
-
-            <Text style={styles.TextF}>Por favor aguarde uma resposta do cuidador</Text>
-
-             <View style={styles.butoes}>
-                    <TouchableOpacity
-                      style={styles.buttonCC}
-                      onPress={() => {
-                        setModal6Visible(false);
-                        setModal5Visible(false);
-                        setModal4Visible(false);
-                        setModal3Visible(false);
-                        setModal2Visible(false);
-                        setModalVisible(false);
-                        navigation.navigate('Home')
-                      }}
-                    >
-                      <Text style={styles.buttonText}>Finalizar</Text>
-                    </TouchableOpacity>
-                  </View>
-              </View>
-            </View>
-           
-          </Modal>
-
-      <StatusBar style="auto" />
+        </View>
+        )}
     </View>
+
+    
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.branco, 
+    alignItems: "center" 
   },
 
-  TextF: {
-    fontSize: 20,
-    color: colors.preto,
-    textAlign: 'center',
-  },
+  soundButton: {
+    position: 'absolute',
+    top: 430, 
+    right: 15, 
+    width: 45,
+    height: 45,
+    borderRadius: 30,
 
-  EndereçoContainer: {
-  borderWidth: 1,
-  borderColor: colors.cinza,
-  padding: 10,
-  borderRadius: 8,
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 12,
-  width: 300,
-  height: 60,
-},
-EnderVerde: {
-  backgroundColor: colors.verde,
-},
-
-  Endereço: {
-    fontSize: 20,
-    color: colors.preto,
-    width: 210,
-  },
-    
- /* foto */
-  foto: {
-    width: 120,
-    height: 120,    
-    marginRight: 1,     
-  },
-
-  /* Nome */
-  nome: {
-    fontSize: 20,
-    color: colors.preto,
-  },
-
-  info: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: colors.texto,
-    marginBottom: 10,
-  },
-
-  /* Perfil */
-  perfil: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    marginRight: 20,
-    justifyContent: 'center',
-  },
-
-  /* Butoes */
-
-  button: {
-    backgroundColor: colors.primaria,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-
-  },
-
-  // Confirmar
-
-    buttonCC: {
-    backgroundColor: colors.primaria,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-    width: 130,
-  },
-
-
-   /* Fechar */
-
-  buttonF: {
-    backgroundColor: colors.vermelho,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-    width: 130,
-  },
-
-   /* Próximo */
-
-  buttonP: {
-    backgroundColor: colors.primaria,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-    width: 130,
-    marginLeft: 10,
-  },
-
-    /* Cancelar */
-
-  buttonC: {
-    backgroundColor: colors.vermelho,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-    width: 130,
-    marginRight: 10,
-  },
-
-    /* Voltar */
-
-  buttonV: {
-    backgroundColor: colors.cinzaC,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-    width: 130,
-  },
-
-    /* Voltar - grande */
-
-  buttonVV: {
-    backgroundColor: colors.cinzaC,
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 20,
-    alignItems: 'center',
-    width: 300,
-  },
-
-  buttonText: {
-    fontWeight: 'bold',
-    fontSize: 20,
-  },
-
-  butoes: {
-    flexDirection: 'row',
-    padding: 12,
-    marginTop: 10,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    justifyContent: 'center',
-  },
-
-   /* Sim e Não */
-
-  butSN: {
-    padding: 12,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    justifyContent: 'center',
-  },
-
-   /* Modais */
-
-  modalBackground: {
-    flex: 1,
-    backgroundColor: 'rgba(58,88,86, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    elevation: 10,
+    zIndex: 1002,
+  },
+  soundIcon: {
+    width: 65,
+    height: 65,
   },
 
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 22,
-    borderRadius: 10,
-    width: '80%',
+  nav: { 
+    width: "100%", 
+    paddingTop: Platform.OS === "web" ? 20 : 45, 
+    paddingBottom: 10, 
+    paddingHorizontal: Platform.OS === "web" ? 40 : 20, 
+    height: Platform.OS === "web" ? height * 0.12 : height * 0.1, 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    backgroundColor: colors.azul 
   },
 
-  modalText: {
-    fontSize: 25,
-    marginBottom: 10,
-    color: colors.preto,
-    textAlign: 'center',
+  navTitulo: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    color: colors.preto 
+  },
+
+  form: { 
+    width: "100%", 
+    alignItems: "center", 
+    marginTop: 60 
+  },
+
+  title: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    marginBottom: 20, 
+    color: colors.preto ,
+    alignItems: "center",
+    textAlign: "center",
     padding: 10,
   },
 
-   /* CheckBox */
+  image: { 
+    width: 120, 
+    height: 120, 
+    marginBottom: 40
+   },
+  input: { 
+    width: width * 0.8, 
+    height: 50, 
+    borderWidth: 2, 
+    borderColor: colors.preto, 
+    borderRadius: 10, 
+    paddingHorizontal: 15, 
+    marginBottom: 20, 
+    justifyContent: "center", 
+    backgroundColor: colors.branco
+   },
 
-  checkboxContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: 10,
+   inputDescricao: { 
+    width: width * 0.8, 
+    height: 90, 
+    borderWidth: 2, 
+    borderColor: colors.preto, 
+    borderRadius: 10, 
+    paddingHorizontal: 15, 
+    marginBottom: 20, 
+    justifyContent: "center", 
+    backgroundColor: colors.branco
+   },
+
+  inputText: { 
+    fontSize: 16 
   },
 
-  checkboxes: {
-    flexDirection: 'row',   
-    alignItems: 'center',   
-    marginBottom: 12,     
+  botoes: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    width: width * 0.8, 
+    marginBottom: 15 
   },
 
-  checkboxContainerE: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: 10,
+  bFoto: { 
+    flex: 1, 
+    height: 50, 
+    backgroundColor: colors.azul, 
+    borderColor: colors.preto, 
+    borderWidth: 2, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    borderRadius: 10, 
+    marginHorizontal: 5, 
+    marginTop: 10 
   },
 
-  checkOpicoes: {
-    fontSize: 20,
-    color: colors.preto,
-    width: 210,
-  },
-
-  outrosText: {
-    fontSize: 20,
-    color: colors.preto,
-  },
-
-  outros: { 
-    justifyContent: 'flex-start',
-    flexDirection: 'row',
-    marginBottom: 10,
-    marginLeft: 30,
-  },
-
-  label: {
+  buttonText: { 
+    color: colors.preto, 
     fontSize: 18,
-    marginBottom: 8,
+     fontWeight: "600" 
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 25,
-    borderRadius: 8,
+  modalSubTitulo: { 
+    fontSize: 18,     
+    color: colors.preto,
+    textAlign: "center",
     marginBottom: 20,
-    color: colors.cinza,
-    fontSize: 18,
   },
 
-  inputC: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 25,
-    borderRadius: 8,
-    marginTop: 20,
-    color: colors.cinza,
-    fontSize: 18,
+  progressContainer: { 
+    flexDirection: "row", 
+    justifyContent: "center", 
+    marginBottom: 50, 
+    gap: 10 
   },
+
+  progressStep: { 
+    width: 40, 
+    height: 8, 
+    borderRadius: 5 
+  },
+
+  checkboxContainer: { 
+    flexDirection: "column", 
+    alignItems: 'center', 
+    marginBottom: 10 
+  },
+
+  checkboxes: { 
+    flexDirection: 'row', 
+    alignItems: 'center',
+     marginBottom: 12 
+  },
+
+  checkOpicoes: { 
+    fontSize: 20, 
+    color: colors.preto, 
+    width: 250 
+  },
+  outros: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginLeft: 30, 
+    marginBottom: 10, 
+    marginTop: 10,
+  },
+  outrosText: { 
+    fontSize: 20, 
+    color: colors.preto 
+  },
+  modalFundo: { 
+    flex: 1, 
+    backgroundColor: "rgba(0,0,0,0.5)", 
+    justifyContent: "center", 
+    alignItems: "center" 
+  
+  },
+  modalContainer: { 
+    width: "85%", 
+    backgroundColor: colors.branco, 
+    borderRadius: 15,
+    padding: 20, 
+    alignItems: "center"
+  },
+
+  modalTitulo: { 
+    fontSize: 22, 
+    fontWeight: "bold", 
+    color: colors.preto, 
+    marginBottom: 15 ,
+    textAlign: "center",
+  },
+
+  enderecoItem: {
+    width: "100%", 
+    paddingVertical: 10, 
+    borderBottomWidth: 1, 
+    borderColor: colors.cinza
+  },
+
+  enderecoNome: { 
+    fontSize: 18, 
+    fontWeight: "bold", 
+    color: colors.preto
+  },
+
+  enderecoTexto: { 
+    fontSize: 16, 
+    color: colors.preto, 
+    opacity: 0.7 
+  },
+
+  inputNovoEndereco: {
+  width: "100%",
+  height: 50,
+  borderWidth: 2,
+  borderColor: colors.preto,
+  borderRadius: 10,
+  paddingHorizontal: 15,
+  marginBottom: 10,
+  backgroundColor: colors.branco,
+},
+botoesAdd: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  width: "100%",
+  marginTop: 10,
+},
+
+  fecharModal: { 
+    marginTop: 15, 
+    backgroundColor: colors.azul,
+    paddingVertical: 10, 
+    paddingHorizontal: 30, 
+    borderRadius: 10 
+  },
+  fecharText: { 
+    color: colors.preto, 
+    fontSize: 16, 
+    fontWeight: "bold" 
+  },
+  dropdown: {
+    backgroundColor: colors.branco,
+    borderWidth: 2,
+    borderColor: colors.preto,
+    borderRadius: 10,
+    width: '80%',
+    marginBottom: 20,
+    zIndex: 1000, 
+    alignSelf: 'center',
+  },
+  dropDownContainer: {
+    backgroundColor: colors.branco,
+    borderWidth: 2,
+    borderColor: colors.preto,
+    borderRadius: 10,
+    width: '80%',
+    alignSelf: 'center',
+  },
+
 });

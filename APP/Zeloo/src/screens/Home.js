@@ -9,7 +9,7 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 
-export default function Home ({ navigation, route }) {
+export default function Home ({ navigation}) {
 
   //FAMILIAR CONSTS
   // 🔹 Componente Bolinha Animada
@@ -94,96 +94,92 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
 
   return (
 <View style={styles.container} >
- {user.tipoUsuario ==="idoso" ?(
   <View>
    <View style={styles.Form1}></View>
    <Image 
      source={require('../../assets/images/Zeloo.png')}
      style={styles.Logo}
    />
+    <Image 
+     source={require('../../assets/images/Zeloo.png')}
+     style={styles.Logo}
+   />
  
-   <ScrollView
-     contentContainerStyle={{
-       flexGrow: 1,
-       alignItems: 'center',
-       paddingVertical: 20,
-     }}
-   >
-     <View style={styles.grid}>
-       {/* BOTÃO CUIDADORES */}
-       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Servico')}>
-         <Image source={require('../../assets/images/cuidadores.png')} style={styles.icon} />
-         <Text style={styles.cardText}>Solicitar Serviço</Text>
-       </TouchableOpacity>
- 
-       {/* BOTÃO FAVORITOS */}
-       <TouchableOpacity style={styles.card}>
-         <Image source={require('../../assets/images/favoritos.png')} style={styles.icon} />
-         <Text style={styles.cardText}>Favoritos</Text>
-       </TouchableOpacity>
- 
-       {/* BOTÃO PERFIL */}
-       <TouchableOpacity style={styles.card}>
-         <Image source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
-         <Text style={styles.cardText}>Seu Perfil</Text>
-       </TouchableOpacity>
- 
-       {/* BOTÃO LINKAGEM */}
-       <TouchableOpacity style={styles.card}>
-         <Image source={require('../../assets/images/linkagem.png')} style={styles.icon} />
-         <Text style={styles.cardText}>Linkagem</Text>
-       </TouchableOpacity>
- 
-       {/* BOTÃO CONVERSAS */}
-       <TouchableOpacity style={styles.card}>
-         <Image source={require('../../assets/images/conversas.png')} style={styles.icon} /> 
-         <Text style={styles.cardText}>Conversas</Text>
-       </TouchableOpacity>
- 
-       {/* BOTÃO FALE CONOSCO */}
-       <TouchableOpacity style={styles.card}>
-         <Image source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
-         <Text style={styles.cardText}>Fale Conosco</Text>
-       </TouchableOpacity>
-     </View>
- 
- 
-   {/* BOTÃO DE SOM FIXO */}
-   <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-     <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-   </TouchableOpacity>
-   </ScrollView>
-   </View>
- ):(
-  <View style={styles.content}>
-  {/* Card Serviço */}
-  <View style={styles.serviceCard}>
-    <Text style={styles.serviceTitle}>Serviço em Andamento</Text>
-    <View style={styles.caregiverInfo}>
-      <CaregiverAvatar />
-      <View>
-        <Text style={styles.caregiverName}>Nome Sobrenome</Text>
-        <RatingDots />
-      </View>
+ <ScrollView
+  contentContainerStyle={styles.scrollContainer}
+  showsVerticalScrollIndicator={false}
+>
+  <View style={styles.grid}>
+    {/* BOTÃO CONTRATO ATIVO MAIS RECENTE*/}
+    <View style={styles.cardcontratro}>
+  <Text style={styles.contractTitle}>Contrato ativo mais recente</Text>
+
+  <View style={styles.contractInfo}>
+    <Image 
+      source={require('../../assets/images/perfilicon.png')}
+      style={styles.contractIcon}
+    />
+    <View>
+      <Text style={styles.contractName}>Ana Maria Braga</Text>
+      <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}>Pago </Text></Text>
     </View>
   </View>
 
-  {/* Botões de ação */}
-  <View style={styles.buttonGrid}>
-    <ActionButton iconName="users" text="Cuidadores" />
-    <ActionButton iconName="heart" text="Favoritos" iconStyle={{ color: 'black' }} />
-    <ActionButton iconName="comment-dots" text="Conversas" />
-    <ActionButton onPress={() => navigation.navigate('Adicionar')} iconName="link" text="Adicionar Idoso" />
-  </View>
+  <View style={styles.separator}></View>
 
-  {/* Ícone volume */}
-  <View style={styles.volumeIconContainer}>
-    <Ionicons name="volume-medium-outline" size={40} color="#000" />
-  </View>
+  <TouchableOpacity 
+    style={styles.viewMoreButton}
+    onPress={() => navigation.navigate('Servico')}
+  >
+    <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+  </TouchableOpacity>
 </View>
- )
 
- }
+    {/* BOTÃO SOLICITAR SERVIÇO */}
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Servico')}>
+      <Image source={require('../../assets/images/cuidadores.png')} style={styles.icon} />
+      <Text style={styles.cardText}>Solicitar Serviço</Text>
+    </TouchableOpacity>
+
+    {/* BOTÃO FAVORITOS */}
+    <View style={styles.favoritosContainer}>
+      <TouchableOpacity style={styles.card}>
+        <Image source={require('../../assets/images/favoritos.png')} style={styles.icon} />
+        <Text style={styles.cardText}>Favoritos</Text>
+      </TouchableOpacity>
+
+      {/* BOTÃO DE SOM SOBREPOSTO */}
+      <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+        <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+      </TouchableOpacity>
+    </View>
+
+    {/* BOTÃO PERFIL */}
+    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Perfil')}>
+      <Image source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
+      <Text style={styles.cardText}>Seu Perfil</Text>
+    </TouchableOpacity>
+
+    {/* BOTÃO LINKAGEM */}
+    <TouchableOpacity style={styles.card}>
+      <Image source={require('../../assets/images/linkagem.png')} style={styles.icon} />
+      <Text style={styles.cardText}>Linkagem</Text>
+    </TouchableOpacity>
+
+    {/* BOTÃO CONVERSAS */}
+    <TouchableOpacity style={styles.card}>
+      <Image source={require('../../assets/images/conversas.png')} style={styles.icon} /> 
+      <Text style={styles.cardText}>Conversas</Text>
+    </TouchableOpacity>
+
+    {/* BOTÃO FALE CONOSCO */}
+    <TouchableOpacity style={styles.card}>
+      <Image source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
+      <Text style={styles.cardText}>Fale Conosco</Text>
+    </TouchableOpacity>
+  </View>
+</ScrollView>
+   </View>
 </View>
   );
 }
@@ -193,18 +189,18 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#fff',
     display:'hidden' ,
+   
   },
   Logo: {
-    left: -190,
-    top: -104,
+    left: -210,
+    top: -110,
     position: 'absolute',
   },
   Form1: {
-    width: width * 0.9,
+    width: 10000,
+    height: 150,
     aspectRatio: 2,
     backgroundColor: '#a4e9e5',
-    borderRadius: 9999,
-    transform: [{ scaleX: 1.3 }],
     position: 'absolute',
     top: -20,
     left: -60,
@@ -219,20 +215,17 @@ logout: {
   borderColor: '#ccc'
 },
 grid: {
-  
-  marginTop: '55%',
+  marginTop: '35%',
   alignItems: 'center',
   overflow: 'hidden',
-
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'center',
-  gap: 15,
+  gap: 20,
 },
 card: {
- 
-  width: 160,
-  height: 130,
+  width: 150,
+  height: 100,
   backgroundColor: '#a4e9e5',
   borderRadius: 20,
   alignItems: 'center',
@@ -243,37 +236,131 @@ card: {
   position: 'relative',
   overflow: 'visible', // garante que o ícone pode “sair”
 },
+cardcontratro: {
+  width: 345,
+  height: 170,
+  backgroundColor: '#a4e9e5',
+  borderRadius: 20,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 20,
+  marginTop: 16,
+  elevation: 5,
+  paddingVertical: 15,
+  paddingHorizontal: 10,
+},
+contractTitle: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: '#000',
+  marginTop: 10,
+},
+
+contractInfo: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  borderRadius: 15,
+  paddingVertical: 8,
+  paddingHorizontal: 12,
+  width: 300,
+  height: 70,
+  marginTop: 8,
+},
+
+contractIcon: {
+  width: 80,
+  height: 80,
+  marginRight: 10,
+  resizeMode: 'contain',
+},
+
+contractName: {
+  fontSize: 15,
+  fontWeight: 'bold',
+  color: '#000',
+},
+
+contractStatus: {
+  fontSize: 14,
+  color: '#000',
+},
+
+contractPaid: {
+  color: 'green',
+  fontWeight: 'bold',
+},
+
+separator: {
+  width: '90%',
+  height: 1,
+  backgroundColor: '#333',
+  opacity: 0.4,
+  marginVertical: 6,
+},
+
+viewMoreButton: {
+  width: '85%',
+  backgroundColor: '#a4e9e5',
+  borderRadius: 12,
+  alignItems: 'center',
+  paddingVertical: 8,
+  marginBottom: 10,
+},
+
+viewMoreText: {
+  fontSize: 15,
+  fontWeight: 'bold',
+  color: '#000',
+},
 icon: { 
-  width: 100, 
-  height: 100, 
+  width: 85, 
+  height: 85, 
   resizeMode: 'contain',
   position: 'absolute',
   top: -23,   // faz o ícone "sair" para fora
 },
 cardText: {
-  fontSize: 14,
-  fontWeight: 'bold',
+  fontSize: 15,
   textAlign: 'center',
   marginTop: 30, // empurra o texto para baixo do ícone
 },
-soundButton: {
-  position: 'absolute',   // geralmente melhor para botões flutuantes
-  bottom: 30,
-  alignSelf: 'center',
-  width: 56,
-  height: 56,
-  borderRadius: 28,      // metade do tamanho → círculo perfeito
-  backgroundColor: '#fff',
-  padding: 5,            // remove espaço interno
+cardTextcontrato: {
+  fontSize: 20,
+  textAlign: 'center',
+  marginTop: 30, // empurra o texto para baixo do ícone
+},
+scrollContainer: {
+  flexGrow: 1,
+  alignItems: 'center',
+  paddingVertical: 20,
+  paddingBottom: 60, // evita corte no fim
+  
+},
+
+favoritosContainer: {
+  position: 'relative',
   alignItems: 'center',
   justifyContent: 'center',
-  elevation: 10,
- 
 },
+
+soundButton: {
+  position: 'absolute',
+  top: 30, // sobe o botão para sobrepor o card
+  right: -10, // desloca para a direita
+  width: 45,
+  height: 45,
+  borderRadius: 30,
+
+  justifyContent: 'center',
+  alignItems: 'center',
+  elevation: 10,
+  zIndex: 10,
+},
+
 soundIcon: {
-  width: 80,
-  height: 80,
- 
+  width: 65,
+  height: 65,
+  
 },
 
 

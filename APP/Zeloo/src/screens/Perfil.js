@@ -4,12 +4,13 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import {Calendar, CalendarList, Agenda, LocaleConfig} from 'react-native-calendars';
 import axios from 'axios';
 import colors from './colors';
+import { Ionicons } from '@expo/vector-icons';
 import { UserContext } from "./userContext";
 import { API_URL } from '../screens/link';
 
 const { width, height } = Dimensions.get("window");
 
-export default function Login({route}) {
+export default function Login({navigation}) {
   const { setUser } = useContext(UserContext);
   const [abrir, setAbrir] = useState(false);
   const [valor, setValor] = useState(null);
@@ -21,123 +22,22 @@ export default function Login({route}) {
     nomeUsuario: "",
     tipoUsuario: "",
     telefoneUsuario: "",
-    emailUsuario: "",
-    
-    ruaUsuario: "",
-    numLogradouroUsuario: "",
-    estadoUsuario: "",
-    bairroUsuario: "",
-    cepUsuario: "",
-    cidadeUsuario: ""
+    dataNasc: "",
 
 
   });
-
-
-  /*ALTERÇÃO */
-  LocaleConfig.locales['pt-br'] = {
-    monthNames: [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ],
-    monthNamesShort: [
-      'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
-    ],
-    dayNames: [
-      'Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira',
-      'Quinta-feira', 'Sexta-feira', 'Sábado'
-    ],
-    dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
-    today: 'Hoje'
-  };
   
-  LocaleConfig.defaultLocale = 'pt-br';
-  
-  
-
-
-
 
   const[nomeUsuario, setNomeUsuario] = useState('');
   const[telefoneUsuario, setTelefoneUsuario] = useState('');
-  const[emailUsuario, setEmailUsuario] = useState('');
-  const[senhaUsuario, setSenhaUsuario] = useState('');
   const[tipoUsuario, setTipoUsuario] = useState('');
   const[dataNasc, setDataNasc] = useState('');
-  const[ruaUsuario, setRuaUsuario] = useState('');
-  const[numLogradouroUsuario, setNumLogradouroUsuario] = useState('');
-  const[estadoUsuario, setEstadoUsuario] = useState('');
+
   const [dataSelecionada, setDataSelecionada] = useState('');
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
-  const[bairroUsuario, setBairroUsuario] = useState('');
-  const[cepUsuario, setCepUsuario] = useState('');
+
   const [abrirEs, setAbrirEs] = useState(false);
   const [valorEs, setValorEs] = useState(null);
-  const [estados, setEstados] = useState([
-    { label: 'AC', value: 'ac' },
-    { label: 'AL', value: 'al' },
-    { label: 'AP', value: 'ap' },
-    { label: 'AM', value: 'am' },
-    { label: 'BA', value: 'ba' },
-    { label: 'CE', value: 'ce' },
-    { label: 'DF', value: 'df' },
-    { label: 'ES', value: 'es' },
-    { label: 'GO', value: 'go' },
-    { label: 'MA', value: 'ma' },
-    { label: 'MT', value: 'mt' },
-    { label: 'MS', value: 'ms' },
-    { label: 'MG', value: 'mg' },
-    { label: 'PA', value: 'pa' },
-    { label: 'PB', value: 'pb' },
-    { label: 'PR', value: 'pr' },
-    { label: 'PE', value: 'pe' },
-    { label: 'PI', value: 'pi' },
-    { label: 'RJ', value: 'rj' },
-    { label: 'RN', value: 'rn' },
-    { label: 'RS', value: 'rs' },
-    { label: 'RO', value: 'ro' },
-    { label: 'RR', value: 'rr' },
-    { label: 'SC', value: 'sc' },
-    { label: 'SP', value: 'sp' },
-    { label: 'SE', value: 'se' },
-    { label: 'TO', value: 'to' }
-  ]);
-  const[cidadeUsuario, setCidadeUsuario] = useState('');
-
-  const [items, setItems] = useState([
-    { label: 'Idoso', value: 'idoso' },
-    { label: 'Familiar', value: 'familiar' },
-
-    
-
-
-  ]);
-
-
-  const editarPerfilInfo = async () =>{
-    try{
-      const response = await axios.put(`${API_URL}/api/updatePerfil/${user.idUsuario}`, {
-        nomeUsuario, telefoneUsuario, emailUsuario, dataNasc:dataSelecionada,
-        ruaUsuario, numLogradouroUsuario, estadoUsuario:valorEs, bairroUsuario, cepUsuario, cidadeUsuario
-        
-      });
-
-      if(response.data.success){
-        setUser(response.data.data);
-        setMostrarEdicao(false);
-      }else{
-        console.log(response.data.message);
-      }
-
-
-    }catch(error){
-      console.log(error);
-    }
-  };
-
-  /*FIM DA ALTERAÇÃO*/ 
-
 
   useEffect (() =>{
     if(user){
@@ -147,13 +47,7 @@ export default function Login({route}) {
       
       setUsuario(dados);
       setNomeUsuario(dados.nomeUsuario);
-      setEmailUsuario(dados.emailUsuario);
       setTelefoneUsuario(dados.telefoneUsuario);
-      setRuaUsuario(dados.ruaUsuario);
-      setNumLogradouroUsuario(dados.numLogradouroUsuario);
-      setBairroUsuario(dados.bairroUsuario);
-      setCidadeUsuario(dados.cidadeUsuario);
-      setCepUsuario(dados.cepUsuario);
       setValorEs(dados.estadoUsuario);
       setDataSelecionada(dados.dataSelecionada);
   
@@ -169,210 +63,58 @@ export default function Login({route}) {
   return (
     <View style={styles.Container}>
 
-<View style={styles.Top}>
-  <Image 
-    source={require('../../assets/images/Zeloo.png')}
-    style={styles.Logo}
-  />
-</View>
+                  <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+                    <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+                  </TouchableOpacity>
+     
+      
+            <View style={styles.nav}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
+              </TouchableOpacity>
+                <Text style={styles.navTitulo}>Perfil</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+                <Ionicons name="settings-outline" size={28} color={colors.preto} />
+              </TouchableOpacity>
+            </View>
 
-<View style={styles.Form2}></View>
+       <View style={styles.Container3}>
 
-<TouchableOpacity onPress={() => setEditFoto(true)}>
-  <Image 
-    source={require('../../assets/images/perfil.png')}
-    style={styles.perfil}
-  />
-</TouchableOpacity>
+      <TouchableOpacity onPress={() => setEditFoto(true)}>
+        <Image 
+          source={require('../../assets/images/perfil.png')}
+          style={styles.perfil}
+        />
+      </TouchableOpacity>
 
-<Text style={styles.Nome}>{usuario.nomeUsuario}</Text>
+      <Text style={styles.Nome}>Zericleuda dos Santos{usuario.nomeUsuario}</Text>
 
-<ScrollView
-  style={styles.ScrollContainer}
-  contentContainerStyle={{ alignItems: 'center', paddingBottom: 50 }}
-  showsVerticalScrollIndicator={true}
->
-  <Text style={styles.input}>Tipo do Usuario: {usuario.tipoUsuario}</Text> 
-  <Text style={styles.input}>Telefone: {usuario.telefoneUsuario}</Text> 
-  <Text style={styles.input}>Email: {usuario.emailUsuario}</Text> 
-  <Text style={styles.input}>CEP: {usuario.cepUsuario}</Text> 
-  <Text style={styles.input}>Logradouro: {usuario.ruaUsuario}</Text> 
-  <Text style={styles.input}>N°: {usuario.numLogradouroUsuario} </Text> 
-  <Text style={styles.input}>Bairro: {usuario.bairroUsuario}</Text> 
-  <Text style={styles.input}>Cidade:{usuario.cidadeUsuario}</Text> 
-  <Text style={styles.input}>Estado: {usuario.estadoUsuario}</Text>
-
-   {/*EDIÇAO*/}
-   <TouchableOpacity
-          onPress={() => setMostrarEdicao(true)}
-          style={styles.edicaoBotao}
-        >
-         <Text style={styles.textoBotao}>Editar Dados</Text>
-        </TouchableOpacity>
-
-</ScrollView>
+      <View style={styles.Container2}>
 
       
 
-        <Modal
-          visible={mostrarEdicao}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setMostrarEdicao(false)}
-        >
-
-<View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center' }}>
-    <ScrollView contentContainerStyle={{ padding: 20 }}>
-      <View style={{ backgroundColor: '#fff', borderRadius: 10, padding: 10 }}>
-       
-      <Text>Nome Inteiro:</Text>
-      <TextInput
-      style={styles.input}
-      placeholder="Nome Inteiro"
-      value={nomeUsuario}
-      onChangeText={setNomeUsuario}
-    />
-
-<Text>Telefone:</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Telefone"
-      value={telefoneUsuario}
-      onChangeText={setTelefoneUsuario}
-    />
-
-<Text>E-mail:</Text>
-  <TextInput
-      style={styles.input}
-      placeholder="E-mail"
-      value={emailUsuario}
-      onChangeText={setEmailUsuario}
-    />
-
-
-    
-<Text>Data de Nascimento:</Text>
-<TouchableOpacity
-          style={[styles.input, { justifyContent: 'center' }]}
-          onPress={() => setMostrarCalendario(true)}
-        >
-          <Text style={{ color: dataSelecionada ? colors.preto: '#', fontSize: 16 }}>
-            {dataSelecionada ? dataSelecionada : 'Data de Nascimento'}
-          </Text>
-        </TouchableOpacity>
-
-        <Modal
-          visible={mostrarCalendario}
-          transparent={true}
-          animationType="slide"
-          onRequestClose={() => setMostrarCalendario(false)}
-        >
-          <View style={{ flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
-            <View style={{ backgroundColor: '#fff', marginHorizontal: 10, borderRadius: 10, padding: 10 }}>
-              <Calendar
-                onDayPress={(day) => {
-                  setDataSelecionada(day.dateString);
-                  setMostrarCalendario(false);
-                }}
-                markedDates={{
-                  [dataSelecionada]: { selected: true, selectedColor: colors.verde },
-                }}
-                theme={{
-                  todayTextColor: colors.verde,
-                  arrowColor: colors.verde,
-                  monthTextColor: colors.preto,
-                  textDayFontWeight: '500',
-                  textMonthFontWeight: 'bold',
-                  textDayHeaderFontWeight: '500',
-                }}
-                style={styles.calendar}
-              />
+      <ScrollView
+        style={styles.ScrollContainer}
+        contentContainerStyle={{ alignItems: 'center', paddingBottom: 50 }}
+        showsVerticalScrollIndicator={true}
+      >
+        <Text style={styles.input}>Telefone: {usuario.telefoneUsuario}</Text> 
+        <Text style={styles.input}>Data de Nascimento: {usuario.dataNasc}</Text> 
+        <Text style={styles.input}>Sexo: {usuario.sexoUsuario}</Text>
+        <Text style={styles.input}>Saúde e Mobilidade: {usuario.SmUsuario}</Text>
+        <Text style={styles.input}>Estado Cognitivo: {usuario.EcUsuario}</Text>
+        <Text style={styles.input}>Rotinas e Preferencias: {usuario.RpUsuario}</Text>
+      
+          <View style={styles.botoes}>
+            <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('Home')}>
+              <Text style={styles.buttonText}>Checar Endereços</Text>
+          </TouchableOpacity>
+        </View>
+      
+      
+      </ScrollView>
             </View>
           </View>
-        </Modal>
-
-<Text>CEP:</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Cep"
-      value={cepUsuario}
-      onChangeText={setCepUsuario}
-    />
-
-<Text>Rua:</Text>
-<TextInput
-      style={styles.input}
-      placeholder="Rua"
-      value={ruaUsuario}
-      onChangeText={setRuaUsuario}
-    />
-
-  
-<Text>N° Logradouro:</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Numero"
-      value={numLogradouroUsuario}
-      onChangeText={setNumLogradouroUsuario}
-    />
-
-<Text>Bairro:</Text>
-    <TextInput
-      style={styles.input}
-      placeholder="Bairro"
-      value={bairroUsuario}
-      onChangeText={setBairroUsuario}
-    />
-
-
-  <Text>Cidade:</Text>
-  <TextInput
-      style={styles.input}
-      placeholder="Cidade"
-      value={cidadeUsuario}
-      onChangeText={setCidadeUsuario}
-    />
-
-
-
-    <Text>Estado:</Text>
-    <DropDownPicker
-        open={abrirEs}
-        items={estados}
-        value={valorEs}
-        setOpen={setAbrirEs}
-        setValue={setValorEs}
-        setItems={setEstados}
-
-        style={styles.dropdown}
-        dropDownContainerStyle={styles.dropDownContainer}
-        placeholder="Em que Estado você mora?" 
-         placeholderStyle={styles.placeholder} 
-      />
-
-    
-
-    
-
-    <View style={styles.botoes}>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText} onPress={()=>setMostrarEdicao(false)}>Voltar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button2}>
-        <Text style={styles.buttonText} onPress={editarPerfilInfo}>Salvar</Text>
-      </TouchableOpacity>
-    </View>
-
-
-      </View>
-    </ScrollView>
-  </View>
-
-  </Modal>
-              {/*FIM DA EDIÇÃO!!!!!*/}
-
-        
-        
     </View>
   
 
@@ -384,10 +126,71 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.branco,
   },
-  som: { 
-    width: 40, 
-    height: 40, 
-    resizeMode: 'contain' 
+  Container2: {
+    marginTop: 75,
+    
+  },
+  Container3: {
+    marginTop: 50,
+    
+  },
+    nav: { 
+      width: "100%", 
+      paddingTop: Platform.OS === "web" ? 20 : 45, 
+      paddingBottom: 10, 
+      paddingHorizontal: Platform.OS === "web" ? 40 : 20, 
+      height: Platform.OS === "web" ? height * 0.12 : height * 0.1, 
+      flexDirection: "row", 
+      justifyContent: "space-between", 
+      alignItems: "center", 
+      backgroundColor: colors.azul 
+    },
+
+    navTitulo: { 
+      fontSize: 20, 
+      fontWeight: "bold", 
+      color: colors.preto 
+    },
+  botoes: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    width: width * 0.8, 
+    marginBottom: 15 
+  },
+  soundButton: {
+    position: 'absolute',
+    top: 430, 
+    right: 15, 
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    zIndex: 1002,
+  },
+  soundIcon: {
+    width: 65,
+    height: 65,
+  },
+  bFoto: { 
+    width: width * 0.8,
+    height: 50,
+    backgroundColor: colors.azul, 
+    borderColor: colors.preto, 
+    borderWidth: 2, 
+    justifyContent: "center", 
+    alignItems: "center", 
+    borderRadius: 10, 
+    marginHorizontal: 5, 
+    marginTop: 10 
+  },
+
+  buttonText: { 
+    color: colors.preto, 
+    fontSize: 18,
+     fontWeight: "600" 
   },
   ScrollContainer: {
     width: '100%',
@@ -397,49 +200,24 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: width * 0.45,
     height: width * 0.45,
-    top: -height * 0.15,
+    bottom: -175,
     position: 'absolute'
   },
-  Logo: {
-    width: Platform.OS === 'web' ? width * 0.2 : width * 0.4, 
-    height: Platform.OS === 'web' ? width * 0.2 : width * 0.3, 
-    left: Platform.OS === 'web' ? 10 : 70,
-    top:  Platform.OS === 'web' ? 6 : 20,      
-    position: 'absolute',
-  },
-  edicaoBotao:{
-    
-    alignText:'center',
-    alignItems:'center',
-    alignContent:'center',
-  },
 
-  textoBotao:{
-    fontStyle:'italic',
-    fontSize:18,
-    color: 'gray',
-  },
   Top: {
     height: width * 0.56,
     backgroundColor: colors.azul,
   },
-  Form2: {
-    top: 70,
-    width: 330,
-    borderRadius: 9999,
-    aspectRatio: 1,
-    backgroundColor: colors.branco,
-    position: 'absolute',
-    alignSelf: 'center',
-  },
+
   Nome: {
-    top: height * 0.34,
+    top: 170,
     alignSelf: 'center',
     position: 'absolute',
     fontSize: 20,
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderColor: '#000',
+    zIndex: 1000, 
   },
   input: {
     width: width * 0.8,
