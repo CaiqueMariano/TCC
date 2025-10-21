@@ -43,6 +43,7 @@ export default function Cadastro({ navigation }) {
     },
   ]);
 
+
   // Campos do novo endereço
 const [ruaUsuario, setRuaUsuario] = useState("");
 const [numLogradouroUsuario, setNumLogradouroUsuario] = useState("");
@@ -136,7 +137,30 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
   if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
 
 
-  //AXCIOS
+  //AXIOS
+
+     const buscarCep= async ()=>{
+    try{
+      const response=await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      if(response.data.erro){
+         console.log('Cep não encontrado');
+         return;
+      }
+      else{
+        setRuaUsuario(response.data.logradouro);
+        setBairroUsuario(response.data.bairro);
+        setCidadeUsuario(response.data.localidade);
+        setEstadoUsuario(response.data.uf);
+        
+      }
+    }
+    catch (error){
+      console.log('Erro ao buscar Cep');
+
+    }
+      
+    } 
+
 const enviarEndereco = async () =>{
   try{
     const response = await axios.post(`${API_URL}/api/storeEnderecoUsuario`,
@@ -413,6 +437,7 @@ const listarEnderecos = async()=>{
             keyboardType="numeric"
             value={cepUsuario}
             onChangeText={setCepUsuario}
+            onBlur={buscarCep} 
           />
 
           <TextInput

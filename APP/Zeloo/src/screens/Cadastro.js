@@ -243,7 +243,7 @@ export default function Cadastro({ navigation }) {
           </View>
 
           <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={()=>navigation.navigate('Home')}>
+            <TouchableOpacity style={styles.bFoto} onPress={enviarDados}>
               <Text style={styles.buttonText}>Finalizar</Text>
             </TouchableOpacity>
           </View>
