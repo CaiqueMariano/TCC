@@ -55,7 +55,25 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
     { label: 'Homem', value: 'homem' },
     { label: 'Mulher', value: 'mulher' },
     { label: 'Tanto faz', value: 'tanto_faz' },
+
+
+    
   ]);
+  
+const validarEtapa1 = () => data && horarioIn && horarioT;
+const validarEtapa2 = () => checked1 || checked2 || checked3 || checked4;
+const validarEtapa3 = () => textoOutro.trim() !== "";
+const validarEtapa4 = () => {
+  // um so
+  if (enderecoUsuario) return true;
+
+  // dois
+  return (
+    enderecoOrigem && enderecoOrigem.trim() !== "" &&
+    enderecoDestino && enderecoDestino.trim() !== ""
+  );
+};
+const validarEtapa5 = () => genero !== null;
 
    const [modalFinal, setModalFinal] = useState(false);
 
@@ -128,6 +146,7 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
   if (checked3) nomeServicosSelecionados.push('Locomoção');
   if (checked4) nomeServicosSelecionados.push('Outro');
   if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+  if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
 
   return (
     <View style={styles.container}>
@@ -166,7 +185,16 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
           </TouchableOpacity>
 
           <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+            <TouchableOpacity
+              style={[styles.bFoto, { opacity: validarEtapa1() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa1()) {
+                  setEtapa(2);
+                } else {
+                  alert("Preencha todos os campos antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -202,7 +230,16 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(1)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+            <TouchableOpacity               
+            style={[styles.bFoto, { opacity: validarEtapa2() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa2()) {
+                  setEtapa(3);
+                } else {
+                  alert("Selecione um ou mais campos antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -229,7 +266,16 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+            <TouchableOpacity               
+            style={[styles.bFoto, { opacity: validarEtapa3() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa3()) {
+                  setEtapa(4);
+                } else {
+                  alert("Preencha o campo antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -427,10 +473,21 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(5)}>
+
+            <TouchableOpacity
+              style={[styles.bFoto, { opacity: validarEtapa4() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa4()) {
+                  setEtapa(5);
+                } else {
+                  alert("Selecione ou cadastre um endereço antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
+
         </View>
       )}
 
@@ -455,10 +512,19 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
           <View style={styles.botoes}>
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
               <Text style={styles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() =>  setModalFinal(true)}>
-              <Text style={styles.buttonText}>Finalizar</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> setModalFinal(true)
+              <TouchableOpacity
+                style={[styles.bFoto, { opacity: validarEtapa5() ? 1 : 0.5 }]}
+                onPress={() => {
+                  if (validarEtapa5()) {
+                    setModalFinal(true);
+                  } else {
+                    alert("Selecione uma opção antes de finalizar!");
+                  }
+                }}
+              >
+                <Text style={styles.buttonText}>Finalizar</Text>
+              </TouchableOpacity>
           </View>
 
           <Modal visible={modalFinal} transparent animationType="slide" onRequestClose={() => setModalFinal(false)}>
