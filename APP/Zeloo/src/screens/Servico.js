@@ -6,11 +6,13 @@ import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { Checkbox } from 'react-native-paper';
+import axios from "axios";
+import { API_URL } from '../screens/link';
 
 const { width, height } = Dimensions.get("window");
 
 export default function Cadastro({ navigation }) {
-  const { setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [etapa, setEtapa] = useState(1);
 
   const [data, setData] = useState("");
@@ -30,15 +32,19 @@ export default function Cadastro({ navigation }) {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [tipoEndereco, setTipoEndereco] = useState(null);
   const [enderecoUsuario, setEnderecoUsuario] = useState("");
-  const [ruaUsuario, setRuaUsuario] = useState("");
+ 
   const [enderecoOrigem, setEnderecoOrigem] = useState("");
   const [enderecoDestino, setEnderecoDestino] = useState("");
   const [enderecosCadastrados, setEnderecosCadastrados] = useState([
-    { id: 1, nome: "Casa", endereco: "Rua das Flores, 123" },
-    { id: 2, nome: "Hospital", endereco: "Hospital Central, 45" },
+    { idEndereco: "", 
+      nomeEndereco: "", 
+      ruaUsuario: "" ,
+      numLogradouroUsuario: ""
+    },
   ]);
 
   // Campos do novo endereço
+const [ruaUsuario, setRuaUsuario] = useState("");
 const [numLogradouroUsuario, setNumLogradouroUsuario] = useState("");
 const [bairroUsuario, setBairroUsuario] = useState("");
 const [cidadeUsuario, setCidadeUsuario] = useState("");
@@ -47,40 +53,7 @@ const [complementoEndereco, setComplementoEndereco] = useState("");
 const [cepUsuario, setCepUsuario] = useState("");
 const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
 
-/*
-  const enviarDados = async () => {
-    setModal5Visible(false);
-    setModal6Visible(true);
-    const nomeServico = nomeServicosSelecionados.join(', '); 
-    const tipoServico = nomeServicosSelecionados.join(', '); 
-    const dataServico = Object.keys(selected)[0] || null;
-   
-    const descServico = 'nome servico'; 
-    const idEnderecoUsuario = 1;
-  
-    try {
-      const response = await axios.post(
-        `${API_URL}/api/storeServicos`,
-        {
-          nomeServico,
-          idUsuario:user.idUsuario,
-          tipoServico,
-          descServico:texto,
-          dataServico,
-          horaInicioServico,
-          horaTerminoServico,
-          idEnderecoUsuario
-        }
-      );
-  
-      if (response.data.success) {
-        console.log('Serviço enviado com sucesso!');
-        navigation.navigate('Home');
-      } else {
-        console.log('Erro:', response.data.message);
 
-      }
-    }*/
   //Dropdownzin aqui
   const [genero, setGenero] = useState(null);
   const [openGenero, setOpenGenero] = useState(false);
@@ -161,6 +134,81 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
   if (checked3) nomeServicosSelecionados.push('Locomoção');
   if (checked4) nomeServicosSelecionados.push('Outro');
   if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+
+
+  //AXCIOS
+const enviarEndereco = async () =>{
+  try{
+    const response = await axios.post(`${API_URL}/api/storeEnderecoUsuario`,
+      {
+        nomeEndereco: nomeNovoEndereco,
+        ruaUsuario,
+        numLogradouroUsuario,
+        estadoUsuario,
+        bairroUsuario,
+        cepUsuario,
+        cidadeUsuario,
+        idUsuario:user.idUsuario
+      }
+    );
+
+    if(response.data.success){
+      
+      console.log('Serviço enviado com sucesso!');
+    }else{
+      console.log('Serviço enviado com negacesso!');
+    }
+
+
+}catch(error){
+
+}
+}
+
+const listarEnderecos = async()=>{
+  try{
+    const response = await axios.post(`${API_URL}/api/listarEndereco`, {
+      idUsuario:user.idUsuario
+    });
+
+    if(response.data.success){
+      console.log('Endereços encontrados!');
+      setEnderecosCadastrados(response.data.data);
+    }else{
+      console.log('Endereços desencontrados!');
+    }
+  }catch(error){
+    console.log('Endereços desencontrados!');
+  }
+}
+  const enviarDados = async () => {
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/storeServicos`,
+        {
+          nomeServico,
+          idUsuario:user.idUsuario,
+          tipoServico,
+          descServico:texto,
+          dataServico,
+          horaInicioServico,
+          horaTerminoServico,
+          idEnderecoUsuario
+        }
+      );
+  
+      if (response.data.success) {
+        console.log('Serviço enviado com sucesso!');
+        navigation.navigate('Home');
+      } else {
+        console.log('Erro:', response.data.message);
+
+      }
+    }catch(error){
+
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -299,7 +347,7 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
               </Pressable>
             </>
           ) : (
-            <Pressable onPress={() => { setTipoEndereco("usuario"); setModalVisivel(true); }}>
+            <Pressable onPress={() => { setTipoEndereco("usuario"); setModalVisivel(true); listarEnderecos(); }}>
               <View pointerEvents="none">
                 <TextInput 
                   style={styles.input} 
@@ -319,23 +367,24 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
           <Text style={styles.modalTitulo}>Escolha um endereço</Text>
 
           <FlatList
-            data={enderecosCadastrados}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.enderecoItem}
-                onPress={() => {
-                  if (tipoEndereco === "usuario") setEnderecoUsuario(item.endereco);
-                  if (tipoEndereco === "origem") setEnderecoOrigem(item.endereco);
-                  if (tipoEndereco === "destino") setEnderecoDestino(item.endereco);
-                  setModalVisivel(false);
-                }}
-              >
-                <Text style={styles.enderecoNome}>{item.nome}</Text>
-                <Text style={styles.enderecoTexto}>{item.endereco}</Text>
-              </TouchableOpacity>
-            )}
-          />
+  data={enderecosCadastrados}
+  keyExtractor={(item) => item.idEndereco.toString()}
+  renderItem={({ item }) => (
+    <TouchableOpacity
+      style={styles.enderecoItem}
+      onPress={() => {
+        const enderecoCompleto = `${item.ruaUsuario}, ${item.numLogradouroUsuario}`;
+        if (tipoEndereco === "usuario") setEnderecoUsuario(enderecoCompleto);
+        if (tipoEndereco === "origem") setEnderecoOrigem(enderecoCompleto);
+        if (tipoEndereco === "destino") setEnderecoDestino(enderecoCompleto);
+        setModalVisivel(false);
+      }}
+    >
+      <Text style={styles.enderecoNome}>{item.nomeEndereco}</Text>
+      <Text style={styles.enderecoTexto}>{`${item.ruaUsuario}, ${item.numLogradouroUsuario}`}</Text>
+    </TouchableOpacity>
+  )}
+/>
 
           <TouchableOpacity style={styles.outros} onPress={() => setAbrir(true)}>
             <Text style={styles.outrosText}>Adicionar novo Endereço</Text>
@@ -431,8 +480,13 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
                   setCidadeUsuario("");
                   setComplementoEndereco("");
                   setCepUsuario("");
+
+                  enviarEndereco();
+
                   setEstadoUsuario("");
                   setAbrir(false);
+
+                  
                 } else {
                   alert("Preencha todos os campos antes de salvar!");
                 }

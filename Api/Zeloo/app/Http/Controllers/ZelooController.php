@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\AuthenticationException;
 use App\Models\servicoModel;
+use App\Models\enderecoModel; 
+use App\Models\enderecoUsuarioModel; 
 use App\Models\User;
 use App\Models\IdosoFamiliaModel;
 use App\Models\UsuarioModel;
@@ -174,13 +176,88 @@ class ZelooController extends Controller
 
     /*Funcões da API*/ 
 
+
+    //CRIAR ENDERECO!
+    public function storeEnderecoUsuario(Request $request){
+        try{
+            $endereco = new enderecoModel();
+
+            $endereco -> ruaUsuario = $request->ruaUsuario;
+            $endereco -> numLogradouroUsuario = $request ->numLogradouroUsuario;
+            $endereco -> estadoUsuario = $request->estadoUsuario;
+            $endereco -> bairroUsuario = $request->bairroUsuario;
+            $endereco -> nomeEndereco = $request->nomeEndereco;
+            $endereco ->cepUsuario = $request->cepUsuario;
+            $endereco ->cidadeUsuario = $request->cidadeUsuario;
+
+            $endereco->save();
+
+
+            //TABELA DO ENDERECO DO USUARIO!
+
+            $idUsuario = $request->idUsuario;
+            $familiar = IdosoModel::where('idUsuario', $idUsuario)->first();
+            $familia = IdosoFamiliaModel::where('idIdoso', $familiar->idIdoso)->first();
+
+            $enderecoU = new enderecoUsuarioModel();
+
+            $enderecoU -> idIdosoFamilia = $familia->idIdosoFamilia;
+            $enderecoU -> idEndereco = $endereco->idEndereco;
+
+            $enderecoU->save();
+
+            return response()->json([
+                'success' => true,
+                'message'=> 'criou-se com sucesso! eba!',
+                'code' =>200
+            ]);
+
+
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao criar endereco',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    //LISTAR ENEDERECO!
+
+    public function listarEndereco(Request $request){
+        $idUsuario = $request->idUsuario;       
+        $familiar = IdosoModel::where('idUsuario', $idUsuario)->first();
+        $familia = IdosoFamiliaModel::where('idIdoso', $familiar->idIdoso)->first();
+        $enderecos = enderecoUsuarioModel::where('idIdosoFamilia', $familia->idIdosoFamilia)->get();
+        $idsEnderecos = $enderecos->pluck('idEndereco'); 
+        $enderecosDetalhes = enderecoModel::whereIn('idEndereco', $idsEnderecos)->get();
+
+
+        if(!$enderecosDetalhes){
+            return response()->json([
+                'success' => false,
+                'message' => 'erro'
+            ], 404);
+        }
+
+        return response()->json([
+            'success'=> true,
+            'message'=> 'sucesso ao buscar serviços' ,
+            'data' => $enderecosDetalhes
+        ], 200);
+
+    }
+
+
       /*CRIACÃO DE SERVICO*/
       public function storeServicoFamiliar(Request $request){
         try{
           
 
             $idUsuario = $request->idUsuario;
-            $familiar = FamiliarModel::where('idUsuario', $idUsuario)->first();
+           $familiar = IdosoModel::where('idUsuario', $idUsuario)->first();
             $familia = IdosoFamiliaModel::where('idFamiliar', $familiar->idFamiliar)->first();
 
 

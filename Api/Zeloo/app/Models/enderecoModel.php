@@ -14,6 +14,7 @@ class enderecoModel extends Model
 
     protected $fillable = [
         'idEndereco',
+        'nomeEnderecoUsuario',
         'ruaUsuario',
         'numLogradouroUsuario',
         'estadoUsuario',

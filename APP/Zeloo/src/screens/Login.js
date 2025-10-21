@@ -11,7 +11,7 @@ const { width, height } = Dimensions.get("window");
 
 export default function Login({navigation}) {
   const { setUser } = useContext(UserContext);
-
+  const [mensagem, setMensagem] = useState('');
   const [abrir, setAbrir] = useState(false);
   const [valor, setValor] = useState(null);
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
@@ -32,11 +32,12 @@ export default function Login({navigation}) {
         setUser(response.data.data);
         navigation.navigate("Home");
       } else {
+        setMensagem('Telefone ou senha incorretos');
         console.log("Erro", response.data.message);
-      
       }
   
     } catch (error) {
+      setMensagem('Telefone ou senha incorretos');
       console.error(error);
     }
   };
@@ -53,6 +54,9 @@ export default function Login({navigation}) {
 
     <View style={styles.Container2}>
       <Text style={styles.title}>Login</Text>
+      <View style={styles.mensagem}>
+            <Text style={styles.mensagemText}>{mensagem}</Text>
+          </View>
 
       <TextInput
         style={styles.input}
@@ -68,7 +72,7 @@ export default function Login({navigation}) {
 
       <View style={styles.botoes}>
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText} onPress={() => navigation.navigate('Home')}>Entrar</Text>
+          <Text style={styles.buttonText} onPress={enviarLogin}>Entrar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button2}>
           <Text style={styles.buttonText} onPress={() => navigation.navigate('Cadastro')}>Cadastrar</Text>
@@ -89,6 +93,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: colors.branco,
   },
+  mensagem:{
+    marginBottom:10,
+},
+mensagemText:{
+  fontSize: 19,
+    color:'red',
+}, 
 
     Logo: {
     left: -190,

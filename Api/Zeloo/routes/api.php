@@ -18,6 +18,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//listarEndereco
+Route::post('/listarEndereco','App\Http\Controllers\ZelooController@listarEndereco');
+//Endereco
+Route::post('/storeEnderecoUsuario','App\Http\Controllers\ZelooController@storeEnderecoUsuario');
 //Aceitar os Servicos
 Route::post('/aceita','App\Http\Controllers\ZelooController@aceita');
 

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id('idEndereco');
                    //Endereço
                    $table->string('ruaUsuario');
+                   $table->string('nomeEndereco');
                    $table->string('numLogradouroUsuario');
                    $table->string('estadoUsuario');
                    $table->string('bairroUsuario');
