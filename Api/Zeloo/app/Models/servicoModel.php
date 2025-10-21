@@ -21,6 +21,6 @@ class servicoModel extends Model
         'dataServico',
         'horaInicioServico',
         'horaTerminoServico',
-        'idEnderecoUsuario'
+        'idEndereco'
     ];
 }

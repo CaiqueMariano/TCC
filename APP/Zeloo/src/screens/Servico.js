@@ -35,13 +35,8 @@ export default function Cadastro({ navigation }) {
  
   const [enderecoOrigem, setEnderecoOrigem] = useState("");
   const [enderecoDestino, setEnderecoDestino] = useState("");
-  const [enderecosCadastrados, setEnderecosCadastrados] = useState([
-    { idEndereco: "", 
-      nomeEndereco: "", 
-      ruaUsuario: "" ,
-      numLogradouroUsuario: ""
-    },
-  ]);
+  const [enderecosCadastrados, setEnderecosCadastrados] = useState([]);
+
 
 
   // Campos do novo endereço
@@ -135,13 +130,13 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
   if (checked3) nomeServicosSelecionados.push('Locomoção');
   if (checked4) nomeServicosSelecionados.push('Outro');
   if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
-
+  const [idEnderecoSelecionado, setIdEnderecoSelecionado] = useState(null);
 
   //AXIOS
 
      const buscarCep= async ()=>{
     try{
-      const response=await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+      const response=await axios.get(`https://viacep.com.br/ws/${cepUsuario}/json/`);
       if(response.data.erro){
          console.log('Cep não encontrado');
          return;
@@ -160,6 +155,22 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
     }
       
     } 
+    const listarEnderecos = async()=>{
+      try{
+        const response = await axios.post(`${API_URL}/api/listarEndereco`, {
+          idUsuario:user.idUsuario
+        });
+    
+        if(response.data.success){
+          console.log('Endereços encontrados!');
+          setEnderecosCadastrados(response.data.data);
+        }else{
+          console.log('Endereços desencontrados!');
+        }
+      }catch(error){
+        console.log('Endereços desencontrados!');
+      }
+    }
 
 const enviarEndereco = async () =>{
   try{
@@ -177,6 +188,10 @@ const enviarEndereco = async () =>{
     );
 
     if(response.data.success){
+      listarEnderecos();
+
+      // Fecha o modal
+      setAbrir(false);
       
       console.log('Serviço enviado com sucesso!');
     }else{
@@ -189,45 +204,42 @@ const enviarEndereco = async () =>{
 }
 }
 
-const listarEnderecos = async()=>{
-  try{
-    const response = await axios.post(`${API_URL}/api/listarEndereco`, {
-      idUsuario:user.idUsuario
-    });
 
-    if(response.data.success){
-      console.log('Endereços encontrados!');
-      setEnderecosCadastrados(response.data.data);
-    }else{
-      console.log('Endereços desencontrados!');
-    }
-  }catch(error){
-    console.log('Endereços desencontrados!');
-  }
-}
   const enviarDados = async () => {
 
     try {
+
+      console.log({
+        nomeServico: nomeServicosSelecionados,
+        idUsuario: user.idUsuario,
+        tipoServico,
+        descServico: textoOutro,
+        dataServico: data,
+        horaInicioServico: horarioIn,
+        horaTerminoServico: horarioT,
+        idEndereco: idEnderecoSelecionado,
+      });
       const response = await axios.post(
         `${API_URL}/api/storeServicos`,
         {
-          nomeServico,
+          nomeServico:nomeServicosSelecionados,
           idUsuario:user.idUsuario,
-          tipoServico,
-          descServico:texto,
-          dataServico,
-          horaInicioServico,
-          horaTerminoServico,
-          idEnderecoUsuario
+          tipoServico:nomeServicosSelecionados,
+          descServico:textoOutro,
+          dataServico:data,
+          horaInicioServico:horarioIn,
+          horaTerminoServico:horarioT,
+          idEndereco:idEnderecoSelecionado
         }
       );
   
       if (response.data.success) {
         console.log('Serviço enviado com sucesso!');
         navigation.navigate('Home');
+        return true;
       } else {
         console.log('Erro:', response.data.message);
-
+        return false;
       }
     }catch(error){
 
@@ -401,6 +413,7 @@ const listarEnderecos = async()=>{
         if (tipoEndereco === "usuario") setEnderecoUsuario(enderecoCompleto);
         if (tipoEndereco === "origem") setEnderecoOrigem(enderecoCompleto);
         if (tipoEndereco === "destino") setEnderecoDestino(enderecoCompleto);
+        setIdEnderecoSelecionado(item.idEndereco);
         setModalVisivel(false);
       }}
     >
@@ -487,35 +500,14 @@ const listarEnderecos = async()=>{
                   ruaUsuario.trim() &&
                   numLogradouroUsuario.trim() &&
                   bairroUsuario.trim() &&
-                  complementoEndereco.trim() &&
                   cidadeUsuario.trim() &&
                   estadoUsuario.trim() &&
                   cepUsuario.trim()
                 ) {
-                  const novo = {
-                    id: enderecosCadastrados.length + 1,
-                    nome: nomeNovoEndereco,
-                    endereco: `${ruaUsuario}, ${numLogradouroUsuario}`,
-                  };
-                  setEnderecosCadastrados((prev) => [...prev, novo]); //atualizando a lista
-                  setNomeNovoEndereco("");
-                  setRuaUsuario("");
-                  setNumLogradouroUsuario("");
-                  setBairroUsuario("");
-                  setCidadeUsuario("");
-                  setComplementoEndereco("");
-                  setCepUsuario("");
-
-                  enviarEndereco();
-
-                  setEstadoUsuario("");
-                  setAbrir(false);
-
-                  
+                  enviarEndereco(); 
                 } else {
                   alert("Preencha todos os campos antes de salvar!");
                 }
-
               }}
             >
               <Text style={styles.buttonText}>Salvar</Text>
@@ -568,7 +560,13 @@ const listarEnderecos = async()=>{
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() =>  setModalFinal(true)}>
+            <TouchableOpacity style={styles.bFoto} onPress={async () => {
+              console.log("Botão Finalizar clicado!");
+  const sucesso = await enviarDados(); 
+  if (sucesso) {
+    setModalFinal(true);
+  }
+}}>
               <Text style={styles.buttonText}>Finalizar</Text>
             </TouchableOpacity>
           </View>

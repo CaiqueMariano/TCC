@@ -368,11 +368,12 @@ class ZelooController extends Controller
             $servico -> dataServico = $request -> dataServico;
             $servico -> horaInicioServico = $request -> horaInicioServico;
             $servico -> horaTerminoServico = $request -> horaTerminoServico;
-            $servico -> idEnderecoUsuario = $request -> idEnderecoUsuario;
+            $servico -> idEndereco= $request -> idEndereco;
 
             $servico->save();
 
             return response()->json([
+                'success' => true,
                 'message'=> 'criou-se com sucesso! eba!',
                 'code' =>200
             ]);

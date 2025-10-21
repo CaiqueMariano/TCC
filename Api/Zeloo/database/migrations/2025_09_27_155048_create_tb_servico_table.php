@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('dataServico');
             $table->time('horaInicioServico');
             $table->time('horaTerminoServico');
-            $table->unsignedBigInteger('idEnderecoUsuario');
+            $table->unsignedBigInteger('idEndereco');
             $table->timestamps();
 
 
@@ -31,9 +31,9 @@ return new class extends Migration
             ->on('tb_idoso_familia') 
             ->onDelete('cascade');
 
-            $table->foreign('idEnderecoUsuario') 
-            ->references('idEnderecoUsuario') 
-            ->on('tb_endereco_usuario') 
+            $table->foreign('idEndereco') 
+            ->references('idEndereco') 
+            ->on('tb_endereco') 
             ->onDelete('cascade');
         });
     }
