@@ -63,37 +63,32 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
 
   const totalEtapas = 5;
 
-  const formatarData = (date) => {
-    const dia = date.getDate().toString().padStart(2, "0");
-    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
-    const ano = date.getFullYear();
-    return `${dia}/${mes}/${ano}`;
-  };
-
   const formatarHora = (date) => {
     const hora = date.getHours().toString().padStart(2, "0");
     const minuto = date.getMinutes().toString().padStart(2, "0");
     return `${hora}:${minuto}`;
   };
 
-  const abrirDatePicker = () => {
-    if (Platform.OS === "web") {
-      const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
-      if (dataSelecionada) {
-        const [ano, mes, dia] = dataSelecionada.split("-");
-        setData(`${dia}/${mes}/${ano}`);
-      }
-    } else {
-      DateTimePickerAndroid.open({
-        value: new Date(),
-        mode: "date",
-        onChange: (event, selectedDate) => {
-          if (selectedDate) setData(formatarData(selectedDate));
-        },
-      });
+ const abrirDatePicker = () => {
+  if (Platform.OS === "web") {
+    const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
+    if (dataSelecionada) {
+      // Removido a transformação, setar direto
+      setData(dataSelecionada);
     }
-  };
-
+  } else {
+    DateTimePickerAndroid.open({
+      value: new Date(),
+      mode: "date",
+      onChange: (event, selectedDate) => {
+        if (selectedDate) {
+          // Setar data no formato 'aaaa-mm-dd' direto
+          setData(selectedDate.toISOString().split('T')[0]);
+        }
+      },
+    });
+  }
+};
   const abrirTimePicker = (setHorario) => {
     if (Platform.OS === "web") {
       const hora = prompt("Digite o horário (hh:mm):");
@@ -203,28 +198,19 @@ const enviarEndereco = async () =>{
 
 }
 }
-
+const nomeServicoString = nomeServicosSelecionados.join("");
 
   const enviarDados = async () => {
 
     try {
 
-      console.log({
-        nomeServico: nomeServicosSelecionados,
-        idUsuario: user.idUsuario,
-        tipoServico,
-        descServico: textoOutro,
-        dataServico: data,
-        horaInicioServico: horarioIn,
-        horaTerminoServico: horarioT,
-        idEndereco: idEnderecoSelecionado,
-      });
+      
       const response = await axios.post(
         `${API_URL}/api/storeServicos`,
         {
-          nomeServico:nomeServicosSelecionados,
+          nomeServico:nomeServicoString,
           idUsuario:user.idUsuario,
-          tipoServico:nomeServicosSelecionados,
+          tipoServico:nomeServicoString,
           descServico:textoOutro,
           dataServico:data,
           horaInicioServico:horarioIn,
@@ -234,11 +220,12 @@ const enviarEndereco = async () =>{
       );
   
       if (response.data.success) {
-        console.log('Serviço enviado com sucesso!');
+        console.log(response.data.message);
+       
         navigation.navigate('Home');
         return true;
       } else {
-        console.log('Erro:', response.data.message);
+        console.log('Erro:', response.data.message, error);
         return false;
       }
     }catch(error){
@@ -540,6 +527,14 @@ const enviarEndereco = async () =>{
 
       {etapa === 5 && (
         <View style={styles.form}>
+           <Text style={styles.teste}> nomeServico:{nomeServicosSelecionados},</Text>
+         <Text> idUsuario:{user.idUsuario},</Text>
+         <Text> tipoServico:{nomeServicosSelecionados},</Text>
+         <Text> descServico:{textoOutro},</Text>
+         <Text> dataServico:{data},</Text>
+         <Text> horaInicioServico:{horarioIn},</Text>
+         <Text> horaTerminoServico:{horarioT},</Text>
+         <Text> idEndereco:{idEnderecoSelecionado}</Text>
           <Progresso />
             <Text style={styles.title}>Tem Preferencia de Gênero?</Text> 
             <Image source={require('../../assets/images/sexologia.png')} style={styles.image} />
@@ -569,6 +564,10 @@ const enviarEndereco = async () =>{
 }}>
               <Text style={styles.buttonText}>Finalizar</Text>
             </TouchableOpacity>
+
+    
+      
+            
           </View>
 
           <Modal visible={modalFinal} transparent animationType="slide" onRequestClose={() => setModalFinal(false)}>
@@ -601,6 +600,10 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: colors.branco, 
     alignItems: "center" 
+  },
+
+  teste:{
+
   },
 
   soundButton: {
