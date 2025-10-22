@@ -93,95 +93,94 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
   }, [user]);
 
   return (
-<View style={styles.container} >
-  <View>
-   <View style={styles.Form1}></View>
-   <Image 
-     source={require('../../assets/images/Zeloo.png')}
-     style={styles.Logo}
-   />
-    <Image 
-     source={require('../../assets/images/Zeloo.png')}
-     style={styles.Logo}
-   />
- 
- <ScrollView
-  contentContainerStyle={styles.scrollContainer}
-  showsVerticalScrollIndicator={false}
->
-  <View style={styles.grid}>
-    {/* BOTÃO CONTRATO ATIVO MAIS RECENTE*/}
-    <View style={styles.cardcontratro}>
-  <Text style={styles.contractTitle}>Contrato ativo mais recente</Text>
+    <View style={styles.container}>
+    
+    {/* HEADER PADRONIZADO COMO O DE ATIVOS */}
+    <View style={styles.header}> 
+  {/* Logo alinhada à esquerda */}
+  <Image 
+    source={require('../../assets/images/logo.png')}
+    style={styles.LogoHeader}
+  />
 
-  <View style={styles.contractInfo}>
-    <Image 
-      source={require('../../assets/images/perfilicon.png')}
-      style={styles.contractIcon}
-    />
-    <View>
-      <Text style={styles.contractName}>Ana Maria Braga</Text>
-      <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}>Pago </Text></Text>
-    </View>
-  </View>
-
-  <View style={styles.separator}></View>
-
-  <TouchableOpacity 
-    style={styles.viewMoreButton}
-    onPress={() => navigation.navigate('Servico')}
-  >
-    <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+  {/* Ícone de configurações à direita */}
+  <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+    <Ionicons name="settings-outline" size={30} color={colors.preto} />
   </TouchableOpacity>
 </View>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.grid}>
+        {/* BOTÃO CONTRATO ATIVO MAIS RECENTE */}
+        <View style={styles.cardcontratro}>
+          
+            <Text style={styles.viewMoreText}>Contrato ativo mais recente</Text>
+    
+          <View style={styles.contractInfo}>
+            <Image 
+              source={require('../../assets/images/perfilicon.png')}
+              style={styles.contractIcon}
+            />
+            <View>
+              <Text style={styles.contractName}>Ana Maria Braga</Text>
+              <Text style={styles.contractStatus}>
+                Status: <Text style={styles.contractPaid}>Pago </Text>
+              </Text>
+            </View>
+          </View>
 
-    {/* BOTÃO SOLICITAR SERVIÇO */}
-    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Servico')}>
-      <Image source={require('../../assets/images/cuidadores.png')} style={styles.icon} />
-      <Text style={styles.cardText}>Solicitar Serviço</Text>
-    </TouchableOpacity>
+          <View style={styles.separator}></View>
 
-    {/* BOTÃO FAVORITOS */}
-    <View style={styles.favoritosContainer}>
-      <TouchableOpacity style={styles.card}>
-        <Image source={require('../../assets/images/favoritos.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Favoritos</Text>
-      </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.viewMoreButton}
+            onPress={() => navigation.navigate('Ativos')}
+          >
+            <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* BOTÃO DE SOM SOBREPOSTO */}
-      <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-        <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-      </TouchableOpacity>
-    </View>
+        {/* BOTÕES PRINCIPAIS */}
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Servico')}>
+          <Image source={require('../../assets/images/cuidadores.png')} style={styles.icon} />
+          <Text style={styles.cardText}>Solicitar Serviço</Text>
+        </TouchableOpacity>
 
-    {/* BOTÃO PERFIL */}
-    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Perfil')}>
-      <Image source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
-      <Text style={styles.cardText}>Seu Perfil</Text>
-    </TouchableOpacity>
+        <View style={styles.favoritosContainer}>
+          <TouchableOpacity style={styles.card}>
+            <Image source={require('../../assets/images/favoritos.png')} style={styles.icon} />
+            <Text style={styles.cardText}>Favoritos</Text>
+          </TouchableOpacity>
 
-    {/* BOTÃO LINKAGEM */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/linkagem.png')} style={styles.icon} />
-      <Text style={styles.cardText}>Linkagem</Text>
-    </TouchableOpacity>
+          <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+            <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+          </TouchableOpacity>
+        </View>
 
-    {/* BOTÃO CONVERSAS */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/conversas.png')} style={styles.icon} /> 
-      <Text style={styles.cardText}>Conversas</Text>
-    </TouchableOpacity>
+        <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Perfil')}>
+          <Image source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
+          <Text style={styles.cardText}>Seu Perfil</Text>
+        </TouchableOpacity>
 
-    {/* BOTÃO FALE CONOSCO */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
-      <Text style={styles.cardText}>Fale Conosco</Text>
-    </TouchableOpacity>
+        <TouchableOpacity style={styles.card}>
+          <Image source={require('../../assets/images/linkagem.png')} style={styles.icon} />
+          <Text style={styles.cardText}>Linkagem</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.card}>
+          <Image source={require('../../assets/images/conversas.png')} style={styles.icon} /> 
+          <Text style={styles.cardText}>Conversas</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.card}>
+          <Image source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
+          <Text style={styles.cardText}>Fale Conosco</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   </View>
-</ScrollView>
-   </View>
-</View>
-  );
+);
 }
 
 const styles = StyleSheet.create({
@@ -191,19 +190,26 @@ const styles = StyleSheet.create({
     display:'hidden' ,
    
   },
-  Logo: {
-    left: -210,
-    top: -110,
-    position: 'absolute',
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.azul,
+    paddingHorizontal: 10,
+    height: 130, // altura controlada da faixa
+ 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 6,
   },
-  Form1: {
-    width: 10000,
-    height: 150,
-    aspectRatio: 2,
-    backgroundColor: '#a4e9e5',
-    position: 'absolute',
-    top: -20,
-    left: -60,
+  LogoHeader: {
+    width: 200,  // tamanho visual bom
+    height: 170,
+    resizeMode: 'contain',
+    marginLeft: 10, // espaçamento suave da borda
   },
 logout: {
   backgroundColor: '#fff',
@@ -353,7 +359,7 @@ soundButton: {
 
   justifyContent: 'center',
   alignItems: 'center',
-  elevation: 10,
+ 
   zIndex: 10,
 },
 
