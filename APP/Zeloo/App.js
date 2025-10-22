@@ -13,6 +13,9 @@ import Login from "./src/screens/Login";
 import BemVindo from "./src/screens/BemVindo";
 import Cadastro from "./src/screens/Cadastro";
 import Home from "./src/screens/Home";
+import Ativos from "./src/screens/Ativos";
+import Apagar from "./src/screens/Apagar";
+import Pendente from "./src/screens/Pendente";
 import Perfil from "./src/screens/Perfil";
 import colors from './src/screens/colors';
 import Conta from "./src/screens/Conta";
@@ -93,7 +96,9 @@ export default function App() {
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Servico" component={Servico} />
         <Stack.Screen name="homeFamiliar" component={HomeFamiliar} />
-        
+        <Stack.Screen name="Apagar" component={Apagar} />
+        <Stack.Screen name="Pendente" component={Pendente} />
+        <Stack.Screen name="Ativos" component={Ativos} />
         <Stack.Screen name="Contrato" component={Contrato} />
         <Stack.Screen name="configuracoes" component={configuracoes} />
         <Stack.Screen name="Perfil" component={Perfil} />
