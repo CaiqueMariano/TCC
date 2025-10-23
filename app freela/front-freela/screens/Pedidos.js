@@ -6,6 +6,7 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
+import { API_URL } from '../screens/link';
 import axios from 'axios';
 
 export default function Pedidos({ navigation }) {
@@ -20,7 +21,7 @@ export default function Pedidos({ navigation }) {
 
   useEffect(() => {
     if (user) {
-      axios.get(`http://localhost:8000/api/buscarProfissional/${user.idProfissional}`)
+      axios.get(`${API_URL}/api/buscarProfissional/${user.idProfissional}`)
         .then(response => {
           const dados = response.data.data;
           setIdProfissional(dados.idProfissional);
@@ -30,7 +31,7 @@ export default function Pedidos({ navigation }) {
   }, [user]);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/buscarServicos`)
+    axios.get(`${API_URL}/api/buscarServicos`)
       .then(response => setServicos(response.data.data))
       .catch(error => console.log("ERRO", error));
   }, []);
@@ -48,7 +49,7 @@ export default function Pedidos({ navigation }) {
     }
 
     try {
-      const response = await axios.post(`http://localhost:8000/api/aceita`, {
+      const response = await axios.post(`${API_URL}/api/aceita`, {
         idProfissional,
         idServico: servicoSelecionado.idServico,
         precoPersonalizado

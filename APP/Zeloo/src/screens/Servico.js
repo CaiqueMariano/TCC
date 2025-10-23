@@ -57,18 +57,31 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
     { label: 'Homem', value: 'homem' },
     { label: 'Mulher', value: 'mulher' },
     { label: 'Tanto faz', value: 'tanto_faz' },
+
+
+    
   ]);
+  
+const validarEtapa1 = () => data && horarioIn && horarioT;
+const validarEtapa2 = () => checked1 || checked2 || checked3 || checked4;
+const validarEtapa3 = () => textoOutro.trim() !== "";
+const validarEtapa4 = () => {
+  // um so
+  if (enderecoUsuario) return true;
+
+  // dois
+  return (
+    enderecoOrigem && enderecoOrigem.trim() !== "" &&
+    enderecoDestino && enderecoDestino.trim() !== ""
+  );
+};
+const validarEtapa5 = () => genero !== null;
 
    const [modalFinal, setModalFinal] = useState(false);
 
   const totalEtapas = 5;
 
-  const formatarData = (date) => {
-    const dia = date.getDate().toString().padStart(2, "0");
-    const mes = (date.getMonth() + 1).toString().padStart(2, "0");
-    const ano = date.getFullYear();
-    return `${dia}/${mes}/${ano}`;
-  };
+
 
   const formatarHora = (date) => {
     const hora = date.getHours().toString().padStart(2, "0");
@@ -80,15 +93,14 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
     if (Platform.OS === "web") {
       const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
       if (dataSelecionada) {
-        const [ano, mes, dia] = dataSelecionada.split("-");
-        setData(`${dia}/${mes}/${ano}`);
+        setData(dataSelecionada);
       }
     } else {
       DateTimePickerAndroid.open({
         value: new Date(),
         mode: "date",
         onChange: (event, selectedDate) => {
-          if (selectedDate) setData(formatarData(selectedDate));
+          setData(selectedDate.toISOString().split("T")[0]);
         },
       });
     }
@@ -209,22 +221,12 @@ const enviarEndereco = async () =>{
 
     try {
 
-      console.log({
-        nomeServico: nomeServicosSelecionados,
-        idUsuario: user.idUsuario,
-        tipoServico,
-        descServico: textoOutro,
-        dataServico: data,
-        horaInicioServico: horarioIn,
-        horaTerminoServico: horarioT,
-        idEndereco: idEnderecoSelecionado,
-      });
       const response = await axios.post(
         `${API_URL}/api/storeServicos`,
         {
-          nomeServico:nomeServicosSelecionados,
+          nomeServico:nomeServicosSelecionados.join(", "),
           idUsuario:user.idUsuario,
-          tipoServico:nomeServicosSelecionados,
+          tipoServico:nomeServicosSelecionados.join(", "),
           descServico:textoOutro,
           dataServico:data,
           horaInicioServico:horarioIn,
@@ -244,6 +246,12 @@ const enviarEndereco = async () =>{
     }catch(error){
 
     }
+  }
+  if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+
+  const fecharModal = () => {
+    navigation.navigate('Home'); 
+    setModalFinal(false);
   }
 
   return (
@@ -283,7 +291,16 @@ const enviarEndereco = async () =>{
           </TouchableOpacity>
 
           <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+            <TouchableOpacity
+              style={[styles.bFoto, { opacity: validarEtapa1() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa1()) {
+                  setEtapa(2);
+                } else {
+                  alert("Preencha todos os campos antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -319,7 +336,16 @@ const enviarEndereco = async () =>{
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(1)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+            <TouchableOpacity               
+            style={[styles.bFoto, { opacity: validarEtapa2() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa2()) {
+                  setEtapa(3);
+                } else {
+                  alert("Selecione um ou mais campos antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -346,7 +372,16 @@ const enviarEndereco = async () =>{
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+            <TouchableOpacity               
+            style={[styles.bFoto, { opacity: validarEtapa3() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa3()) {
+                  setEtapa(4);
+                } else {
+                  alert("Preencha o campo antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -531,10 +566,21 @@ const enviarEndereco = async () =>{
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(5)}>
+
+            <TouchableOpacity
+              style={[styles.bFoto, { opacity: validarEtapa4() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa4()) {
+                  setEtapa(5);
+                } else {
+                  alert("Selecione ou cadastre um endereço antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
+
         </View>
       )}
 
@@ -559,16 +605,23 @@ const enviarEndereco = async () =>{
           <View style={styles.botoes}>
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
               <Text style={styles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={async () => {
-              console.log("Botão Finalizar clicado!");
-  const sucesso = await enviarDados(); 
-  if (sucesso) {
-    setModalFinal(true);
-  }
-}}>
-              <Text style={styles.buttonText}>Finalizar</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> 
+              <TouchableOpacity
+                style={[styles.bFoto, { opacity: validarEtapa5() ? 1 : 0.5 }]}
+                onPress={async () => {
+                  if (validarEtapa5()) {
+                    const sucesso = await enviarDados(); 
+                    if (sucesso) {
+                      setModalFinal(true);
+                    }
+                  } else {
+                    alert("Selecione uma opção antes de finalizar!");
+                  }
+                 
+                }}
+              >
+                <Text style={styles.buttonText}>Finalizar</Text>
+              </TouchableOpacity>
           </View>
 
           <Modal visible={modalFinal} transparent animationType="slide" onRequestClose={() => setModalFinal(false)}>
@@ -579,7 +632,7 @@ const enviarEndereco = async () =>{
                 <Text style={styles.modalSubTitulo}>Você receberá uma notificação quando um cuidador aceitar sua solicitação!</Text>
 
                 <View style={styles.botoes}>
-                  <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('Home')}>
+                  <TouchableOpacity style={styles.bFoto} onPress={fecharModal}>
                     <Text style={styles.buttonText}>Entendi</Text>
                   </TouchableOpacity>
                 </View>

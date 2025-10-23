@@ -18,7 +18,7 @@ return new class extends Migration
             
             $table->unsignedBigInteger('idProfissionalServico');
             $table->datetime('dataInicioContrato');
-            $table->datetime('dataFinalContrato');
+            $table->datetime('dataFinalContrato')->nullable();
             $table->string('statusContrato');
             $table->string('obsContrato');
             $table->timestamps();

@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { UserContext } from "./userContext";
 import axios from 'axios';
 import { useState, useContext } from 'react';
-
+import { API_URL } from '../screens/link';
 const Stack = createNativeStackNavigator();
 
 
@@ -18,7 +18,7 @@ const [mensagem, setMensagem] = useState('');
 
 const enviarLogin = async () => {
     try {
-      const response = await axios.post(`http://localhost:8000/api/loginFree`, {
+      const response = await axios.post(`${API_URL}/api/loginFree`, {
         emailProfissional,
         senhaProfissional,
       });

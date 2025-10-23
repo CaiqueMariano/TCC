@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions,Modal , Image } from "react-native";
 import colors from "./colors";
 import { TextInput } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -88,6 +88,8 @@ export default function Cadastro({ navigation }) {
     }
   };
 
+    const [modalFotoVisible, setModalFotoVisible] = useState(false)
+
   const totalEtapas = 3;
 
   const Progresso = () => (
@@ -132,10 +134,57 @@ export default function Cadastro({ navigation }) {
       }
     };
 
+  const validarEtapa1 = () => {
+    const apenasNumeros = (telefoneUsuario || "").replace(/\D/g, "");
+
+    const telefoneValido =
+      apenasNumeros.length === 11 &&
+      apenasNumeros.startsWith("9", 2); // garante que seja celular (9 após DDD)
+
+    return (
+      nomeUsuario.trim().length > 0 &&
+      senhaUsuario.trim().length > 0 &&
+      telefoneValido
+    );
+  };
+
+  const validarEtapa2 = () => {
+  const dataValida = /^\d{2}\/\d{2}\/\d{4}$/.test(dataNasc); 
+  return dataValida && value !== null && value !== "";
+};
+
+  const formatarTelefone = (valor, anterior) => {
+  // Remove tudo que não for número
+  let telefone = valor.replace(/\D/g, "");
+
+    if (telefone.length < anterior.replace(/\D/g, "").length) {
+    return valor;
+  }
+
+  telefone = telefone.slice(0, 11);
+
+  // aplica o formato celular 
+  if (telefone.length > 2 && telefone.length <= 7) {
+    telefone = telefone.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+  } else if (telefone.length > 7) {
+    telefone = telefone.replace(/^(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+  } else if (telefone.length > 0) {
+    telefone = telefone.replace(/^(\d{0,2})/, "($1");
+  }
+
+  return telefone;
+
+
+};
+
   return (
     <View style={styles.container}>
       <View style={styles.Form1}></View>
       <View style={styles.Form2}></View>
+    
+       <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+         <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+      </TouchableOpacity>
 
       <Image
         source={require('../../assets/images/Zeloo.png')}
@@ -154,12 +203,16 @@ export default function Cadastro({ navigation }) {
       onChangeText={setNomeUsuario}
     />
 
-    <TextInput
-      style={styles.input}
-      placeholder="Telefone"
-      onChangeText={setTelefoneUsuario}
-      keyboardType="numeric"
-    />
+      <TextInput
+        style={styles.input}
+        placeholder="Telefone celular"
+        keyboardType="numeric"
+        value={telefoneUsuario}
+        onChangeText={(text) =>
+          setTelefoneUsuario(formatarTelefone(text, telefoneUsuario))
+        }
+        maxLength={15}
+      />
 
     <View style={styles.senhaContainer}>
       <TextInput
@@ -178,9 +231,18 @@ export default function Cadastro({ navigation }) {
       <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('BemVindo')}>
         <Text style={styles.buttonText}>Voltar</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
-        <Text style={styles.buttonText}>Próximo</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.bFoto, { opacity: validarEtapa1() ? 1 : 0.5 }]}
+            onPress={() => {
+              if (validarEtapa1()) {
+                setEtapa(2);
+              } else {
+                alert("Preencha todos os campos antes de continuar!");
+              }
+            }}
+          >
+            <Text style={styles.buttonText}>Próximo</Text>
+        </TouchableOpacity>
     </View>
   </View>
 )}
@@ -216,39 +278,93 @@ export default function Cadastro({ navigation }) {
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(1)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+            <TouchableOpacity                
+            style={[styles.bFoto, { opacity: validarEtapa2() ? 1 : 0.5 }]}
+                onPress={() => {
+                  if (validarEtapa2()) {
+                    setEtapa(3);
+                  } else {
+                    alert("Selecione uma opção antes de finalizar!");
+                  }
+                }}
+              >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
-      {etapa === 3 && (
-        <View style={styles.form}>
-            <Progresso />
-          <Text style={styles.title}>Adicione uma foto sua</Text>
+    {etapa === 3 && (
+      <View style={styles.form}>
+        <Progresso />
+        <Text style={styles.title}>Clique na foto para adicionar uma foto sua</Text>
 
+        <TouchableOpacity onPress={() => setModalFotoVisible(true)}>
           <Image
             source={imagem ? { uri: imagem } : require('../../assets/images/perfil.png')}
             style={styles.image}
           />
+        </TouchableOpacity>
 
-          <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={escolherDaGaleria}>
-              <Text style={styles.buttonText}>Galeria</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={tirarFoto}>
-              <Text style={styles.buttonText}>Tirar Foto</Text>
-            </TouchableOpacity>
-          </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalFotoVisible}
+          onRequestClose={() => setModalFotoVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Escolha uma opção</Text>
 
-          <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={enviarDados}>
-              <Text style={styles.buttonText}>Finalizar</Text>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.modalButton} 
+                onPress={() => {
+                  setModalFotoVisible(false);
+                  escolherDaGaleria();
+                }}
+              >
+                <Text style={styles.modalButtonText}>Galeria</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.modalButton} 
+                onPress={() => {
+                  setModalFotoVisible(false);
+                  tirarFoto();
+                }}
+              >
+                <Text style={styles.modalButtonText}>Tirar Foto</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.modalButton, { backgroundColor: colors.cinza }]} 
+                onPress={() => setModalFotoVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+        </Modal>
+
+        <View style={styles.botoes}>
+          <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+            <Text style={styles.buttonText}>Voltar</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.bFoto, { opacity: imagem ? 1 : 0.5 }]}
+              onPress={() => {
+                if (imagem) {
+                 enviarDados();
+                } else {
+                  alert("Por favor, adicione uma foto antes de finalizar!");
+                }
+              }}
+            >
+            <Text style={styles.buttonText}>Finalizar</Text>
+          </TouchableOpacity>
         </View>
-      )}
+      </View>
+    )}
     </View>
   );
 }
@@ -259,6 +375,23 @@ const styles = StyleSheet.create({
     backgroundColor: colors.branco,
     alignItems: "center",
     paddingHorizontal: 20,
+  },
+  soundButton: {
+    position: 'absolute',
+    top: 430, 
+    right: 15, 
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+
+  justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    zIndex: 1002,
+  },
+  soundIcon: {
+    width: 65,
+    height: 65,
   },
     senhaContainer: {
     flexDirection: 'row',
@@ -381,6 +514,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: colors.preto,
+    textAlign: 'center',
   },
   dropdowncontainer: {
   width: width * 0.8,
@@ -403,5 +537,40 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     zIndex: 2,
   },
+modalOverlay: {
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+modalContainer: {
+  width: "80%",
+  backgroundColor: colors.branco,
+  borderRadius: 15,
+  padding: 20,
+  alignItems: "center",
+  elevation: 10,
+},
+modalTitle: {
+  fontSize: 18,
+  fontWeight: "bold",
+  marginBottom: 15,
+  color: colors.preto,
+},
+modalButton: {
+  width: "100%",
+  backgroundColor: colors.azul,
+  paddingVertical: 12,
+  borderRadius: 8,
+  marginTop: 10,
+  alignItems: "center",
+  borderWidth: 2,
+  borderColor: colors.preto,
+},
+modalButtonText: {
+  fontSize: 16,
+  color: colors.preto,
+  fontWeight: "600",
+},
 
 });

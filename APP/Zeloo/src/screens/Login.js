@@ -6,6 +6,7 @@ import colors from './colors';
 import { UserContext } from "./userContext";
 import { API_URL } from '../screens/link';
 
+import { Ionicons } from '@expo/vector-icons';
 
 const { width, height } = Dimensions.get("window");
 
@@ -16,27 +17,57 @@ export default function Login({navigation}) {
   const [valor, setValor] = useState(null);
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
   const [senhaUsuario,setSenhaUsuario] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [ver, setVer] = useState("");
   const [items, setItems] = useState([
     { label: 'Idoso', value: 'ido' },
     { label: 'Familia', value: 'fam' },
+
+    
   ]);
+
+  const formatarTelefone = (valor, anterior) => {
+  // Remove tudo que não for número
+  let telefone = valor.replace(/\D/g, "");
+
+    if (telefone.length < anterior.replace(/\D/g, "").length) {
+    return valor;
+  }
+
+  telefone = telefone.slice(0, 11);
+
+  // aplica o formato celular 
+  if (telefone.length > 2 && telefone.length <= 7) {
+    telefone = telefone.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+  } else if (telefone.length > 7) {
+    telefone = telefone.replace(/^(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
+  } else if (telefone.length > 0) {
+    telefone = telefone.replace(/^(\d{0,2})/, "($1");
+  }
+
+  return telefone;
+};
 
   const enviarLogin = async () => {
     try {
+      const telefoneLimpo = telefoneUsuario.replace(/\D/g, "");
       const response = await axios.post(`${API_URL}/api/login`, {
-        telefoneUsuario,
+        telefoneUsuario:telefoneLimpo,
         senhaUsuario
       });
+   
   
       if (response.data.success) {
         setUser(response.data.data);
         navigation.navigate("Home");
       } else {
+       
         setMensagem('Telefone ou senha incorretos');
         console.log("Erro", response.data.message);
       }
   
     } catch (error) {
+     
       setMensagem('Telefone ou senha incorretos');
       console.error(error);
     }
@@ -46,6 +77,10 @@ export default function Login({navigation}) {
     <View style={styles.Container}>
       <View style={styles.Form1}></View>
       <View style={styles.Form2}></View>
+
+       <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+         <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+      </TouchableOpacity>
 
       <Image 
         source={require('../../assets/images/Zeloo.png')}
@@ -60,15 +95,28 @@ export default function Login({navigation}) {
 
       <TextInput
         style={styles.input}
-        placeholder="Telefone"
-        onChangeText={setTelefoneUsuario}
+        placeholder="Telefone celular"
+        keyboardType="numeric"
+        value={telefoneUsuario}
+        onChangeText={(text) =>
+          setTelefoneUsuario(formatarTelefone(text, telefoneUsuario))
+        }
+        maxLength={15}
       />
 
+
+    <View style={styles.senhaContainer}>
       <TextInput
-        style={styles.input}
+        style={styles.senhaInput}
         placeholder="Senha"
         onChangeText={setSenhaUsuario}
+        secureTextEntry={!mostrarSenha}
       />
+      <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+        <Text style={styles.senhaToggle}>{mostrarSenha ? <Ionicons size={25} name="eye-outline"></Ionicons>
+ : <Ionicons name="eye-off-outline" size={25}/> }</Text>
+      </TouchableOpacity>
+    </View>
 
       <View style={styles.botoes}>
         <TouchableOpacity style={styles.button}>
@@ -107,6 +155,23 @@ mensagemText:{
     position: 'absolute',
 
   },
+  soundButton: {
+    position: 'absolute',
+    top: 430, 
+    right: 15, 
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+
+  justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    zIndex: 1002,
+  },
+  soundIcon: {
+    width: 65,
+    height: 65,
+  },
   Form1: {
     width: width * 0.9,
     aspectRatio: 2,
@@ -129,7 +194,28 @@ mensagemText:{
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
   },
-    Container2: {
+  senhaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: width * 0.8,
+    height: 50,
+    borderWidth: 2,
+    borderColor: colors.preto,
+    borderRadius: 10,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    backgroundColor: colors.branco,
+  },
+  senhaInput: {
+    flex: 1,
+    fontSize: 16,
+    height: '100%',
+  },
+  senhaToggle: {
+    fontSize: 18,
+    marginLeft: 10,
+  },
+  Container2: {
     flex: 1,
     marginTop: "58%",
     alignItems: 'center',
