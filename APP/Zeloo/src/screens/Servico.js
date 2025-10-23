@@ -81,18 +81,14 @@ const validarEtapa5 = () => genero !== null;
 
   const totalEtapas = 5;
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> dc74ca52f740281f1d1db472af2d597b5853f8d8
   const formatarHora = (date) => {
     const hora = date.getHours().toString().padStart(2, "0");
     const minuto = date.getMinutes().toString().padStart(2, "0");
     return `${hora}:${minuto}`;
   };
 
-<<<<<<< HEAD
   const abrirDatePicker = () => {
     if (Platform.OS === "web") {
       const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
@@ -107,26 +103,7 @@ const validarEtapa5 = () => genero !== null;
           setData(selectedDate.toISOString().split("T")[0]);
         },
       });
-=======
- const abrirDatePicker = () => {
-  if (Platform.OS === "web") {
-    const dataSelecionada = prompt("Digite a data (aaaa-mm-dd):");
-    if (dataSelecionada) {
-      // Removido a transformação, setar direto
-      setData(dataSelecionada);
->>>>>>> dc74ca52f740281f1d1db472af2d597b5853f8d8
     }
-  } else {
-    DateTimePickerAndroid.open({
-      value: new Date(),
-      mode: "date",
-      onChange: (event, selectedDate) => {
-        if (selectedDate) {
-          // Setar data no formato 'aaaa-mm-dd' direto
-          setData(selectedDate.toISOString().split('T')[0]);
-        }
-      },
-    });
   }
 };
   const abrirTimePicker = (setHorario) => {
@@ -244,22 +221,12 @@ const nomeServicoString = nomeServicosSelecionados.join("");
 
     try {
 
-<<<<<<< HEAD
       const response = await axios.post(
         `${API_URL}/api/storeServicos`,
         {
           nomeServico:nomeServicosSelecionados.join(", "),
           idUsuario:user.idUsuario,
           tipoServico:nomeServicosSelecionados.join(", "),
-=======
-      
-      const response = await axios.post(
-        `${API_URL}/api/storeServicos`,
-        {
-          nomeServico:nomeServicoString,
-          idUsuario:user.idUsuario,
-          tipoServico:nomeServicoString,
->>>>>>> dc74ca52f740281f1d1db472af2d597b5853f8d8
           descServico:textoOutro,
           dataServico:data,
           horaInicioServico:horarioIn,
@@ -647,7 +614,6 @@ const nomeServicoString = nomeServicosSelecionados.join("");
           <View style={styles.botoes}>
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
               <Text style={styles.buttonText}>Voltar</Text>
-<<<<<<< HEAD
             </TouchableOpacity> 
               <TouchableOpacity
                 style={[styles.bFoto, { opacity: validarEtapa5() ? 1 : 0.5 }]}
@@ -665,22 +631,6 @@ const nomeServicoString = nomeServicosSelecionados.join("");
               >
                 <Text style={styles.buttonText}>Finalizar</Text>
               </TouchableOpacity>
-=======
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={async () => {
-              console.log("Botão Finalizar clicado!");
-  const sucesso = await enviarDados(); 
-  if (sucesso) {
-    setModalFinal(true);
-  }
-}}>
-              <Text style={styles.buttonText}>Finalizar</Text>
-            </TouchableOpacity>
-
-    
-      
-            
->>>>>>> dc74ca52f740281f1d1db472af2d597b5853f8d8
           </View>
 
           <Modal visible={modalFinal} transparent animationType="slide" onRequestClose={() => setModalFinal(false)}>
@@ -706,7 +656,7 @@ const nomeServicoString = nomeServicosSelecionados.join("");
 
     
   );
-}
+
 
 const styles = StyleSheet.create({
   container: { 
