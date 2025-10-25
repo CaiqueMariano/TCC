@@ -75,7 +75,13 @@ Route::post('/usuario','App\Http\Controllers\ZelooController@storeUsuarioApi');
 Route::post('/familiar','App\Http\Controllers\ZelooController@storeFamiliarApi');
 Route::post('/idoso','App\Http\Controllers\ZelooController@storeIdosoApi');*/
 
+
+
 //Cadastro Profissional
 Route::post('/profissional','App\Http\Controllers\ZelooController@storeProfissionalApi');
 
+
 //Route::post('/telefone','App\Http\Controllers\ZelooController@storeTelefoneApi');
+
+Route::post('/telefone','App\Http\Controllers\ZelooController@storeTelefoneApi');
+

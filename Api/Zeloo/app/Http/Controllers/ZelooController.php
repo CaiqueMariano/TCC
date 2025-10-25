@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Auth\AuthenticationException;
 use App\Models\servicoModel;
 use App\Models\enderecoModel; 
@@ -52,7 +53,22 @@ class ZelooController extends Controller
         return view('login');
     }
 
+    // Função para gerar PDF do Dashboard
+public function downloadDashboardPdf()
+{
+    // Buscar dados que você deseja mostrar no PDF
+    $totalReclamacoes = Denuncias::count();
+    $totalCuidadores = ProfissionalModel::count();
+    $totalServicos = servicoModel::count();
 
+
+    $dados = compact('totalReclamacoes', 'totalCuidadores', 'totalServicos');
+
+    $pdf = Pdf::loadView('dashboard_pdf', $dados);
+
+    // Retornar download do PDF
+    return $pdf->download('dashboard.pdf');
+}
 
   
     

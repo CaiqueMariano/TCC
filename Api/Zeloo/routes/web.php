@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Auth\AuthenticationException;
+use App\Http\Controllers\ZelooController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -26,4 +27,7 @@ Route::get('/denuncias','App\Http\Controllers\ZelooController@denuncias')->name(
 Route::get('/denunciados','App\Http\Controllers\ZelooController@denunciados')->name('denunciados')->middleware(Authenticate::class);
 
 
+Route::get('/admin/download-dashboard-pdf', [ZelooController::class, 'downloadDashboardPdf'])
+    ->name('download.dashboard.pdf');
+   
 
