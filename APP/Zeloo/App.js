@@ -26,67 +26,13 @@ import Adicionar from './src/screens/Adicionar';
 import { UserProvider } from "./src/screens/userContext";
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
+import { AccessibilityProvider } from './src/screens/AccessibilityContext';
 const Stack = createNativeStackNavigator();
-/*const Tab = createBottomTabNavigator();
-
-// No futuro sera configuracoes e notificacoes
-function TabRoutes() {
-  return (
-   <Tab.Navigator screenOptions={{ 
-    headerShown: false, 
-    tabBarShowLabel: true,
-    tabBarActiveTintColor: colors.azul,
-    tabBarInactiveTintColor: colors.preto,
-    tabBarStyle: {
-          height: '10%',
-          position: Platform.OS === 'web' ? 'relative' : 'absolute',
-        },
-    }}>
-
-      <Tab.Screen
-        name="Início"
-        component={Home}
-        options={{
-          tabBarIcon:  ({color}) => (
-          <Ionicons name="home" size = {20} color={color}/>
-          ),
-        }}
-      /> 
-
-      <Tab.Screen 
-        name="Perfil" 
-        component={Perfil} 
-        options={{
-      
-          tabBarIcon:  ({color}) => (
-          <Ionicons name="person-circle" size = {20} color={color}/>
-          ),
-          
-        }}
-      /> 
-
-      
-      
-      <Tab.Screen 
-        name="Configurações" 
-        component={configuracoes} 
-        options={{
-          
-          tabBarIcon:  ({color}) => (
-          <Ionicons name="settings" size = {20} color={color}/>
-          ),
-        }}
-      /> 
-
-      
-
-    </Tab.Navigator>
-  );
-}*/
 
 export default function App() {
   return (
-    <UserProvider>
+<UserProvider>
+  <AccessibilityProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
       
@@ -107,6 +53,7 @@ export default function App() {
        
       </Stack.Navigator>
     </NavigationContainer>
-    </UserProvider>
+    </AccessibilityProvider>
+  </UserProvider>
   );
 }

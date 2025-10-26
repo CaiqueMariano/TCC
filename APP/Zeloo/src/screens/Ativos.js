@@ -3,11 +3,12 @@ import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, 
 import colors from './colors';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
+import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import Home from './Home';
 const { width, height } = Dimensions.get("window");
 
 export default function Ativos({ navigation }) {
-
+const { increaseScale, decreaseScale, resetScale,scale } = useAccessibility();
 
     const [profissional, setProfissional] = useState({
         idProfissional: "",
@@ -38,26 +39,26 @@ export default function Ativos({ navigation }) {
       <View style={styles.header}>
 
         <TouchableOpacity onPress={() => navigation.navigate(Home)}>
-                         <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
-                       </TouchableOpacity>
+             <Ionicons name="arrow-back-outline" size={28 * scale} color={colors.preto} />
+         </TouchableOpacity>
         <Text style={styles.title}> Ativos </Text>
         <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
-        <Ionicons name="settings-outline" size={28} color={colors.preto} />
+        <Ionicons name="settings-outline" size={28 * scale} color={colors.preto} />
       </TouchableOpacity>
           
 
       </View>
       <View style={styles.headerTabs}>
         <TouchableOpacity onPress={() => navigation.navigate('Apagar')}>
-          <Text style={styles.tabText}>A Pagar</Text>
+          <EscalarText style={styles.tabText}>A Pagar</EscalarText>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => navigation.navigate('Pendente')}>
-          <Text style={styles.tabText}>Pendentes</Text>
+          <EscalarText style={styles.tabText}>Pendentes</EscalarText>
         </TouchableOpacity>
 
         <View style={styles.activeTab}>
-          <Text style={styles.activeTabText}>Ativos</Text>
+          <EscalarText style={styles.activeTabText}>Ativos</EscalarText>
           <View style={styles.activeIndicator} />
         </View>
       </View>
@@ -69,8 +70,8 @@ export default function Ativos({ navigation }) {
         alignItems: 'center',
       }} style={styles.content}>
 
-      <Text style={styles.subtitle}> Contrato ativo mais recente </Text>
-       <View style={styles.cardcontratro}>
+      <EscalarText style={styles.subtitle}> Contrato ativo mais recente </EscalarText>
+       <EscalarCard style={styles.cardcontratro} maxScale={1.2}>
           
          <View style={styles.contractInfo}>
            <Image 
@@ -78,28 +79,28 @@ export default function Ativos({ navigation }) {
              style={styles.contractIcon}
            />
            <View>
-             <Text style={styles.contractName}>Ana Maria Não Braga</Text>
-             <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}>Pago </Text></Text>
+             <EscalarText style={styles.contractName} maxScale={1.}>Ana Maria Não Braga</EscalarText>
+             <EscalarText style={styles.contractStatus} maxScale={1.2}>Status: <Text style={styles.contractPaid}>Pago </Text></EscalarText>
            </View>
          </View>
        
          <View style={styles.separator}></View>
          
-         <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
+         <EscalarText style={styles.detalhestitulo}maxScale={1.2}>Detalhes do contrato</EscalarText>
          
          <View style={{ width: '100%', paddingLeft: 20 }}>
           
-          <Text style={styles.detalhes}>Dia:</Text>
-          <Text style={styles.detalhes}>Horario:</Text>
-          <Text style={styles.detalhes}>Acompanhamento medico:</Text>
-          <Text style={styles.detalhes}>Endereço:</Text>
+          <EscalarText style={styles.detalhes} maxScale={1}>Dia:</EscalarText>
+          <EscalarText style={styles.detalhes} maxScale={1}>Horario:</EscalarText>
+          <EscalarText style={styles.detalhes} maxScale={1}>Acompanhamento medico:</EscalarText>
+          <EscalarText style={styles.detalhes} maxScale={1}>Endereço:</EscalarText>
         </View>
          {/* BOTÃO DE SOM SOBREPOSTO */}
               <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
                 <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
               </TouchableOpacity>
             
-       </View>
+       </EscalarCard>
        
     
        <View style={styles.sectionDivider}>
