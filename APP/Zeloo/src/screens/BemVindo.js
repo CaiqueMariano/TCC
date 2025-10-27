@@ -67,7 +67,7 @@ export default function BemVindo({ navigation }) {
 
         {/* Botões principais */}
         <View style={styles.mainButtons}>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate("Login")}>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate("PerguntasC")}>
             <View style={styles.button}>
               <Text style={styles.buttonText}>Login</Text>
             </View>

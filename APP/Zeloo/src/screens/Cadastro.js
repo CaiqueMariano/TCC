@@ -89,7 +89,7 @@ export default function Cadastro({ navigation }) {
 
     const [modalFotoVisible, setModalFotoVisible] = useState(false)
 
-  const totalEtapas = 3;
+  const totalEtapas = 5;
 
   const Progresso = () => (
     <View style={styles.progressContainer}>
@@ -189,8 +189,6 @@ export default function Cadastro({ navigation }) {
         source={require('../../assets/images/Zeloo.png')}
         style={styles.logo}
       />
-
-    
 
 {etapa === 1 && (
   <View style={styles.form}>
@@ -353,7 +351,7 @@ export default function Cadastro({ navigation }) {
           <TouchableOpacity style={[styles.bFoto, { opacity: imagem ? 1 : 0.5 }]}
               onPress={() => {
                 if (imagem) {
-                  navigation.navigate('Home');
+                  navigation.navigate('PerguntasC');
                 } else {
                   alert("Por favor, adicione uma foto antes de finalizar!");
                 }
@@ -364,6 +362,55 @@ export default function Cadastro({ navigation }) {
         </View>
       </View>
     )}
+    {etapa === 4 && (
+      <View style={styles.form}>
+    
+    
+      
+        
+            <EscalarText style={styles.title}>Sua conta foi criada com sucesso!</EscalarText>
+            
+                  <EscalarImage
+                    source={require('../../assets/images/perguntas1.jpg')}
+                    style={styles.image}
+                />
+            
+            <EscalarText style={styles.text}>Agora precisamos de algumas informações para garantir que o cuidador atenda às suas necessidades.</EscalarText>
+    
+    
+    
+        <View style={styles.botoes}>
+            <EscalarTouchable
+              style={styles.bFoto}
+                onPress={() => {setEtapa(2);}}
+              >
+                <EscalarText style={styles.buttonText}>Próximo</EscalarText>
+            </EscalarTouchable>
+        </View>
+      </View>
+    )}
+    
+    
+          {etapa === 5 && (
+            <View style={styles.form}>
+    
+            <EscalarText style={styles.title}>É de extrema importancia que seja honesto!</EscalarText>
+            
+                  <EscalarImage
+                    source={require('../../assets/images/Honestidade.png')}
+                    style={styles.image1}
+                />
+    
+                <View style={styles.botoes}>
+                    <EscalarTouchable
+                    style={styles.bFoto}
+                        onPress={() => {setEtapa(3);}}
+                    >
+                        <EscalarText style={styles.buttonText}>Próximo</EscalarText>
+                    </EscalarTouchable>
+                </View>
+            </View>
+          )}
     </View>
   );
 }

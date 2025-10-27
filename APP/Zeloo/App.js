@@ -26,6 +26,7 @@ import Adicionar from './src/screens/Adicionar';
 import { UserProvider } from "./src/screens/userContext";
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
+import PerguntasC from './src/screens/PerguntasC'
 import { AccessibilityProvider } from './src/screens/AccessibilityContext';
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ export default function App() {
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
+        <Stack.Screen name="PerguntasC" component={PerguntasC} />
        
       </Stack.Navigator>
     </NavigationContainer>
