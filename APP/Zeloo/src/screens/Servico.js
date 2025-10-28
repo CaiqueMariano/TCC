@@ -579,14 +579,13 @@ const styles = StyleSheet.create({
 
   nav: { 
     width: "100%", 
-    paddingTop: Platform.OS === "web" ? 20 : 45, 
-    paddingBottom: 10, 
-    paddingHorizontal: Platform.OS === "web" ? 40 : 20, 
-    height: Platform.OS === "web" ? height * 0.12 : height * 0.1, 
+    paddingTop: Platform.OS === "ios" ? 60 : 35, 
+    paddingBottom: 15, 
+    paddingHorizontal: 20, 
     flexDirection: "row", 
     justifyContent: "space-between", 
     alignItems: "center", 
-    backgroundColor: colors.azul 
+    backgroundColor: colors.azul,
   },
 
   navTitulo: { 

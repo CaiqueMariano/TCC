@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions,Alert, Image } from "react-native";
 import colors from "./colors";
 import { TextInput } from "react-native";
 import axios from "axios";
@@ -29,7 +29,7 @@ export default function Cadastro({ navigation }) {
         <EscalarTouchable onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
         </EscalarTouchable>
-        <Text style={styles.navTitulo}>Solicitação</Text>
+        <Text style={styles.navTitulo}>Condições de Saúde</Text>
         <EscalarTouchable onPress={() => navigation.navigate('configuracoes')}>
           <Ionicons name="settings-outline" size={28} color={colors.preto} />
         </EscalarTouchable>
@@ -43,45 +43,155 @@ export default function Cadastro({ navigation }) {
         <View style={styles.form}>
           <EscalarText style={styles.title}>Qual o seu nível de Autonomia?</EscalarText>
 
-                <View style={styles.checkboxContainer}>
-                {[
-                    { label: "Eu ando sozinho", checked: checked1, setChecked: setChecked1 },
-                    { label: "Uso cadeira de rodas", checked: checked2, setChecked: setChecked2 },
-                    { label: "Uso andador/bengala", checked: checked3, setChecked: setChecked3 },
-                    { label: "Estou acamado", checked: checked4, setChecked: setChecked4 },
-                ].map((item, i) => (
-                    <EscalarTouchable
-                    key={i}
-                    style={[
-                        styles.checkboxBox,
-                        item.checked && styles.checkboxBoxSelecionado, // muda a cor ao selecionar
-                    ]}
-                    onPress={() => item.setChecked(!item.checked)}
-                    activeOpacity={0.8}
-                    >
-                    <View style={styles.checkboxes}>
-                        <Checkbox
-                        status={item.checked ? "checked" : "unchecked"}
-                        color={colors.azul}
-                        onPress={() => item.setChecked(!item.checked)}
-                        />
-                        <Text style={styles.checkOpicoes}>{item.label}</Text>
-                    </View>
-                    </EscalarTouchable>
-                ))}
+            <View style={styles.checkboxContainer}>
+              {[
+                { 
+                  label: "Eu ando sozinho", 
+                  checked: checked1, 
+                  setChecked: setChecked1,
+                  image: require("../../assets/images/andar.png"),
+                },
+                { 
+                  label: "Uso cadeira de rodas", 
+                  checked: checked2, 
+                  setChecked: setChecked2,
+                  image: require("../../assets/images/cadeira.png"),
+                },
+                { 
+                  label: "Uso andador/bengala", 
+                  checked: checked3, 
+                  setChecked: setChecked3,
+                  image: require("../../assets/images/muleta.png"),
+                },
+                { 
+                  label: "Estou acamado", 
+                  checked: checked4, 
+                  setChecked: setChecked4,
+                  image: require("../../assets/images/acamado.png"),
+                },
+              ].map((item, i) => (
+                <EscalarTouchable
+                  key={i}
+                  style={[
+                    styles.checkboxBox,
+                    item.checked && styles.checkboxBoxSelecionado,
+                  ]}
+                  onPress={() => item.setChecked(!item.checked)}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.checkboxes}>
+                    <Checkbox
+                      status={item.checked ? "checked" : "unchecked"}
+                      color={colors.azul}
+                      onPress={() => item.setChecked(!item.checked)}
+                    />
+                <View style={styles.imageContainer}>
+                    <EscalarImage source={item.image} style={styles.optionImage} resizeMode="contain" />
                 </View>
 
+                    <EscalarText style={styles.checkOpicoes}>{item.label}</EscalarText>
+               
+                  </View>
+                </EscalarTouchable>
+              ))}
+            </View>
 
-          <View style={styles.botoes}>
-            <EscalarTouchable
-              style={styles.bFoto}
-              onPress={() => { setEtapa(3); }}
-            >
-              <EscalarText style={styles.buttonText}>Próximo</EscalarText>
-            </EscalarTouchable>
-          </View>
+
+            <View style={styles.botoes}>
+              <EscalarTouchable
+                style={[
+                  styles.bFoto,
+                  !(checked1 || checked2 || checked3 || checked4) && { opacity: 0.5 }, 
+                ]}
+                onPress={() => {
+                  if (checked1 || checked2 || checked3 || checked4) {
+                    setEtapa(2);
+                  } else {
+                    alert("Por favor, selecione uma opção antes de continuar.");
+                  }
+                }}
+                activeOpacity={0.8}
+              >
+                <EscalarText style={styles.buttonText}>Próximo</EscalarText>
+              </EscalarTouchable>
+            </View>
         </View>
       )}
+
+      {etapa === 2 && (
+        <View style={styles.form}>
+          <EscalarText style={styles.title}>E quanto a sua higiene?</EscalarText>
+
+            <View style={styles.checkboxContainer}>
+              {[
+                { 
+                  label: "Preciso de ajuda com banho e higiene", 
+                  checked: checked1, 
+                  setChecked: setChecked1,
+                  image: require("../../assets/images/banho.png"),
+                },
+                { 
+                  label: "Uso e preciso de fralda trocada", 
+                  checked: checked2, 
+                  setChecked: setChecked2,
+                  image: require("../../assets/images/fralda.png"),
+                },
+                { 
+                  label: "Uso sonda", 
+                  checked: checked3, 
+                  setChecked: setChecked3,
+                  image: require("../../assets/images/sonda.png"),
+                },
+              ].map((item, i) => (
+                <EscalarTouchable
+                  key={i}
+                  style={[
+                    styles.checkboxBox,
+                    item.checked && styles.checkboxBoxSelecionado,
+                  ]}
+                  onPress={() => item.setChecked(!item.checked)}
+                  activeOpacity={0.8}
+                >
+                  <View style={styles.checkboxes}>
+                    <Checkbox
+                      status={item.checked ? "checked" : "unchecked"}
+                      color={colors.azul}
+                      onPress={() => item.setChecked(!item.checked)}
+                    />
+                <View style={styles.imageContainer}>
+                    <EscalarImage source={item.image} style={styles.optionImage} resizeMode="contain" />
+                </View>
+
+                    <EscalarText style={styles.checkOpicoes}>{item.label}</EscalarText>
+               
+                  </View>
+                </EscalarTouchable>
+              ))}
+            </View>
+
+
+            <View style={styles.botoes}>
+              <EscalarTouchable
+                style={[
+                  styles.bFoto,
+                  !(checked1 || checked2 || checked3 || checked4) && { opacity: 0.5 }, // visualmente desativa
+                ]}
+                onPress={() => {
+                  if (checked1 || checked2 || checked3 || checked4) {
+                    setEtapa(3);
+                  } else {
+                    alert("Por favor, selecione uma opção antes de continuar.");
+                  }
+                }}
+                activeOpacity={0.8}
+                disabled={!(checked1 || checked2 || checked3 || checked4)} // bloqueia o toque
+              >
+                <EscalarText style={styles.buttonText}>Próximo</EscalarText>
+              </EscalarTouchable>
+            </View>
+        </View>
+      )}
+      
     </View>
   );
 }
@@ -92,17 +202,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.branco, 
     alignItems: "center" 
   },
-  nav: { 
-    width: "100%", 
-    paddingTop: Platform.OS === "web" ? 20 : 45, 
-    paddingBottom: 10, 
-    paddingHorizontal: Platform.OS === "web" ? 40 : 20, 
-    height: Platform.OS === "web" ? height * 0.12 : height * 0.1, 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
-    backgroundColor: colors.azul 
-  },
+nav: { 
+  width: "100%", 
+  paddingTop: Platform.OS === "ios" ? 60 : 35, 
+  paddingBottom: 15, 
+  paddingHorizontal: 20, 
+  flexDirection: "row", 
+  justifyContent: "space-between", 
+  alignItems: "center", 
+  backgroundColor: colors.azul,
+},
   navTitulo: { 
     fontSize: 20, 
     fontWeight: "bold", 
@@ -111,12 +220,12 @@ const styles = StyleSheet.create({
   form: { 
     width: "100%", 
     alignItems: "center", 
-    marginTop: 60 
+    marginTop: 40 
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 30,
     color: colors.preto,
     textAlign: 'center',
   },
@@ -145,11 +254,33 @@ const styles = StyleSheet.create({
     color: colors.preto, 
     width: 250 
   },
+  optionImage: {
+  width: 90,
+  height: 90,
+  marginLeft: 10, 
+},
+imageContainer: {
+  width: 50, 
+  height: 50,
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflow: 'visible', 
+  marginRight: 10,
+},
+checkboxBoxSelecionado: {
+  backgroundColor: "#E0F2FF", // leve destaque ao selecionar
+  borderColor: colors.azul,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 3,
+  elevation: 3,
+},
   botoes: {
     flexDirection: "row",
     justifyContent: "space-between",
     width: "80%",
-    marginTop: 50,
+    marginTop: 20,
   },
   bFoto: {
     flex: 1,

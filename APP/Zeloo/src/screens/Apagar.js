@@ -106,7 +106,7 @@ export default function Contrato({ navigation }) {
   <TouchableOpacity style={styles.button2}>
     <Text style={styles.buttonText2}>Cancelar</Text>
   </TouchableOpacity>
-  <TouchableOpacity style={styles.button}>
+  <TouchableOpacity style={styles.button}  onPress={() => navigation.navigate('telaPagamento')}>
     <Text style={styles.buttonText}>Pagar</Text>
   </TouchableOpacity>
 </View>

@@ -27,6 +27,7 @@ import { UserProvider } from "./src/screens/userContext";
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
 import PerguntasC from './src/screens/PerguntasC'
+import telaPagamento from './src/screens/telaPagamento'
 import { AccessibilityProvider } from './src/screens/AccessibilityContext';
 const Stack = createNativeStackNavigator();
 
@@ -52,6 +53,7 @@ export default function App() {
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
         <Stack.Screen name="PerguntasC" component={PerguntasC} />
+        <Stack.Screen name="telaPagamento" component={telaPagamento} />
        
       </Stack.Navigator>
     </NavigationContainer>

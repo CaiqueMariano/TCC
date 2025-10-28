@@ -5,6 +5,7 @@ import { TextInput } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
+import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get("window");
@@ -175,6 +176,7 @@ export default function Cadastro({ navigation }) {
 
 
 };
+  const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
 
   return (
     <View style={styles.container}>
@@ -349,14 +351,9 @@ export default function Cadastro({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.bFoto, { opacity: imagem ? 1 : 0.5 }]}
-              onPress={() => {
-                if (imagem) {
-                  navigation.navigate('PerguntasC');
-                } else {
-                  alert("Por favor, adicione uma foto antes de finalizar!");
-                }
-              }}
-            >
+                onPress={() => {setEtapa(4);}}
+              >
+            
             <Text style={styles.buttonText}>Finalizar</Text>
           </TouchableOpacity>
         </View>
@@ -375,14 +372,14 @@ export default function Cadastro({ navigation }) {
                     style={styles.image}
                 />
             
-            <EscalarText style={styles.text}>Agora precisamos de algumas informações para garantir que o cuidador atenda às suas necessidades.</EscalarText>
+            <EscalarText style={styles.text1}>Agora precisamos de algumas informações para garantir que o cuidador atenda às suas necessidades.</EscalarText>
     
     
     
         <View style={styles.botoes}>
             <EscalarTouchable
               style={styles.bFoto}
-                onPress={() => {setEtapa(2);}}
+                onPress={() => {setEtapa(5);}}
               >
                 <EscalarText style={styles.buttonText}>Próximo</EscalarText>
             </EscalarTouchable>
@@ -404,7 +401,7 @@ export default function Cadastro({ navigation }) {
                 <View style={styles.botoes}>
                     <EscalarTouchable
                     style={styles.bFoto}
-                        onPress={() => {setEtapa(3);}}
+                        onPress={() => navigation.navigate('PerguntasC')}
                     >
                         <EscalarText style={styles.buttonText}>Próximo</EscalarText>
                     </EscalarTouchable>
@@ -480,6 +477,17 @@ const styles = StyleSheet.create({
     right: -50,
     borderTopLeftRadius: height * 0.09,
     borderTopRightRadius: height * 0.09,
+  },
+  text1: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: colors.preto,
+  },
+  image1:{
+    width: 200,
+    height: 150,
+    marginBottom: 15,
   },
   logo: {
     left: -190,

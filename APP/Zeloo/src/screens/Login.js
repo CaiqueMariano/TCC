@@ -107,17 +107,15 @@ export default function Login({navigation}) {
       </TouchableOpacity>
     </View>
 
-      <View style={styles.botoes}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText} onPress={() => navigation.navigate('Home')}>Entrar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button2}>
-          <Text style={styles.buttonText} onPress={() => navigation.navigate('Cadastro')}>Cadastrar</Text>
-        </TouchableOpacity>
+        <View style={styles.botoes}>
+                  <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText} onPress={() => navigation.navigate('Home')}>Entrar</Text>
+          </TouchableOpacity>
+                  <TouchableOpacity style={styles.button2}>
+            <Text style={styles.buttonText} onPress={() => navigation.navigate('Cadastro')}>Cadastrar</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-
-    </View>
-
     </View>
       
   );
