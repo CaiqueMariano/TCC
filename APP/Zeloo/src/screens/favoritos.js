@@ -8,7 +8,8 @@ import {
   StyleSheet,
   Platform,
   Dimensions,
-  Image, 
+  Image,
+  Modal,
 } from 'react-native';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,41 +20,59 @@ const { width } = Dimensions.get('window');
 
 export default function Favoritos({ navigation }) {
   const [cuidadores, setCuidadores] = useState([]);
-  const [favoritos, setFavoritos] = useState([]);
+  const [favoritos, setFavoritos] = useState([]); // já começa com todos
   const [pesquisa, setPesquisa] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [cuidadorSelecionado, setCuidadorSelecionado] = useState(null);
 
-  // 🔹 Evita erro de JSON nulo / API off
   useEffect(() => {
     axios
-      // 🔸 se usar emulador Android, troque para http://10.0.2.2:8000
       .get('http://localhost:8000/api/selectProfissional')
       .then((response) => {
-        if (response.data?.data) setCuidadores(response.data.data);
-        else setCuidadores([]);
+        if (response.data?.data) {
+          setCuidadores(response.data.data);
+          // 🔹 Todos começam favoritados
+          setFavoritos(response.data.data.map((c) => c.idProfissional));
+        } else {
+          const dadosTeste = [
+            { idProfissional: 1, nomeProfissional: 'Maria Silva' },
+            { idProfissional: 2, nomeProfissional: 'João Pereira' },
+            { idProfissional: 3, nomeProfissional: 'Carla Souza' },
+            { idProfissional: 4, nomeProfissional: 'Pedro Lima' },
+          ];
+          setCuidadores(dadosTeste);
+          setFavoritos(dadosTeste.map((c) => c.idProfissional));
+        }
       })
       .catch((error) => {
         console.log('Erro ao buscar cuidadores:', error.message);
-        // cria dados de teste caso o servidor falhe
-        setCuidadores([
-          { idProfissional: 1, nomeProfissional: 'Maria Silva' },
+        const dadosTeste = [
+          { idProfissional: 1, nomeProfissional: 'Ana Maria Braga' },
           { idProfissional: 2, nomeProfissional: 'João Pereira' },
           { idProfissional: 3, nomeProfissional: 'Carla Souza' },
           { idProfissional: 4, nomeProfissional: 'Pedro Lima' },
-        ]);
+        ];
+        setCuidadores(dadosTeste);
+        setFavoritos(dadosTeste.map((c) => c.idProfissional));
       });
   }, []);
 
-  const alternarFavorito = (id) => {
-    setFavoritos((prev) =>
-      prev.includes(id)
-        ? prev.filter((fid) => fid !== id)
-        : [...prev, id]
-    );
+  const confirmarDesfavoritar = (id) => {
+    setCuidadorSelecionado(id);
+    setModalVisible(true);
+  };
+
+  const desfavoritar = () => {
+    if (cuidadorSelecionado !== null) {
+      // Remove dos favoritos e da lista
+      setFavoritos((prev) => prev.filter((fid) => fid !== cuidadorSelecionado));
+      setCuidadores((prev) => prev.filter((c) => c.idProfissional !== cuidadorSelecionado));
+      setModalVisible(false);
+      setCuidadorSelecionado(null);
+    }
   };
 
   const renderItem = ({ item }) => (
-    
-          
     <View style={styles.cardRow}>
       <Ionicons
         name="person-circle-outline"
@@ -66,23 +85,17 @@ export default function Favoritos({ navigation }) {
         <Text style={styles.mensagem}>Mensagem...</Text>
       </View>
 
-      <TouchableOpacity onPress={() => alternarFavorito(item.idProfissional)}>
-        <Ionicons
-          name={favoritos.includes(item.idProfissional) ? 'heart' : 'heart-outline'}
-          size={28}
-          color={favoritos.includes(item.idProfissional) ? 'red' : colors.preto}
-        />
+      <TouchableOpacity onPress={() => confirmarDesfavoritar(item.idProfissional)}>
+        <Ionicons name="heart" size={28} color="red" />
       </TouchableOpacity>
     </View>
   );
 
-  // 🔹 Filtragem simples (não quebra se o nome for null)
   const filtrados = cuidadores.filter((item) =>
     item.nomeProfissional?.toLowerCase().includes(pesquisa.toLowerCase())
   );
 
   return (
-    
     <View style={styles.container}>
       {/* TOPO */}
       <View style={styles.header}>
@@ -90,12 +103,11 @@ export default function Favoritos({ navigation }) {
           <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Cuidadores</Text>
+        <Text style={styles.title}>Favoritos</Text>
 
-          <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
-           <Ionicons name="settings-outline" size={28} color={colors.preto} />
-         </TouchableOpacity>
-                  
+        <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+          <Ionicons name="settings-outline" size={28} color={colors.preto} />
+        </TouchableOpacity>
       </View>
 
       {/* CAMPO DE PESQUISA */}
@@ -123,11 +135,45 @@ export default function Favoritos({ navigation }) {
         renderItem={renderItem}
         contentContainerStyle={styles.list}
       />
-      
-     <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-              <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-           </TouchableOpacity>
-      
+
+      <TouchableOpacity
+        style={styles.soundButton}
+        onPress={() => alert('Auxiliar auditivo')}
+      >
+        <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+      </TouchableOpacity>
+
+      {/* MODAL DE CONFIRMAÇÃO */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>
+              Você deseja mesmo desfavoritar esse cuidador?
+            </Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: '#a4e9e5' }]}
+                onPress={desfavoritar}
+              >
+                <Text style={styles.modalButtonText}>Sim</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: '#e74c3c' }]}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Não</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -138,7 +184,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
-
   header: {
     width: '100%',
     flexDirection: 'row',
@@ -148,19 +193,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: Platform.OS === 'web' ? 20 : 35,
   },
-
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     color: colors.preto,
   },
-
   searchContainer: {
     width: '90%',
     alignItems: 'center',
     marginTop: 15,
   },
-
   searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -171,13 +213,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 45,
   },
-
   input: {
     flex: 1,
     fontSize: 16,
     color: '#000',
   },
-
   filterButton: {
     marginTop: 10,
     backgroundColor: '#a4e9e5',
@@ -187,18 +227,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#000',
   },
-
   filterText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.preto,
   },
-
   list: {
     paddingTop: 10,
     paddingBottom: 20,
   },
-
   cardRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -209,34 +246,67 @@ const styles = StyleSheet.create({
     width: width * 0.9,
     height: 100,
   },
-
   nome: {
     fontSize: 16,
     fontWeight: 'bold',
     color: colors.preto,
   },
-
   mensagem: {
     fontSize: 14,
     color: '#666',
   },
   soundButton: {
     position: 'absolute',
-    right: -8,           // fixa no canto direito
-    top: '50%',          // centraliza verticalmente
-    transform: [{ translateY: -15 }], // corrige leve deslocamento pra ficar central
+    right: -8,
+    top: '50%',
+    transform: [{ translateY: -15 }],
     width: 100,
     height: 100,
     borderRadius: 20,
     backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
-   
   },
-  
   soundIcon: {
     width: 73,
     height: 73,
     resizeMode: 'contain',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 25,
+    alignItems: 'center',
+    elevation: 10,
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
+  },
+  modalButton: {
+    flex: 1,
+    marginHorizontal: 8,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  modalButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
   },
 });
