@@ -30,6 +30,11 @@ Route::post('/storeServicos','App\Http\Controllers\ZelooController@storeServico'
 /**API DE buscar SERVICOS */ 
 Route::get('/buscarServicos','App\Http\Controllers\ZelooController@buscarServicos');
 
+// API filtrar serviços 
+
+Route::get('/filtrarServicos', 'App\Http\Controllers\ZelooController@filtrarServicos');
+
+
 //Buscar profissionais
 Route::get('/selectProfissional','App\Http\Controllers\ZelooController@selectProfissional');
 

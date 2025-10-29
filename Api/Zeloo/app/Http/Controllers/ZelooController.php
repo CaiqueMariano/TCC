@@ -833,6 +833,42 @@ return response()->json([
 }
 
 }
+     public function filtrarServicos(Request $request)
+{
+    $query = ProfissionalServicoModel::query()
+        ->with(['profissional', 'servico']); // relação com ProfissionalModel e servicoModel
+
+    if ($request->has('nomeServico')) {
+        $query->whereHas('servico', function($q) use ($request) {
+            $q->where('nomeServico', 'like', '%' . $request->nomeServico . '%');
+        });
+    }
+
+    // Filtro por área do profissional
+    if ($request->has('areaProfissional')) {
+        $query->whereHas('profissional', function($q) use ($request) {
+            $q->where('areaAtuacaoProfissional', 'like', '%' . $request->areaProfissional . '%');
+        });
+    }
+
+    // Filtro por preço mínimo
+    if ($request->has('precoMin')) {
+        $query->where('precoPersonalizado', '>=', $request->precoMin);
+    }
+
+    // Filtro por preço máximo
+    if ($request->has('precoMax')) {
+        $query->where('precoPersonalizado', '<=', $request->precoMax);
+    }
+
+    $resultados = $query->get();
+
+    return response()->json([
+        'success' => true,
+        'data' => $resultados
+    ]);
+}
+
 
 
 

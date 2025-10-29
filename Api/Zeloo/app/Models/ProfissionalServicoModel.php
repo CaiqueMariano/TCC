@@ -18,4 +18,14 @@ class ProfissionalServicoModel extends Model
         'idServico',
         'precoPersonalizado'
     ];
+
+    // Relação com o profissional
+    public function profissional() {
+        return $this->belongsTo(ProfissionalModel::class, 'idProfissional');
+    }
+
+    // Relação com o serviço
+    public function servico() {
+        return $this->belongsTo(servicoModel::class, 'idServico');
+    }
 }
