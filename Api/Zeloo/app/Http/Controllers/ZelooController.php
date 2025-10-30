@@ -15,12 +15,16 @@ use App\Models\User;
 use App\Models\IdosoFamiliaModel;
 use App\Models\UsuarioModel;
 use App\Models\Denuncias;
+use App\Models\DenunciasFreeModel;
 use App\Models\ContratoModel;
 use App\Models\FamiliarModel;
 use App\Models\IdosoModel;
 use App\Models\ProfissionalModel;
 use App\Models\ProfissionalServicoModel;
 use App\Models\TelefoneModel;
+use App\Mail\UsuarioBanidoMail;
+use App\Mail\FreeBanidoMail;
+use Illuminate\Support\Facades\Mail;
 /*TESTE DO GIT HAHAHAHAHAHHAHAHAHAHHAHAHAHAHAHAHAHHAHAHAHHAHAHAHAHHAHAHAHSSS*/
 /*TUTORIAL LEGAL RSRS*/ 
 class ZelooController extends Controller
@@ -104,17 +108,33 @@ public function downloadDashboardPdf()
     /*BANIR USUARIO*/
     public function destroyUsuario($idUsuario)
     {
-
+        $usuarioss = UsuarioModel::find($idUsuario);
         
         if (Denuncias::exists()) {
             UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'inativo']);
-           
+            Mail::to($usuarioss->emailUsuario)->send(new UsuarioBanidoMail($usuarioss->nomeUsuario));
             return redirect()->route('denuncias')
                             ->with('success', 'Usuário banido com sucesso');
         } else {
             return redirect()->route('registro'); 
         }
     }
+
+    public function destroyFree($idProfissional)
+    {
+        $usuarioss = ProfissionalModel::find($idProfissional);
+        
+        if (DenunciasFreeModel::exists()) {
+            ProfissionalModel::where('idProfissional', '=', $idProfissional)->update(['statusProfissional' => 'inativo']);
+           Mail::to($usuarioss->emailProfissional)->send(new FreeBanidoMail($usuarioss->nomeProfissional));
+            return redirect()->route('denuncias')
+                            ->with('success', 'Usuário banido com sucesso');
+        } else {
+            return redirect()->route('registro'); 
+        }
+    }
+
+    //DESBANIR USUARIO
     public function desbanirUsuario($idUsuario)
     {
 
@@ -123,7 +143,21 @@ public function downloadDashboardPdf()
             UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'ativo']);
             Denuncias::where('idUsuario', '=', $idUsuario)->delete();
             return redirect()->route('denuncias')
-                            ->with('success', 'Usuário banido com sucesso');
+                            ->with('success', 'Usuário desbanido com sucesso');
+        } else {
+            return redirect()->route('registro'); 
+        }
+    }
+
+    public function desbanirFree($idProfissional)
+    {
+
+        
+        if (DenunciasFreeModel::exists()) {
+            ProfissionalModel::where('idProfissional', '=', $idProfissional)->update(['statusProfissional' => 'ativo']);
+            DenunciasFreeModel::where('idProfissional', '=', $idProfissional)->delete();
+            return redirect()->route('denuncias')
+                            ->with('success', 'Usuário desbanido com sucesso');
         } else {
             return redirect()->route('registro'); 
         }
@@ -133,51 +167,71 @@ public function downloadDashboardPdf()
 /*VER DENUCNIAS*/
     public function denuncias(){
 
-        if(Denuncias::exists()){
         $usuarios = DB::table('denuncias')
         ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
         ->where('tb_usuario.statusUsuario', '=', 'ativo')
         ->select(
-            'tb_usuario.idUsuario',
-            'tb_usuario.nomeUsuario',
-            'tb_usuario.tipoUsuario',
-            'denuncias.motivoDenuncia',
-            'denuncias.descDenuncia',
-            'denuncias.evidenciaDenuncia'
+            'tb_usuario.idUsuario as id',
+            'tb_usuario.nomeUsuario as nome',
+            'denuncias.motivoDenuncia as motivo',
+            'denuncias.descDenuncia as desc',
+            'denuncias.evidenciaDenuncia as evidencia',
+            DB::raw("'usuario' as origem")
+        );
 
-        )
+        $profissionais = DB::table('tb_denuncias_free')
+        ->join('tb_profissional', 'tb_denuncias_free.idProfissional', '=', 'tb_profissional.idProfissional')
+        ->where('tb_profissional.statusProfissional', '=', 'ativo')
+        ->select(
+            'tb_profissional.idProfissional as id',
+            'tb_profissional.nomeProfissional as nome',
+            'tb_denuncias_free.motivoDenuncia as motivo',
+            'tb_denuncias_free.descDenuncia as desc',
+            'tb_denuncias_free.evidenciaDenuncia as evidencia',
+            DB::raw("'profissional' as origem")
+        );
+
+
+        $usuarios = $usuarios->unionAll($profissionais)
+        ->orderByDesc('id')
         ->paginate(10);
 
-
         return view('denuncias', compact('usuarios'));
-        }else{
-            return view('nenhum-registro');
-        }
     }
 
     //VER DENUNCIADOS
      public function denunciados(){
 
-        if(Denuncias::exists()){
         $usuarios = DB::table('denuncias')
         ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
         ->where('tb_usuario.statusUsuario', '=', 'inativo')
         ->select(
-            'tb_usuario.idUsuario',
-            'tb_usuario.nomeUsuario',
-            'tb_usuario.tipoUsuario',
-            'denuncias.motivoDenuncia',
-            'denuncias.descDenuncia',
-            'denuncias.evidenciaDenuncia'
+            'tb_usuario.idUsuario as id',
+            'tb_usuario.nomeUsuario as nome',
+            'denuncias.motivoDenuncia as motivo',
+            'denuncias.descDenuncia as desc',
+            'denuncias.evidenciaDenuncia as evidencia',
+            DB::raw("'usuario' as origem")
+        );
 
-        )
+        $profissionais = DB::table('tb_denuncias_free')
+        ->join('tb_profissional', 'tb_denuncias_free.idProfissional', '=', 'tb_profissional.idProfissional')
+        ->where('tb_profissional.statusProfissional', '=', 'inativo')
+        ->select(
+            'tb_profissional.idProfissional as id',
+            'tb_profissional.nomeProfissional as nome',
+            'tb_denuncias_free.motivoDenuncia as motivo',
+            'tb_denuncias_free.descDenuncia as desc',
+            'tb_denuncias_free.evidenciaDenuncia as evidencia',
+            DB::raw("'profissional' as origem")
+        );
+
+
+        $usuarios = $usuarios->unionAll($profissionais)
+        ->orderByDesc('id')
         ->paginate(10);
 
-
         return view('responder-denuncia', compact('usuarios'));
-        }else{
-            return view('nenhum-registro');
-        }
     }
 
 
@@ -607,7 +661,7 @@ public function downloadDashboardPdf()
         {
             $usuario = ProfissionalModel::where('emailProfissional', $request->emailProfissional)->first();
     
-        if (!$usuario || !Hash::check($request->senhaProfissional, $usuario->senhaProfissional)) {
+        if (!$usuario || !Hash::check($request->senhaProfissional, $usuario->senhaProfissional) || $usuario->statusProfissional === 'inativo') {
             return response()->json([
                 'success' => false,
                 'message' => 'E-mail ou senha incorretos'
@@ -921,7 +975,7 @@ return response()->json([
             $profissional->biografiaProfissional = $request->biografiaProfissional;
             $profissional->areaAtuacaoProfissional = $request->areaAtuacaoProfissional;
             $profissional->servicosOferecidosProfissional = $request->servicosOferecidosProfissional;
-       
+            $profissional->statusProfissional = "ativo";
             $profissional->save();
 
             return response()->json([

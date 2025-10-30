@@ -15,7 +15,9 @@ use App\Http\Controllers\ZelooController;
 |
 */
 Route::delete('/excluirPerfil/{idUsuario}','App\Http\Controllers\ZelooController@destroyUsuario');
+Route::delete('/excluirPerfilFree/{idProfissional}','App\Http\Controllers\ZelooController@destroyFree');
 Route::delete('/desbanir/{idUsuario}','App\Http\Controllers\ZelooController@desbanirUsuario');
+Route::delete('/desbanirFree/{idProfissional}','App\Http\Controllers\ZelooController@desbanirFree');
 Route::get('/','App\Http\Controllers\ZelooController@index');
 Route::get('/logoutUser','App\Http\Controllers\ZelooController@logoutUser');
 Route::get('/dashboard','App\Http\Controllers\ZelooController@dashboard')->middleware(Authenticate::class);

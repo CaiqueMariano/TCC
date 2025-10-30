@@ -233,58 +233,46 @@
     <!--CARDS DO BIXOOO!!!-->
 
 
-
+    @if($usuarios->isEmpty())
+    <p>Nenhuma denúncia encontrada.</p>
+    @else
     <table class="table">
   <thead>
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Nome</th>
       <th scope="col">Motivo Denúncia</th>
+      <th scope="col">Tipo de Usuario</th>
       <th scope="col">Banir Usuario</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-        @foreach ($usuarios as $usuario)
-      <th scope="row">{{$usuario->idUsuario}}</th>
-      <td>{{$usuario->nomeUsuario}}</td>
-      <td>{{$usuario->motivoDenuncia}}</td>
-      <td><a href="#" 
-   class="btn btn-primary" 
-   onclick="abrirModalBanir('{{ $usuario->idUsuario }}', '{{ $usuario->nomeUsuario }}', '{{ $usuario->tipoUsuario }}', '{{$usuario->motivoDenuncia}}', '{{$usuario->descDenuncia}}', '{{$usuario->evidenciaDenuncia}}')">
-   Banir
-</a></td>
-    </tr>
-    @endforeach
-  </tbody>
-</table>
-    <!--
-    <div class="card">
-  <h5 class="card-header">{{$usuario->idUsuario}}</h5>
-  <div class="card-body">
-    <h5 class="card-title">{{$usuario->nomeUsuario}}</h5>
-    <div class="tipo">
-    <p class="card-text">{{$usuario->motivoDenuncia}}</p>
-    <div class="tipo">
+   
 
-    
-    <a href="#" 
-   class="btn btn-primary" 
-   onclick="abrirModalBanir('{{ $usuario->idUsuario }}', '{{ $usuario->nomeUsuario }}', '{{ $usuario->tipoUsuario }}', '{{$usuario->motivoDenuncia}}', '{{$usuario->descDenuncia}}', '{{$usuario->evidenciaDenuncia}}')">
-   Banir
-</a>
-    
-  </div>
-</div>
-<BR>
-
-        </div>
-    </div>-->
-
-
-    <div class="d-flex justify-content-center">
+    @foreach ($usuarios as $usuario)
+        <tr>
+            <th scope="row">{{$usuario->id}}</th>
+            <td>{{$usuario->nome}}</td>
+            <td>{{$usuario->motivo}}</td>
+            <td>{{$usuario->origem}}</td>
+            <td>
+                <a href="#" class="btn btn-primary"
+                   onclick="abrirModalBanir('{{ $usuario->id }}', '{{ $usuario->nome }}', '{{$usuario->motivo}}', '{{$usuario->desc}}', '{{$usuario->evidencia}}', '{{$usuario->origem}}')">
+                   Banir
+                </a>
+            </td>
+        </tr>
+        <div class="d-flex justify-content-center">
     {{ $usuarios->links('pagination::bootstrap-5') }}
 </div>
+    @endforeach
+@endif
+  </tbody>
+</table>
+    
+
+ 
 
     <!--MODAL DE BANIMENTO!!!-->
     <div class="modal fade" id="banUserModal" tabindex="-1">
@@ -310,7 +298,7 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Tipo de Usuário</label>
-                                        <input type="text" class="form-control" id="banUserType" readonly>
+                                        <input type="text" class="form-control" id="banUserOrigem" readonly>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -357,14 +345,21 @@
             }
         });
 
-        function abrirModalBanir(idUsuario, nomeUsuario, tipoUsuario, motivoDenuncia, descDenuncia, evidenciaDenuncia){
-            document.getElementById('banUserId').value = idUsuario;
-            document.getElementById('banUserName').value = nomeUsuario;
-            document.getElementById('banUserType').value = tipoUsuario;
-            document.getElementById('banUserMotivo').value = motivoDenuncia;
-            document.getElementById('banUserDesc').value = descDenuncia;
-            document.getElementById('banUserEvidencia').value = evidenciaDenuncia;
-            document.getElementById('banForm').action = '/excluirPerfil/' + idUsuario;
+        function abrirModalBanir(id, nome, tipo, motivo, desc, evidencia, origem){
+            document.getElementById('banUserId').value = id;
+            document.getElementById('banUserName').value = nome;
+     
+            document.getElementById('banUserMotivo').value = motivo;
+            document.getElementById('banUserDesc').value = desc;
+            document.getElementById('banUserEvidencia').value = evidencia;
+           document.getElementById('banUserOrigem').value = origem;
+
+           if(origem === 'usuario'){
+            document.getElementById('banForm').action = '/excluirPerfil/' + id;
+           }else{
+            document.getElementById('banForm').action = '/excluirPerfilFree/' + id;
+           }
+           
             const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
             modal.show();
         }

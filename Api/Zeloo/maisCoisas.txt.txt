@@ -1,7 +1,11 @@
 php artisan serve --host=0.0.0.0 --port=8000
 npx expo start --host lan
 
-
+{
+"name": "Eu",
+"email": "eu@gmail.com",
+"password": "123"
+  }
 import { API_URL } from '../screens/link';
 ${API_URL}
 
