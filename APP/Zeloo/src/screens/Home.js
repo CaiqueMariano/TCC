@@ -162,7 +162,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
         </EscalarTouchable>
 
         <View style={styles.favoritosContainer}>
-          <EscalarTouchable style={styles.card}>
+          <EscalarTouchable style={styles.card}onPress={() => navigation.navigate('favoritos')}>
             <EscalarImage source={require('../../assets/images/favoritos.png')} style={styles.icon} />
             <EscalarText style={styles.cardText}>Favoritos</EscalarText>
           </EscalarTouchable>

@@ -16,6 +16,7 @@ import Home from "./src/screens/Home";
 import Ativos from "./src/screens/Ativos";
 import Apagar from "./src/screens/Apagar";
 import Pendente from "./src/screens/Pendente";
+import favoritos from "./src/screens/favoritos";
 import Perfil from "./src/screens/Perfil";
 import colors from './src/screens/colors';
 import Conta from "./src/screens/Conta";
@@ -48,6 +49,7 @@ export default function App() {
         <Stack.Screen name="Pendente" component={Pendente} />
         <Stack.Screen name="Ativos" component={Ativos} />
         <Stack.Screen name="Contrato" component={Contrato} />
+        <Stack.Screen name="favoritos" component={favoritos} />
         <Stack.Screen name="configuracoes" component={configuracoes} />
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Login" component={Login} />
