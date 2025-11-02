@@ -561,6 +561,56 @@ public function downloadDashboardPdf()
     }
 
 
+//em andanmento
+public function vizualizarContratoAndamento($idProfissional){
+    $contratos = DB::table('tb_contrato')
+    ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
+    ->where('tb_profissional_servico.idProfissional', $idProfissional)
+    ->where('tb_contrato.statusContrato', 'andamento')
+    ->select('tb_contrato.*')
+    ->get();
+
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Contratos encontrados',
+        'data'=> $contratos
+    ],200);
+}
+//CONTRATO A PAGAR
+public function vizualizarContratoAPagar($idProfissional){
+    $contratos = DB::table('tb_contrato')
+    ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
+    ->where('tb_profissional_servico.idProfissional', $idProfissional)
+    ->where('tb_contrato.statusContrato', 'aguardando')
+    ->select('tb_contrato.*')
+    ->get();
+
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Contratos encontrados',
+        'data'=> $contratos
+    ],200);
+}
+
+//CONTRATO INATIVO   
+public function vizualizarContratoTerminado($idProfissional){
+    $contratos = DB::table('tb_contrato')
+    ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
+    ->where('tb_profissional_servico.idProfissional', $idProfissional)
+    ->where('tb_contrato.statusContrato', 'inativo')
+    ->select('tb_contrato.*')
+    ->get();
+
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Contratos encontrados',
+        'data'=> $contratos
+    ],200);
+}
+
 //LISTAR CONTRATOS
     public function vizualizarContrato($idProfissional){
         $contratos = DB::table('tb_contrato')

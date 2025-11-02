@@ -18,6 +18,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//CONTRATOS
+//EM ANDAMENTO vizualizarContratoAndamento
+Route::post('/vizualizarContratoAndamento/{idProfissional}','App\Http\Controllers\ZelooController@vizualizarContratoAndamento');
+//INATIVO
+Route::post('/vizualizarContratoTerminado/{idProfissional}','App\Http\Controllers\ZelooController@vizualizarContratoTerminado');
+//A PAGAR
+Route::post('/vizualizarContratoAPagar/{idProfissional}','App\Http\Controllers\ZelooController@vizualizarContratoAPagar');
+
 //listarEndereco
 Route::post('/listarEndereco','App\Http\Controllers\ZelooController@listarEndereco');
 //Endereco
