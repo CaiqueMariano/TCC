@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform, Alert, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform, Alert, Dimensions, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../temas/ThemeContext';
@@ -15,26 +15,40 @@ export default function Cadastro() {
   
   // Estados para controle das etapas e dados
   const [etapa, setEtapa] = useState(1);
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
-  const [dataNascimento, setDataNascimento] = useState('');
-  const [imagem, setImagem] = useState(null);
+  const [nomeProfissional, setNomeProfissional] = useState('');
+  const [emailProfissional, setEmailProfissional] = useState('');
+  const [telefoneProfissional, setTelefoneProfissional] = useState('');
+  const [senhaProfissional, setSenhaProfissional] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [biografia, setBiografia] = useState('');
+  const [valorMinimo, setValorMinimo] = useState('');
+  const [areaAtuacao, setAreaAtuacao] = useState('');
+  const [mostrarDropdownArea, setMostrarDropdownArea] = useState(false);
+  const [servicosOferecidos, setServicosOferecidos] = useState('');
+  const [imagem, setImagem] = useState(null);
 
-  // Função para formatar data de nascimento
-  const formatarData = (texto) => {
+  // Formatações simples
+  const formatarTelefone = (texto) => {
     let numeros = texto.replace(/\D/g, '');
-    if (numeros.length > 8) numeros = numeros.slice(0, 8);
-    
-    if (numeros.length >= 5) {
-      numeros = numeros.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
-    } else if (numeros.length >= 3) {
-      numeros = numeros.replace(/(\d{2})(\d{1,2})/, '$1/$2');
+    if (numeros.length > 11) numeros = numeros.slice(0, 11);
+    if (numeros.length > 6) {
+      numeros = numeros.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
+    } else if (numeros.length > 2) {
+      numeros = numeros.replace(/(\d{2})(\d{1,4})/, '($1) $2');
     }
-    
-    setDataNascimento(numeros);
+    setTelefoneProfissional(numeros);
+  };
+
+  const formatarValor = (texto) => {
+    let numeros = texto.replace(/[^\d]/g, '');
+    if (!numeros) {
+      setValorMinimo('');
+      return;
+    }
+    const inteiro = numeros.slice(0, Math.max(0, numeros.length - 2));
+    const centavos = numeros.slice(-2).padStart(2, '0');
+    const inteiroFormatado = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    setValorMinimo(`R$ ${inteiroFormatado || '0'},${centavos}`);
   };
 
   // Função para solicitar permissões
@@ -84,7 +98,7 @@ export default function Cadastro() {
   // Componente de progresso
   const Progresso = () => (
     <View style={styles.progressContainer}>
-      {Array.from({ length: 2 }).map((_, index) => (
+      {Array.from({ length: 3 }).map((_, index) => (
         <View
           key={index}
           style={[
@@ -106,39 +120,39 @@ export default function Cadastro() {
           <Text style={styles.loginTitle}>Cadastro</Text>
           
           {etapa === 1 && (
-            <>
+            <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
               <TextInput
                 style={styles.input}
-                placeholder="Nome"
+                placeholder="Nome profissional"
                 placeholderTextColor="#444"
-                value={nome}
-                onChangeText={setNome}
+                value={nomeProfissional}
+                onChangeText={setNomeProfissional}
               />
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder="E-mail profissional"
                 placeholderTextColor="#444"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                value={email}
-                onChangeText={setEmail}
+                value={emailProfissional}
+                onChangeText={setEmailProfissional}
               />
               <TextInput
                 style={styles.input}
-                placeholder="Data de nascimento (DD/MM/AAAA)"
+                placeholder="Telefone profissional"
                 placeholderTextColor="#444"
-                keyboardType="numeric"
-                value={dataNascimento}
-                onChangeText={formatarData}
+                keyboardType="phone-pad"
+                value={telefoneProfissional}
+                onChangeText={formatarTelefone}
               />
               <View style={styles.senhaContainer}>
                 <TextInput
                   style={styles.senhaInput}
-                  placeholder="Senha"
+                  placeholder="Senha profissional"
                   placeholderTextColor="#444"
                   secureTextEntry={!mostrarSenha}
-                  value={senha}
-                  onChangeText={setSenha}
+                  value={senhaProfissional}
+                  onChangeText={setSenhaProfissional}
                 />
                 <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
                   <Ionicons 
@@ -148,18 +162,66 @@ export default function Cadastro() {
                   />
                 </TouchableOpacity>
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="Confirmar senha"
-                placeholderTextColor="#444"
-                secureTextEntry
-                value={confirmarSenha}
-                onChangeText={setConfirmarSenha}
-              />
-            </>
+            </ScrollView>
           )}
 
           {etapa === 2 && (
+            <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="Biografia"
+                placeholderTextColor="#444"
+                value={biografia}
+                onChangeText={setBiografia}
+                multiline
+                textAlignVertical="top"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Valor mínimo (ex: R$ 50,00)"
+                placeholderTextColor="#444"
+                keyboardType="numeric"
+                value={valorMinimo}
+                onChangeText={formatarValor}
+              />
+              <View style={styles.dropdownContainer}>
+                <TouchableOpacity style={styles.dropdownHeader} onPress={() => setMostrarDropdownArea(!mostrarDropdownArea)}>
+                  <Text style={styles.dropdownHeaderText}>{areaAtuacao || 'Área de atuação'}</Text>
+                  <Ionicons name={mostrarDropdownArea ? 'chevron-up' : 'chevron-down'} size={20} color="#444" />
+                </TouchableOpacity>
+                {mostrarDropdownArea && (
+                  <View style={styles.dropdownList}>
+                    {[
+                      'Cuidador de idosos',
+                      'Serviço de compras',
+                      'Transporte',
+                      'Acompanhante médico',
+                      'Enfermagem',
+                    ].map((opcao) => (
+                      <TouchableOpacity
+                        key={opcao}
+                        style={styles.dropdownItem}
+                        onPress={() => { setAreaAtuacao(opcao); setMostrarDropdownArea(false); }}
+                      >
+                        <Text style={styles.dropdownItemText}>{opcao}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                )}
+              </View>
+              <TextInput
+                style={[styles.input, styles.textarea]}
+                placeholder="Serviços oferecidos (descreva)"
+                placeholderTextColor="#444"
+                value={servicosOferecidos}
+                onChangeText={setServicosOferecidos}
+                multiline
+                textAlignVertical="top"
+              />
+            </ScrollView>
+          )}
+
+          {etapa === 3 && (
             <>
               <Text style={styles.photoTitle}>Adicione uma foto sua</Text>
               <Image
@@ -180,7 +242,7 @@ export default function Cadastro() {
           <View style={styles.buttonRow}>
             <TouchableOpacity 
               style={[styles.button, styles.buttonSecondary]} 
-              onPress={() => etapa === 1 ? navigation.goBack() : setEtapa(1)}
+              onPress={() => etapa === 1 ? navigation.goBack() : setEtapa(etapa - 1)}
             >
               <Text style={[styles.buttonText, styles.buttonTextSecondary]}>
                 {etapa === 1 ? 'Cancelar' : 'Voltar'}
@@ -188,10 +250,18 @@ export default function Cadastro() {
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.button, styles.buttonPrimary]}
-              onPress={() => etapa === 1 ? setEtapa(2) : () => {/* Finalizar cadastro */}}
+              onPress={() => {
+                if (etapa < 3) {
+                  setEtapa(etapa + 1);
+                } else {
+                  // Finalizar cadastro - aqui você pode integrar com sua API
+                  Alert.alert('Sucesso', 'Cadastro concluído!');
+                  navigation.goBack();
+                }
+              }}
             >
               <Text style={styles.buttonText}>
-                {etapa === 1 ? 'Seguinte' : 'Finalizar'}
+                {etapa < 3 ? 'Seguinte' : 'Finalizar'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -247,6 +317,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
+  scrollArea: {
+    maxHeight: 360,
+    width: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 8,
+  },
   input: {
     width: '100%',
     height: 44,
@@ -257,6 +334,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     color: '#111',
     marginBottom: 16,
+  },
+  textarea: {
+    height: 100,
   },
   button: {
     width: '100%',
@@ -318,6 +398,40 @@ const styles = StyleSheet.create({
   senhaInput: {
     flex: 1,
     fontSize: 16,
+    color: '#111',
+  },
+  dropdownContainer: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  dropdownHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingHorizontal: 12,
+  },
+  dropdownHeaderText: {
+    color: '#111',
+  },
+  dropdownList: {
+    backgroundColor: 'rgba(255,255,255,0.98)',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    marginTop: 6,
+    overflow: 'hidden',
+  },
+  dropdownItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  dropdownItemText: {
     color: '#111',
   },
   photoTitle: {
