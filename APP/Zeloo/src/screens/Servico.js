@@ -62,7 +62,7 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
     
   ]);
   
-const validarEtapa1 = () => data && horarioIn && horarioT;
+const validarEtapa1 = () => data && horarioIn;
 const validarEtapa2 = () => checked1 || checked2 || checked3 || checked4;
 const validarEtapa3 = () => textoOutro.trim() !== "";
 const validarEtapa4 = () => {
@@ -104,7 +104,7 @@ const validarEtapa5 = () => genero !== null;
         },
       });
     }
-  }
+  
 };
   const abrirTimePicker = (setHorario) => {
     if (Platform.OS === "web") {
@@ -229,6 +229,7 @@ const nomeServicoString = nomeServicosSelecionados.join("");
           tipoServico:nomeServicosSelecionados.join(", "),
           descServico:textoOutro,
           dataServico:data,
+          generoServico:genero,
           horaInicioServico:horarioIn,
           horaTerminoServico:horarioT,
           idEndereco:idEnderecoSelecionado
@@ -587,14 +588,14 @@ const nomeServicoString = nomeServicosSelecionados.join("");
 
       {etapa === 5 && (
         <View style={styles.form}>
-           <Text style={styles.teste}> nomeServico:{nomeServicosSelecionados},</Text>
+           {/*<Text style={styles.teste}> nomeServico:{nomeServicosSelecionados},</Text>
          <Text> idUsuario:{user.idUsuario},</Text>
          <Text> tipoServico:{nomeServicosSelecionados},</Text>
          <Text> descServico:{textoOutro},</Text>
          <Text> dataServico:{data},</Text>
          <Text> horaInicioServico:{horarioIn},</Text>
          <Text> horaTerminoServico:{horarioT},</Text>
-         <Text> idEndereco:{idEnderecoSelecionado}</Text>
+         <Text> idEndereco:{idEnderecoSelecionado}</Text>*/}
           <Progresso />
             <Text style={styles.title}>Tem Preferencia de Gênero?</Text> 
             <Image source={require('../../assets/images/sexologia.png')} style={styles.image} />
@@ -656,7 +657,7 @@ const nomeServicoString = nomeServicosSelecionados.join("");
 
     
   );
-
+}
 
 const styles = StyleSheet.create({
   container: { 

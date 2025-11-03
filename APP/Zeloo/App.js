@@ -18,6 +18,7 @@ import Apagar from "./src/screens/Apagar";
 import Pendente from "./src/screens/Pendente";
 import Perfil from "./src/screens/Perfil";
 import colors from './src/screens/colors';
+import telaPagamento from './src/screens/telaPagamento';
 import Conta from "./src/screens/Conta";
 import configuracoes from "./src/screens/configuracoes";
 import Contratar from "./src/screens/Contratar";
@@ -92,6 +93,7 @@ export default function App() {
       
         <Stack.Screen name="BemVindo" component={BemVindo} />
         <Stack.Screen name="Adicionar" component={Adicionar} />
+        <Stack.Screen name="telaPagamento" component={telaPagamento} />
         <Stack.Screen name="Conta" component={Conta} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="Servico" component={Servico} />

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('statusUsuario');
             $table->date('dataNasc');
             $table->string('tipoUsuario');
+            $table->string('fotoUsuario')->nullable();
  
 
 

@@ -1,35 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, StyleSheet, Image, ScrollView } from 'react-native';
 import colors from './colors';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Home';
+import { UserContext } from "./userContext";
+import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 
 export default function Contrato({ navigation }) {
+  const { user } = useContext(UserContext);
+
+  const [servicos, setServico] = useState([]);
+
+  useEffect(()=>{
+    axios.get(`${API_URL}/api/vizualizarContratoAPagar/${user.idUsuario}`)
+    .then(response => setServico(response.data.data))
+    .catch(error => console.log(error));
+  },[])
 
 
-    const [profissional, setProfissional] = useState({
-        idProfissional: "",
-        nomeProfissional: ""
-    });
-    useEffect(()=>{
-        axios.get(`http://localhost:8000/api/selectProfissional`)
-        .then(response => setProfissional(response.data.data))
-        .catch(error => console.log("ERRO", error));
-      },[])
-
-
-      
-
-  const renderItem = ({ item }) => (
-    <View style={styles.cuida}>
-            <Text style={styles.cardText}>{item.nomeProfissional}</Text>
-            <TouchableOpacity style={styles.button} onPress={() =>aceitando(item.idProfissional)}>
-                <Text style={styles.buttonText}>Perfil</Text>
-            </TouchableOpacity>
-    </View>
-  );
 
       
   return (
@@ -67,61 +57,74 @@ export default function Contrato({ navigation }) {
         paddingHorizontal: 10,
         alignItems: 'center',
       }} style={styles.content}>
+        
+        {servicos.length === 0 ? (
+  <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
+) : (
+  servicos.map((servico, index) => (
+    <>
+      <Text style={styles.subtitle}>
+        Você tem até 2 dias para pagar ou cancelar um serviço
+      </Text>
 
-      <Text style={styles.subtitle}> Você tem até 2 días para pagar ou cancelar um serviço </Text>
-      <View style={styles.cardcontratro}>
-          {/* ÍCONE DE ALERTA SOBREPOSTO */}
-          <TouchableOpacity style={styles.alertIconContainer} onPress={() => alert('Pagamento pendente')}>
-          <Image 
-             source={require('../../assets/images/alert.png')}
-             style={styles.alertIconIcon}
-           />
-          </TouchableOpacity>
-          <View style={styles.contractInfo}>
-          <Image 
-             source={require('../../assets/images/perfilicon.png')}
-             style={styles.contractIcon}
-           />
-            <View>
-            <Text style={styles.contractName}>Ana Maria Braga</Text>
-            <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}> </Text></Text>
-             <Text style={styles.contractPaid}>Esperando pagamento</Text>
-              
-            </View>
+      <View key={index} style={styles.cardcontratro}>
+        <TouchableOpacity
+          style={styles.alertIconContainer}
+          onPress={() => alert('Pagamento pendente')}
+        >
+          <Image
+            source={require('../../assets/images/alert.png')}
+            style={styles.alertIconIcon}
+          />
+        </TouchableOpacity>
+
+        <View style={styles.contractInfo}>
+          <Image
+            source={require('../../assets/images/perfilicon.png')}
+            style={styles.contractIcon}
+          />
+          <View>
+          
+            <Text style={styles.contractName}>{servico.nomeProfissional}</Text>
+            <Text style={styles.contractStatus}>
+              Status: <Text style={styles.contractPaid}> </Text>
+            </Text>
+            <Text style={styles.contractPaid}>Esperando pagamento</Text>
           </View>
-        
-          <View style={styles.separator}></View>
-          
-          <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
-          
-          <View style={{ width: '100%', paddingLeft: 20 }}>
-           
-           <Text style={styles.detalhes}>Dia:</Text>
-           <Text style={styles.detalhes}>Horario:</Text>
-           <Text style={styles.detalhes}>Acompanhamento medico:</Text>
-           <Text style={styles.detalhes}>Endereço:</Text>
- 
-          
-           <View style={styles.buttonRow}>
-  <TouchableOpacity style={styles.button2}>
-    <Text style={styles.buttonText2}>Cancelar</Text>
-  </TouchableOpacity>
-  <TouchableOpacity style={styles.button}>
-    <Text style={styles.buttonText}>Pagar</Text>
-  </TouchableOpacity>
-</View>
- 
-         </View>
-         {/* BOTÃO DE SOM SOBREPOSTO */}
-              <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-                <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-              </TouchableOpacity>
-            
-       </View>
-       
-    
-      
-        
+        </View>
+
+        <View style={styles.separator}></View>
+
+        <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
+
+        <View style={{ width: '100%', paddingLeft: 20 }}>
+          <Text style={styles.detalhes}>Dia: {servico.dataServico}</Text>
+          <Text style={styles.detalhes}>Horário: {servico.horaInicioServico}</Text>
+          <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.button2} >
+              <Text style={styles.buttonText2}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate("telaPagamento", {servico})}>
+              <Text style={styles.buttonText}>Pagar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <TouchableOpacity
+          style={styles.soundButton}
+          onPress={() => alert('Auxiliar auditivo')}
+        >
+          <Image
+            source={require('../../assets/images/audio.png')}
+            style={styles.soundIcon}
+          />
+        </TouchableOpacity>
+      </View>
+    </>
+  ))
+)}
       </ScrollView>
     </View>
   );

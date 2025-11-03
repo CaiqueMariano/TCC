@@ -321,7 +321,7 @@ public function downloadDashboardPdf()
     }
 
 
-      /*CRIACÃO DE SERVICO FAMILIARRRRRRRR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+      /*CRIACÃO DE SERVICO FAMILIARRRRRRRR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       public function storeServicoFamiliar(Request $request){
         try{
           
@@ -340,6 +340,8 @@ public function downloadDashboardPdf()
             $servico -> horaInicioServico = $request -> horaInicioServico;
             $servico -> horaTerminoServico = $request -> horaTerminoServico;
             $servico -> idEnderecoUsuario = $request -> idEnderecoUsuario;
+           
+            
 
             $servico->save();
 
@@ -356,7 +358,7 @@ public function downloadDashboardPdf()
                 'error' => $e->getMessage()
             ], 500);
         }
-      }
+      }*/
 
       // CRIAÇÃO DO PAGAMENTO
         public function storePagamento(Request $request){
@@ -436,9 +438,11 @@ public function downloadDashboardPdf()
             $servico -> tipoServico = $request -> tipoServico;
             $servico -> descServico = $request -> descServico;
             $servico -> dataServico = $request -> dataServico;
+            $servico -> generoServico = $request-> generoServico;
             $servico -> horaInicioServico = $request -> horaInicioServico;
             $servico -> horaTerminoServico = $request -> horaTerminoServico;
             $servico -> idEndereco= $request -> idEndereco;
+            $servico -> statusServico = "nAceito";
 
             $servico->save();
 
@@ -561,35 +565,64 @@ public function downloadDashboardPdf()
     }
 
 
-//em andanmento
-public function vizualizarContratoAndamento($idProfissional){
+    //Buscar Servicos n aceitos
+    public function buscarServicosN($idUsuario){  
+        $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+        $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
+
+        $servicos = DB::table('tb_servico')
+        ->where('tb_servico.idIdosoFamilia',$familia->idIdosoFamilia)
+        ->where('tb_servico.statusServico', 'nAceito')
+        ->select('tb_servico.*')
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contratos encontrados',
+            'data'=> $servicos
+        ],200);
+    }
+
+
+//em ativo
+public function vizualizarContratoAtivo($idUsuario){
+
+    $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+    $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
     $contratos = DB::table('tb_contrato')
     ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
-    ->where('tb_profissional_servico.idProfissional', $idProfissional)
-    ->where('tb_contrato.statusContrato', 'andamento')
-    ->select('tb_contrato.*')
+    ->join('tb_servico', 'tb_profissional_servico.idServico', '=' ,'tb_servico.idServico')
+    ->join('tb_profissional', 'tb_profissional_servico.idProfissional', '=', 'tb_profissional.idProfissional')
+    ->where('tb_servico.idIdosoFamilia', $familia->idIdosoFamilia)
+    ->where('tb_contrato.statusContrato', 'ativo')
+    ->select('tb_contrato.*', 'tb_servico.*', 'tb_profissional.*', 'tb_profissional_servico.*')
     ->get();
 
 
     return response()->json([
         'success' => true,
-        'message' => 'Contratos encontrados',
+        'message' => 'Contratos ativos encontrados',
         'data'=> $contratos
     ],200);
 }
 //CONTRATO A PAGAR
-public function vizualizarContratoAPagar($idProfissional){
+public function vizualizarContratoAPagar($idUsuario){
+
+    $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+    $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
     $contratos = DB::table('tb_contrato')
     ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
-    ->where('tb_profissional_servico.idProfissional', $idProfissional)
-    ->where('tb_contrato.statusContrato', 'aguardando')
-    ->select('tb_contrato.*')
+    ->join('tb_servico', 'tb_profissional_servico.idServico', '=' ,'tb_servico.idServico')
+    ->join('tb_profissional', 'tb_profissional_servico.idProfissional', '=', 'tb_profissional.idProfissional')
+    ->where('tb_servico.idIdosoFamilia', $familia->idIdosoFamilia)
+    ->where('tb_contrato.statusContrato', 'Aguardando Pagamento')
+    ->select('tb_contrato.*', 'tb_servico.*', 'tb_profissional.*', 'tb_profissional_servico.*')
     ->get();
 
 
     return response()->json([
         'success' => true,
-        'message' => 'Contratos encontrados',
+        'message' => 'Contratos sem pagar encontrados',
         'data'=> $contratos
     ],200);
 }
@@ -606,7 +639,7 @@ public function vizualizarContratoTerminado($idProfissional){
 
     return response()->json([
         'success' => true,
-        'message' => 'Contratos encontrados',
+        'message' => 'Contratos terminados encontrados',
         'data'=> $contratos
     ],200);
 }
@@ -625,6 +658,26 @@ public function vizualizarContratoTerminado($idProfissional){
             'message' => 'Contratos encontrados',
             'data'=> $contratos
         ],200);
+    }
+
+
+
+    //PAGAMENTO
+
+    public function pagar(Request $request){
+        $contrato = ContratoModel::find($request->idContrato);
+           if($contrato){
+            $contrato -> statusContrato = "Ativo";
+            $contrato-> save();
+           }
+
+           return response()->json([
+            'success' => true,
+            'message' => 'Contrato Pago!',
+            'data'=> $contrato
+        ],200);
+        
+       
     }
     //Buscar dados Profssional
 
@@ -783,6 +836,16 @@ public function vizualizarContratoTerminado($idProfissional){
         $usuario->tipoUsuario = $request->tipoUsuario;
         $usuario->statusUsuario = 'ativo';
 
+        $image = $request->file('fotoUsuario');
+
+        if($image == null){
+            $path = "";
+        }else{
+            $path = $image->store('imagesPicture', 'public');
+        }
+
+        $usuario->fotoUsuario = $path;
+
         $usuario->save();
 
 //SE FOR IDOSO VAI PRA TABELA IDOSO
@@ -825,7 +888,7 @@ public function vizualizarContratoTerminado($idProfissional){
 }
 
 
-//CRIAR CONTRATO
+/*
 public function criarContrato(Request $request)
 {
     try {
@@ -852,7 +915,7 @@ public function criarContrato(Request $request)
             'error' => $e->getMessage()
         ], 500);
     }
-}
+}*/
 
 //CRIAR FAMILIASSS
 
@@ -907,9 +970,15 @@ public function aceita(Request $request){
            $contrato = new ContratoModel();
            $contrato->idProfissionalServico = $aceita->idProfissionalServico; 
            $contrato->dataInicioContrato = date('Y-m-d');
-           $contrato->statusContrato = 'inativo';
+           $contrato->statusContrato = 'Aguardando Pagamento';
            $contrato->obsContrato = '-';
            $contrato->save();
+
+           $servico = servicoModel::find($request->idServico);
+           if($servico){
+            $servico -> statusServico = "aceito";
+            $servico-> save();
+           }
 
     return response()->json([
         'success' => true,
@@ -1026,6 +1095,16 @@ return response()->json([
             $profissional->areaAtuacaoProfissional = $request->areaAtuacaoProfissional;
             $profissional->servicosOferecidosProfissional = $request->servicosOferecidosProfissional;
             $profissional->statusProfissional = "ativo";
+            
+            $image = $request->file('fotoProfissional');
+
+            if($image == null){
+                $path = "";
+            }else{
+                $path = $image->store('imagesPicture', 'public');
+            }
+
+            $profissional-> fotoProfissional = $path;
             $profissional->save();
 
             return response()->json([

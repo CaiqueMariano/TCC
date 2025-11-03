@@ -1,135 +1,116 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext   } from 'react';
 import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, StyleSheet, Image, ScrollView } from 'react-native';
 import colors from './colors';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Home';
+import { UserContext } from "./userContext";
+import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 
 export default function Ativos({ navigation }) {
+  const { user } = useContext(UserContext);
 
+  const [servicos, setServico] = useState([]);
 
-    const [profissional, setProfissional] = useState({
-        idProfissional: "",
-        nomeProfissional: ""
-    });
-    useEffect(()=>{
-        axios.get(`http://localhost:8000/api/selectProfissional`)
-        .then(response => setProfissional(response.data.data))
-        .catch(error => console.log("ERRO", error));
-      },[])
-
-
-      
-
-  const renderItem = ({ item }) => (
-    <View style={styles.cuida}>
-            <Text style={styles.cardText}>{item.nomeProfissional}</Text>
-            <TouchableOpacity style={styles.button} onPress={() =>aceitando(item.idProfissional)}>
-                <Text style={styles.buttonText}>Perfil</Text>
-            </TouchableOpacity>
-    </View>
-  );
+  useEffect(()=>{
+    axios.get(`${API_URL}/api/vizualizarContratoAtivo/${user.idUsuario}`)
+    .then(response => setServico(response.data.data))
+    .catch(error => console.log(error));
+  },[])
 
       
   return (
-    <View style={styles.container}>
-
-      <View style={styles.header}>
-
-        <TouchableOpacity onPress={() => navigation.navigate(Home)}>
-                         <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
-                       </TouchableOpacity>
-        <Text style={styles.title}> Ativos </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
-        <Ionicons name="settings-outline" size={28} color={colors.preto} />
-      </TouchableOpacity>
-          
-
-      </View>
-      <View style={styles.headerTabs}>
-        <TouchableOpacity onPress={() => navigation.navigate('Apagar')}>
-          <Text style={styles.tabText}>A Pagar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Pendente')}>
-          <Text style={styles.tabText}>Pendentes</Text>
-        </TouchableOpacity>
-
-        <View style={styles.activeTab}>
-          <Text style={styles.activeTabText}>Ativos</Text>
-          <View style={styles.activeIndicator} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate(Home)}>
+            <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
+          </TouchableOpacity>
+          <Text style={styles.title}>Ativos</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+            <Ionicons name="settings-outline" size={28} color={colors.preto} />
+          </TouchableOpacity>
         </View>
-      </View>
-
-      <ScrollView contentContainerStyle={{
-        flexGrow: 1,         
-        paddingBottom: Platform.OS === 'web' ? width * 0.1 : width * 0.2  ,   
-        paddingHorizontal: 10,
-        alignItems: 'center',
-      }} style={styles.content}>
-
-      <Text style={styles.subtitle}> Contrato ativo mais recente </Text>
-       <View style={styles.cardcontratro}>
-          
-         <View style={styles.contractInfo}>
-           <Image 
-             source={require('../../assets/images/perfilicon.png')}
-             style={styles.contractIcon}
-           />
-           <View>
-             <Text style={styles.contractName}>Ana Maria Não Braga</Text>
-             <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}>Pago </Text></Text>
-           </View>
-         </View>
-       
-         <View style={styles.separator}></View>
-         
-         <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
-         
-         <View style={{ width: '100%', paddingLeft: 20 }}>
-          
-          <Text style={styles.detalhes}>Dia:</Text>
-          <Text style={styles.detalhes}>Horario:</Text>
-          <Text style={styles.detalhes}>Acompanhamento medico:</Text>
-          <Text style={styles.detalhes}>Endereço:</Text>
-        </View>
-         {/* BOTÃO DE SOM SOBREPOSTO */}
-              <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-                <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-              </TouchableOpacity>
-            
-       </View>
-       
     
-       <View style={styles.sectionDivider}>
-      <View style={styles.line} />
-      <Text style={styles.sectionText}>Outros</Text>
-      <View style={styles.line} />
+        <View style={styles.headerTabs}>
+          <TouchableOpacity onPress={() => navigation.navigate('Apagar')}>
+            <Text style={styles.tabText}>A Pagar</Text>
+          </TouchableOpacity>
+    
+          <TouchableOpacity onPress={() => navigation.navigate('Pendente')}>
+            <Text style={styles.tabText}>Pendentes</Text>
+          </TouchableOpacity>
+    
+          <View style={styles.activeTab}>
+            <Text style={styles.activeTabText}>Ativos</Text>
+            <View style={styles.activeIndicator} />
+          </View>
+        </View>
+    
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: Platform.OS === 'web' ? width * 0.1 : width * 0.2,
+            paddingHorizontal: 10,
+            alignItems: 'center',
+          }}
+          style={styles.content}
+        >
+          {servicos.length === 0 ? (
+            <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
+          ) : (
+            servicos.map((servico, index) => (
+              <React.Fragment key={index}>
+                <Text style={styles.subtitle}>
+                 Contratos Ativos
+                </Text>
+    
+                <View style={styles.cardcontratro}>
+  
+    
+                  <View style={styles.contractInfo}>
+                    <Image
+                      source={require('../../assets/images/perfilicon.png')}
+                      style={styles.contractIcon}
+                    />
+                    <View>
+                      <Text style={styles.contractName}>{servico.nomeProfissional}</Text>
+                      <Text style={styles.contractStatus}>
+                        Status: <Text style={styles.contractPaid}> </Text>
+                      </Text>
+                      <Text style={styles.contractPaid}>Pago</Text>
+                    </View>
+                  </View>
+    
+                  <View style={styles.separator}></View>
+    
+                  <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
+    
+                  <View style={{ width: '100%', paddingLeft: 20 }}>
+                    <Text style={styles.detalhes}>Dia: {servico.dataServico}</Text>
+                    <Text style={styles.detalhes}>Horário: {servico.horaInicioServico}</Text>
+                    <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
+    
+
+                  </View>
+    
+                  {/* BOTÃO DE SOM SOBREPOSTO */}
+                  <TouchableOpacity
+                    style={styles.soundButton}
+                    onPress={() => alert('Auxiliar auditivo')}
+                  >
+                    <Image
+                      source={require('../../assets/images/audio.png')}
+                      style={styles.soundIcon}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </React.Fragment>
+            ))
+          )}
+        </ScrollView>
       </View>
-
-       <View style={styles.cardcontratro2}>
-          
-         <View style={styles.contractInfo}>
-           <Image 
-             source={require('../../assets/images/perfilicon.png')}
-             style={styles.contractIcon}
-           />
-           <View>
-             <Text style={styles.contractName}>Ana Maria Mais Braga</Text>
-             <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}>Pago </Text></Text>
-           </View>
-         </View>
-       
-         <View style={styles.separator}></View>
-         
-         <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
-
-         </View>
-        
-      </ScrollView>
-    </View>
-  );
+    );
 }
 const styles = StyleSheet.create({
   container: { 
@@ -180,7 +161,7 @@ fButton: {
   },
   cardcontratro: {
     width: 340,
-    height: 320,
+    height: 260,
     backgroundColor: '#a4e9e5',
     borderRadius: 20,
     justifyContent: 'flex-start',

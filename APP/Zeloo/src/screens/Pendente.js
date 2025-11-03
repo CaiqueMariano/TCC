@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, StyleSheet, Image, ScrollView } from 'react-native';
 import colors from './colors';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import Home from './Home';
+import { UserContext } from "./userContext";
 const { width, height } = Dimensions.get("window");
-
+import { API_URL } from '../screens/link';
 export default function Pendente({ navigation }) {
+  const { user } = useContext(UserContext);
 
-
-    const [profissional, setProfissional] = useState({
-        idProfissional: "",
-        nomeProfissional: ""
-    });
-    useEffect(()=>{
+    const [servicos, setServico] = useState([]);
+    /*useEffect(()=>{
         axios.get(`http://localhost:8000/api/selectProfissional`)
         .then(response => setProfissional(response.data.data))
         .catch(error => console.log("ERRO", error));
+      },[])*/
+
+
+      useEffect(()=>{
+        axios.post(`${API_URL}/api/buscarServicosN/${user.idUsuario}`)
+        .then(response => setServico(response.data.data))
+        .catch(error => console.log(error));
       },[])
-
-
       
 
   const renderItem = ({ item }) => (
@@ -62,49 +65,55 @@ export default function Pendente({ navigation }) {
   </TouchableOpacity>
 </View>
 
-      <ScrollView contentContainerStyle={{
-        flexGrow: 1,         
-        paddingBottom: Platform.OS === 'web' ? width * 0.1 : width * 0.2  ,   
-        paddingHorizontal: 10,
-        alignItems: 'center',
-      }} style={styles.content}>
+<ScrollView
+  contentContainerStyle={{
+    flexGrow: 1,
+    paddingBottom: Platform.OS === 'web' ? width * 0.1 : width * 0.2,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  }}
+  style={styles.content}
+>
+  {servicos.length === 0 ? (
+    <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
+  ) : (
+    servicos.map((servico, index) => (
+      <View key={index} style={styles.cardcontratro}>
+        <View style={styles.contractInfo}>
+          <View>
+            <Text style={styles.contractStatus}>
+              Status: <Text style={styles.contractPaid}>Esperando um cuidador</Text>
+            </Text>
+          </View>
+        </View>
 
-     
-        <View style={styles.cardcontratro}>
-          
-          
-         <View style={styles.contractInfo}>
-           
-           <View>
-           <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}> </Text></Text>
-           <Text style={styles.contractPaid}>Esperando um cuidador</Text>
-             
-           </View>
-         </View>
-       
-         <View style={styles.separator}></View>
-         
-         <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
-         
-         <View style={{ width: '100%', paddingLeft: 20 }}>
-          
-          <Text style={styles.detalhes}>Dia:</Text>
-          <Text style={styles.detalhes}>Horario:</Text>
-          <Text style={styles.detalhes}>Acompanhamento medico:</Text>
-          <Text style={styles.detalhes}>Endereço:</Text>
+        <View style={styles.separator}></View>
+
+        <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
+
+        <View style={{ width: '100%', paddingLeft: 20 }}>
+          <Text style={styles.detalhes}>Dia: {servico.dataServico}</Text>
+          <Text style={styles.detalhes}>Horário: {servico.horaInicioServico}</Text>
+          <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
 
           <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Cancelar</Text>
-        </TouchableOpacity>
-
+            <Text style={styles.buttonText}>Cancelar</Text>
+          </TouchableOpacity>
         </View>
-       {/* BOTÃO DE SOM SOBREPOSTO */}
-       <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-                <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-              </TouchableOpacity>
-         </View>
-        
-      </ScrollView>
+
+        <TouchableOpacity
+          style={styles.soundButton}
+          onPress={() => alert('Auxiliar auditivo')}
+        >
+          <Image
+            source={require('../../assets/images/audio.png')}
+            style={styles.soundIcon}
+          />
+        </TouchableOpacity>
+      </View>
+    ))
+  )}
+</ScrollView>
     </View>
   );
 }

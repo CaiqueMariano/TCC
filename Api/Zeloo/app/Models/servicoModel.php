@@ -18,9 +18,11 @@ class servicoModel extends Model
         'idIdosoFamilia',
         'tipoServico',
         'descServico',
+        'generoServico',
         'dataServico',
         'horaInicioServico',
         'horaTerminoServico',
-        'idEndereco'
+        'idEndereco',
+        'statusServico'
     ];
 }

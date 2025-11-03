@@ -1,17 +1,39 @@
-import React from 'react';
+import React, { useState, useEffect, useContext  } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { UserContext } from "./userContext";
+import { API_URL } from '../screens/link';
+import axios from 'axios';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 
-export default function App() {
+export default function telaPagamento({route, navigation}) {
+  const { servico } = route.params;
+  const pagar = async () =>{
+    try{
+      const response = await axios.post(`${API_URL}/api/pagar`,{
+        idContrato:servico.idContrato
+      });
+
+      if(response.data.success){
+        alert('Pagamento Feito!')
+        navigation.navigate("Ativos");
+      }
+
+    }catch(error){
+      console.log(error);
+    }
+  }
+  
+
+
   return (
     <View style={styles.container}>
 
       {/* 🔹 Total */}
-      <Text style={styles.totalText}>Total  R$00,00</Text>
+      <Text style={styles.totalText}>Total: R${servico.precoPersonalizado}</Text>
       <View style={styles.line} />
 
       {/* 🔹 Cuidador */}
-      <Text style={styles.cuidadorText}>Cuidador: Ana Maria Braga</Text>
+      <Text style={styles.cuidadorText}>Cuidador:{servico.nomeProfissional}</Text>
 
       <View style={styles.cuidadorSection}>
         <Image
@@ -57,10 +79,10 @@ export default function App() {
       <View style={styles.line} />
 
       {/* 🔹 Total final */}
-      <Text style={styles.totalFinal}>Total  R$00,00</Text>
+      <Text style={styles.totalFinal}>Total: R${servico.precoPersonalizado}</Text>
 
       {/* 🔹 Botão pagar */}
-      <TouchableOpacity style={styles.pagamentoButton}>
+      <TouchableOpacity style={styles.pagamentoButton} onPress={pagar}>
         <Text style={styles.pagamentoButtonText}>Efetuar Pagamento</Text>
       </TouchableOpacity>
 

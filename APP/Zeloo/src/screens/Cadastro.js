@@ -111,12 +111,38 @@ export default function Cadastro({ navigation }) {
     try{
 
       const partes = dataNasc.split('/');
+      const telefoneLimpo = telefoneUsuario.replace(/\D/g, '');
     const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
-      const response =  await axios.post(`${API_URL}/api/usuario`,{nomeUsuario,telefoneUsuario, senhaUsuario,tipoUsuario:value,dataNasc: dataFormatada});
+
+    const formData = new FormData();
+    formData.append('nomeUsuario', nomeUsuario);
+    formData.append('telefoneUsuario', telefoneLimpo);
+    formData.append('senhaUsuario', senhaUsuario);
+    formData.append('tipoUsuario', value);
+    formData.append('dataNasc', dataFormatada);
+
+    
+    if (imagem) {
+      
+      const filename = imagem.split('/').pop();
+      const match = /\.(\w+)$/.exec(filename);
+      const type = match ? `image/${match[1]}` : `image`;
+
+      formData.append('fotoUsuario', {
+        uri: imagem,
+        name: filename,
+        type
+      });
+    }
+       const response = await axios.post(`${API_URL}/api/usuario`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
 
       if(response.data.success){
         setUser(response.data.data);
-        navigation.navigate("Home");
+        navigation.navigate("Login");
       }else{
      
         console.log("Erro", response.data.message);

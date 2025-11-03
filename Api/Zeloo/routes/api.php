@@ -18,13 +18,18 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//PAGAMENTO
+Route::post('/pagar','App\Http\Controllers\ZelooController@pagar');
+//Ver servicos
+//Aguardando aceitar buscarServicosN
+Route::post('/buscarServicosN/{idUsuario}','App\Http\Controllers\ZelooController@buscarServicosN');
 //CONTRATOS
 //EM ANDAMENTO vizualizarContratoAndamento
-Route::post('/vizualizarContratoAndamento/{idProfissional}','App\Http\Controllers\ZelooController@vizualizarContratoAndamento');
+Route::get('/vizualizarContratoAtivo/{idUsuario}','App\Http\Controllers\ZelooController@vizualizarContratoAtivo');
 //INATIVO
-Route::post('/vizualizarContratoTerminado/{idProfissional}','App\Http\Controllers\ZelooController@vizualizarContratoTerminado');
+Route::post('/vizualizarContratoTerminado/{idUsuario}','App\Http\Controllers\ZelooController@vizualizarContratoTerminado');
 //A PAGAR
-Route::post('/vizualizarContratoAPagar/{idProfissional}','App\Http\Controllers\ZelooController@vizualizarContratoAPagar');
+Route::get('/vizualizarContratoAPagar/{idUsuario}','App\Http\Controllers\ZelooController@vizualizarContratoAPagar');
 
 //listarEndereco
 Route::post('/listarEndereco','App\Http\Controllers\ZelooController@listarEndereco');

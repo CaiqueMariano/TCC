@@ -19,10 +19,12 @@ return new class extends Migration
             $table->unsignedBigInteger('idIdosoFamilia');
             $table->string('tipoServico');
             $table->string('descServico');
+            $table->string('generoServico');
             $table->date('dataServico');
             $table->time('horaInicioServico');
-            $table->time('horaTerminoServico');
+            $table->time('horaTerminoServico')->nullable();
             $table->unsignedBigInteger('idEndereco');
+            $table->string('statusServico');
             $table->timestamps();
 
 
