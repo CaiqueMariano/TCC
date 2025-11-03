@@ -17,39 +17,39 @@ export default function PedidosDisponiveis() {
   const pedidos = [
     {
       id: 1,
-      nome: 'Maria Oliveira',
-      cidade: 'São Paulo - SP',
-      nota: 4.5,
-      valor: 'R$ 180,00',
-      pedido: 'Mercado e supervisão',
-      imagem: 'https://i.pravatar.cc/150?img=12',
+      nome: 'João dos Santos',
+      cidade: '📌Jardim Europa - SP',
+      nota: 3.7,
+      avaliaçoes: 43,
+      pedido: 'senhor de idade, precisa de ajuda dentro de casa (lavar louça, passar e guardar, cozinhar, etc...)',
+      imagem: 'https://i.pravatar.cc/150?img=65',
     },
     {
       id: 2,
-      nome: 'Carlos Andrade',
-      cidade: 'Belo Horizonte - MG',
-      nota: 5,
-      valor: 'R$ 200,00',
-      pedido: 'Acompanhamento médico',
-      imagem: 'https://i.pravatar.cc/150?img=7',
+      nome: 'Severino da Silva',
+      cidade: '📌Brooklin - SP',
+      nota: 4.7,
+      avaliaçoes: 36,
+      pedido: 'senhor de idade, precisa de ajuda com o dia a dia (compras de mercado,farmacia,feira, etc...)',
+      imagem: 'https://i.pravatar.cc/150?img=17',
     },
     {
       id: 3,
-      nome: 'Ana Souza',
-      cidade: 'Curitiba - PR',
+      nome: 'Sebastião Melo',
+      cidade: '📌Vila olimpia - SP',
       nota: 3.5,
-      valor: 'R$ 150,00',
-      pedido: 'Ajuda com medicação',
-      imagem: 'https://i.pravatar.cc/150?img=4',
+      avaliaçoes: 47,
+      pedido: 'senhor de idade, precisa de ajuda com o dia a dia (compras de mercado,farmacia,feira, etc...)',
+      imagem: 'https://i.pravatar.cc/150?img=70',
     },
     {
       id: 4,
-      nome: 'Pedro Lima',
-      cidade: 'Rio de Janeiro - RJ',
-      nota: 4,
-      valor: 'R$ 220,00',
-      pedido: 'Companhia e conversa',
-      imagem: 'https://i.pravatar.cc/150?img=9',
+      nome: 'José Ricardo',
+      cidade: '📌Guarulhos - SP',
+      nota: 3,
+      avaliaçoes: 23,
+      pedido: 'senhor de idade, precisa de ajuda com o dia a dia (compras de mercado,farmacia,feira, etc...)',
+      imagem: 'https://i.pravatar.cc/150?img=63',
     },
   ];
 
@@ -76,14 +76,13 @@ export default function PedidosDisponiveis() {
       <ScrollView contentContainerStyle={styles.container}>
         {pedidos.map((item) => (
           <View key={item.id} style={styles.card}>
-            <Text style={styles.cardTitle}>Novo pedido</Text>
 
             <View style={styles.cardContent}>
               <Image source={{ uri: item.imagem }} style={styles.profileImage} />
               <View style={styles.infoSection}>
                 <Text style={styles.personName}>{item.nome}</Text>
                 <Text style={styles.locationText}>{item.cidade}</Text>
-                {renderStars(item.nota)}
+                {renderStars(item.nota)} <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçoes) </Text>
               </View>
               <View style={styles.valueContainer}>
                 <Text style={styles.valueText}>{item.valor}</Text>
@@ -91,8 +90,16 @@ export default function PedidosDisponiveis() {
             </View>
 
             <View style={styles.requestContainer}>
-              <Text style={styles.requestText}>Pedido: {item.pedido}</Text>
-            </View>
+            <Text style={styles.requestText} numberOfLines={4}>
+              Pedido: {item.pedido}
+            </Text>
+            <TouchableOpacity
+              style={[styles.button, styles.buttonPrimary]}
+              onPress={() => navigation.navigate('Home')}
+            >
+              <Text style={styles.buttonText}>Ver Mais</Text>
+            </TouchableOpacity>
+          </View>
           </View>
         ))}
       </ScrollView>
@@ -140,11 +147,30 @@ const styles = StyleSheet.create({
     paddingBottom: 96,
     flexGrow: 1,
   },
+  button: {
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  buttonPrimary: {
+    backgroundColor: 'rgba(129, 17, 17, 0.9)',
+    paddingHorizontal: 20,
+    paddingVertical: 6, // antes era 10
+    borderRadius: 8,
+    alignSelf: 'flex-end',
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
+    backgroundColor: 'rgb(218, 216, 216)',
+    borderRadius: 15,
+    padding: 30,
+    marginBottom: 20,
   },
   cardTitle: {
     fontSize: 16,
@@ -167,7 +193,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   personName: {
-    fontSize: 15,
+    fontSize: 22,
     fontWeight: '600',
     color: '#111',
   },
@@ -198,10 +224,14 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   requestContainer: {
-    marginTop: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 8,
   },
+
   requestText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#333',
     fontWeight: '500',
   },
