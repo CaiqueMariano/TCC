@@ -187,8 +187,8 @@ export default function Perfil({ route }) {
             style={styles.navItem}
             onPress={() => navigation.navigate("Home")}
           >
-            <Ionicons name="home-outline" size={22} color="#0a84ff" />
-            <Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
+            <Ionicons name="home-outline" size={22} color="#fff" />
+            <Text style={styles.navLabel}>Home</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -212,8 +212,8 @@ export default function Perfil({ route }) {
             style={styles.navItem}
             onPress={() => navigation.navigate("Perfil")}
           >
-            <Ionicons name="person-outline" size={22} color="#fff" />
-            <Text style={styles.navLabel}>Perfil</Text>
+            <Ionicons name="person-outline" size={22} color="#0a84ff" />
+            <Text style={[styles.navLabel, styles.navLabelActive]}>Perfil</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

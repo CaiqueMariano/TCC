@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   loginBox: {
     width: '70%',
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: '#e2d9ff',
     padding: 20,
     paddingVertical: 28,
     minHeight: 320,

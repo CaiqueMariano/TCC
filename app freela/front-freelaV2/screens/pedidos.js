@@ -59,11 +59,11 @@ export default function PedidosDisponiveis() {
     return (
       <View style={{ flexDirection: 'row' }}>
         {[...Array(fullStars)].map((_, i) => (
-          <Ionicons key={i} name="star" size={14} color="#FFD700" />
+          <Ionicons key={i} name="star" size={14} color="#b08cff" />
         ))}
-        {hasHalfStar && <Ionicons name="star-half" size={14} color="#FFD700" />}
+        {hasHalfStar && <Ionicons name="star-half" size={14} color="#b08cff" />}
         {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <Ionicons key={i} name="star-outline" size={14} color="#FFD700" />
+          <Ionicons key={i} name="star-outline" size={14} color="#b08cff" />
         ))}
       </View>
     );
@@ -82,7 +82,10 @@ export default function PedidosDisponiveis() {
               <View style={styles.infoSection}>
                 <Text style={styles.personName}>{item.nome}</Text>
                 <Text style={styles.locationText}>{item.cidade}</Text>
-                {renderStars(item.nota)} <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçoes) </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  {renderStars(item.nota)}
+                  <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçoes )</Text>
+                </View>
               </View>
               <View style={styles.valueContainer}>
                 <Text style={styles.valueText}>{item.valor}</Text>
@@ -154,7 +157,7 @@ const styles = StyleSheet.create({
   },
   
   buttonPrimary: {
-    backgroundColor: 'rgba(129, 17, 17, 0.9)',
+    backgroundColor: '#0a84ff',
     paddingHorizontal: 20,
     paddingVertical: 6, // antes era 10
     borderRadius: 8,
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    backgroundColor: 'rgb(218, 216, 216)',
+    backgroundColor: '#e2d9ff',
     borderRadius: 15,
     padding: 30,
     marginBottom: 20,

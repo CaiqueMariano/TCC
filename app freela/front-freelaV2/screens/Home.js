@@ -51,11 +51,11 @@ export default function Home() {
               <Text style={styles.personName}>Maria Oliveira</Text>
               <Text style={styles.locationText}>São Paulo - SP</Text>
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star-half" size={14} color="#FFD700" />
-                <Ionicons name="star-outline" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star-half" size={14} color="#b08cff" />
+                <Ionicons name="star-outline" size={14} color="#b08cff" />
               </View>
             </View>
             <View style={styles.valueContainer}>
@@ -87,7 +87,7 @@ export default function Home() {
               key={i}
               name={i < item.rating ? 'star' : 'star-outline'}
               size={16}
-              color="#FFD700"
+              color="#b08cff"
             />
           ))}
         </View>
@@ -108,11 +108,11 @@ export default function Home() {
               <Text style={styles.personName}>João Cuidador</Text>
               <Text style={styles.locationText}>Bairro Vila Nova - Curitiba/PR</Text>
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star-outline" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#b08cff" />
+                <Ionicons name="star-outline" size={14} color="#b08cff" />
               </View>
               <Text style={styles.profileDetail}>Média de avaliação: 4.0</Text>
               <Text style={styles.profileDetail}>Tempo no app: 1 ano e 3 meses</Text>
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   card: {
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: '#e2d9ff',
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   kpiBox: {
     flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.95)',
+    backgroundColor: '#e2d9ff',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 8,
