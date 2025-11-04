@@ -25,6 +25,7 @@ import Contratar from "./src/screens/Contratar";
 import HomeFamiliar from './src/screens/homeFamiliar';
 import Adicionar from './src/screens/Adicionar';
 import { UserProvider } from "./src/screens/userContext";
+import perfilProfissional from './src/screens/perfilProfissional';
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
 const Stack = createNativeStackNavigator();
@@ -99,6 +100,7 @@ export default function App() {
         <Stack.Screen name="Servico" component={Servico} />
         <Stack.Screen name="homeFamiliar" component={HomeFamiliar} />
         <Stack.Screen name="Apagar" component={Apagar} />
+        <Stack.Screen name="perfilProfissional" component={perfilProfissional} />
         <Stack.Screen name="Pendente" component={Pendente} />
         <Stack.Screen name="Ativos" component={Ativos} />
         <Stack.Screen name="Contrato" component={Contrato} />

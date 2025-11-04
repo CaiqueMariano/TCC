@@ -1092,8 +1092,8 @@ return response()->json([
             $profissional->senhaProfissional = bcrypt($request->senhaProfissional);
             $profissional->documentosProfissional = $request->documentosProfissional;
             $profissional->biografiaProfissional = $request->biografiaProfissional;
-            $profissional->areaAtuacaoProfissional = $request->areaAtuacaoProfissional;
-            $profissional->servicosOferecidosProfissional = $request->servicosOferecidosProfissional;
+            $profissional->generoProfissional = $request->generoProfissional;
+            $profissional->dataNascProfissional = $request->dataNascProfissional;
             $profissional->statusProfissional = "ativo";
             
             $image = $request->file('fotoProfissional');

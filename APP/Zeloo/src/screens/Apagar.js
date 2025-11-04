@@ -78,12 +78,16 @@ export default function Contrato({ navigation }) {
           />
         </TouchableOpacity>
 
+     
         <View style={styles.contractInfo}>
+        <TouchableOpacity onPress={()=> navigation.navigate("perfilProfissional", {servico})}>
           <Image
-            source={require('../../assets/images/perfilicon.png')}
-            style={styles.contractIcon}
+            source={ {uri: `${API_URL}/storage/${servico.fotoProfissional}` }}
+            style={styles.foto}
           />
+           </TouchableOpacity>
           <View>
+         
           
             <Text style={styles.contractName}>{servico.nomeProfissional}</Text>
             <Text style={styles.contractStatus}>
@@ -446,5 +450,14 @@ content: {
     width: 50,
     height: 50,
     resizeMode: 'contain',
+    },
+    foto: {
+      width: 80,
+      height: 80,
+      borderRadius: 55,
+      marginBottom: 14,
+      borderWidth: 2,
+      borderColor: '#ccc',
+      marginRight:20,
     },
 });

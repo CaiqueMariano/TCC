@@ -10,7 +10,10 @@ import { API_URL } from '../screens/link';
 const { width, height } = Dimensions.get("window");
 
 export default function Home ({ navigation}) {
-
+  const [servicos, setServico] = useState([]);
+  const [contratoAtivo, setContratoAtivo] = useState(null);
+  const [servicosNAceitos, setServicosNAceitos] = useState(null);
+  const [contratosAPagar, setContratosAPagar] = useState(null);
   //FAMILIAR CONSTS
   // 🔹 Componente Bolinha Animada
 const RatingDots = () => {
@@ -91,6 +94,48 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
   }
 
   }, [user]);
+//CONTRATOS ATIVOS
+  useEffect(() => {
+    axios.get(`${API_URL}/api/vizualizarContratoAtivo/${user.idUsuario}`)
+      .then(response => {
+        const contratos = response.data.data;
+        if (contratos.length > 0) {
+          setContratoAtivo(contratos[contratos.length - 1]);
+        } else {
+          setContratoAtivo(null);
+        }
+      })
+      .catch(error => console.log(error));
+  }, []);
+
+  //A PAGAR
+  useEffect(() => {
+    axios.get(`${API_URL}/api/vizualizarContratoAPagar/${user.idUsuario}`)
+      .then(response => {
+        const contratos = response.data.data;
+        
+        if (contratos.length > 0) {
+          setContratosAPagar(contratos[contratos.length - 1]);
+        } else {
+          setContratosAPagar(null);
+        }
+      })
+      .catch(error => console.log(error));
+  }, []);
+
+  //Esperando aceitar
+  useEffect(() => {
+    axios.get(`${API_URL}/api/buscarServicosN/${user.idUsuario}`)
+      .then(response => {
+        const contratos = response.data.data;
+        if (contratos.length > 0) {
+          setServicosNAceitos(contratos[contratos.length - 1]);
+        } else {
+          setServicosNAceitos(null);
+        }
+      })
+      .catch(error => console.log(error));
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -113,33 +158,91 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.grid}>
-        {/* BOTÃO CONTRATO ATIVO MAIS RECENTE */}
-        <View style={styles.cardcontratro}>
-          
-            <Text style={styles.viewMoreText}>Contrato ativo mais recente</Text>
-    
-          <View style={styles.contractInfo}>
-            <Image 
-              source={require('../../assets/images/perfilicon.png')}
-              style={styles.contractIcon}
-            />
-            <View>
-              <Text style={styles.contractName}>Ana Maria Braga</Text>
-              <Text style={styles.contractStatus}>
-                Status: <Text style={styles.contractPaid}>Pago </Text>
-              </Text>
-            </View>
-          </View>
 
-          <View style={styles.separator}></View>
+        {/**CONTRATO ATIVO */}
+      {contratoAtivo && (
+  <View style={styles.cardcontratro}>
+    <Text style={styles.viewMoreText}>Contrato ativo mais recente</Text>
 
-          <TouchableOpacity 
-            style={styles.viewMoreButton}
-            onPress={() => navigation.navigate('Ativos')}
-          >
-            <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
-          </TouchableOpacity>
-        </View>
+    <View style={styles.contractInfo}>
+      <Image 
+        source={ {uri: `${API_URL}/storage/${contratoAtivo.fotoProfissional}` }}
+        style={styles.foto}
+      />
+      <View>
+      <Text style={styles.contractName}>{contratoAtivo.nomeProfissional}</Text>
+        <Text style={styles.contractStatus}>
+          Status: <Text style={styles.contractPaid}>Pago</Text>
+        </Text>
+      </View>
+    </View>
+
+    <View style={styles.separator}></View>
+
+    <TouchableOpacity 
+      style={styles.viewMoreButton}
+      onPress={() => navigation.navigate('Ativos')}
+    >
+      <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+    </TouchableOpacity>
+  </View>
+)}
+{/**A PGAR */}
+{contratosAPagar && (
+  <View style={styles.cardcontratro}>
+    <Text style={styles.viewMoreText}>Contratos não pagos</Text>
+
+    <View style={styles.contractInfo}>
+      <Image 
+         source={ {uri: `${API_URL}/storage/${contratosAPagar.fotoProfissional}` }}
+         style={styles.foto}
+      />
+      <View>
+        <Text style={styles.contractName}>{contratosAPagar.nomeProfissional}</Text>
+        <Text style={styles.contractStatus}>
+          Status: <Text style={styles.contractPaid}>Aguardando pagamento</Text>
+        </Text>
+      </View>
+    </View>
+
+    <View style={styles.separator}></View>
+
+    <TouchableOpacity 
+      style={styles.viewMoreButton}
+      onPress={() => navigation.navigate('Apagar')}
+    >
+      <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+    </TouchableOpacity>
+  </View>
+)}
+
+{/**N ACIEOTS */}
+{servicosNAceitos && (
+  <View style={styles.cardcontratro}>
+    <Text style={styles.viewMoreText}>Aguardando profissional</Text>
+
+    <View style={styles.contractInfo}>
+      <Image 
+        source={require('../../assets/images/perfilicon.png')}
+        style={styles.contractIcon}
+      />
+      <View>
+        <Text style={styles.contractStatus}>
+          Status: <Text style={styles.contractPaid}>Aguardando cuidador</Text>
+        </Text>
+      </View>
+    </View>
+
+    <View style={styles.separator}></View>
+
+    <TouchableOpacity 
+      style={styles.viewMoreButton}
+      onPress={() => navigation.navigate('Pendente')}
+    >
+      <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+    </TouchableOpacity>
+  </View>
+)}
 
         {/* BOTÕES PRINCIPAIS */}
         <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Servico')}>
@@ -447,5 +550,14 @@ volumeIconContainer: {
   alignItems: 'center',
   alignSelf: 'center',
   marginTop: 20,
+},
+foto: {
+  width: 70,
+  height: 70,
+  borderRadius: 55,
+  marginBottom: 14,
+  borderWidth: 2,
+  borderColor: '#ccc',
+  marginRight:10,
 },
 });

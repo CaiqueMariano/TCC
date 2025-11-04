@@ -69,10 +69,12 @@ export default function Ativos({ navigation }) {
   
     
                   <View style={styles.contractInfo}>
-                    <Image
-                      source={require('../../assets/images/perfilicon.png')}
-                      style={styles.contractIcon}
-                    />
+                    <TouchableOpacity onPress={()=> navigation.navigate("perfilProfissional", {servico})}>
+                            <Image
+                                source={ {uri: `${API_URL}/storage/${servico.fotoProfissional}` }}
+                                style={styles.foto}
+                              />
+                    </TouchableOpacity>
                     <View>
                       <Text style={styles.contractName}>{servico.nomeProfissional}</Text>
                       <Text style={styles.contractStatus}>
@@ -381,5 +383,14 @@ content: {
     backgroundColor: 'green', // linha verde embaixo do ativo
     borderRadius: 2,
     marginTop: 4,
+  },
+  foto: {
+    width: 80,
+    height: 80,
+    borderRadius: 55,
+    marginBottom: 14,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    marginRight:20,
   },
 });

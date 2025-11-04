@@ -1,12 +1,28 @@
 import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { API_URL } from '../screens/link';
+import { useState, useEffect } from 'react';
 
-export default function App() {
+export default function perfilProfissional({route, navigation}) {
+  const { servico } = route.params;
+
+  const anoNasc = new Date(servico.dataNascProfissional).getFullYear();
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const [idade, setIdade] = useState("");
+  const CalcularIdade =  () =>{
+    const calculo = ano - anoNasc;
+    setIdade(calculo);
+  };
+
+  useEffect(() => {
+    CalcularIdade();
+  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
         <Image
-          source={{ uri: 'https://placekitten.com/200/200' }}
+          source={{ uri: `${API_URL}/storage/${servico.fotoProfissional}` }}
           style={styles.foto}
         />
         <Text style={styles.avaliacoes}>
@@ -19,9 +35,9 @@ export default function App() {
           <Ionicons name="location-sharp" size={20} color="#d0342c" /> São Paulo, SP
         </Text>
 
-        <Text style={styles.info}>Idade: 26 anos</Text>
+        <Text style={styles.info}>Idade: {idade}</Text>
         <Text style={styles.info}>Cuidador há: 5 anos</Text>
-        <Text style={styles.info}>Sexo: Feminino</Text>
+        <Text style={styles.info}>Gênero: {servico.generoProfissional}</Text>
 
         <View style={styles.line} />
 
@@ -81,7 +97,7 @@ export default function App() {
           <Text style={styles.sectionTitle}>Faixa de preço:</Text>
           <View style={styles.precoItem}>
             <FontAwesome5 name="money-bill-wave" size={22} color="#4caf50" style={styles.icon} />
-            <Text style={styles.precoText}>R$ -- – R$ -- / hora</Text>
+            <Text style={styles.precoText}>R${servico.valorMin} / hora</Text>
           </View>
         </View>
       </ScrollView>

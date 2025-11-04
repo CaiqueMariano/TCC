@@ -18,15 +18,14 @@ return new class extends Migration
             $table->string('nomeProfissional');
             $table->string('emailProfissional');
             $table->string('telefoneProfissional');
+            $table->date('dataNascProfissional');
+            $table->string('generoProfissional');
             $table->string('senhaProfissional');
             $table->integer('documentosProfissional');
             $table->string('biografiaProfissional');
             $table->decimal('valorMin', 8, 2);
-            $table->string('areaAtuacaoProfissional');
             $table->string('statusProfissional');
             $table->string('fotoProfissional')->nullable();
-
-            $table->string('servicosOferecidosProfissional');
             $table->timestamps();
 
             
