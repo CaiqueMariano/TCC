@@ -6,6 +6,7 @@ import colors from './colors';
 import { UserContext } from "./userContext";
 
 const { width, height } = Dimensions.get("window");
+
 export default function Conta({route, navigation}){
   
     const[mostrarExcluir, setMostrarExcluir] = useState(false);
@@ -21,6 +22,7 @@ export default function Conta({route, navigation}){
           console.log(error);
         }
       }
+      
 
 
     return(

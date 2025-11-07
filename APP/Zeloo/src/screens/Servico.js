@@ -30,12 +30,23 @@ export default function Cadastro({ navigation }) {
   const [modalVisivel, setModalVisivel] = useState(false);
   const [tipoEndereco, setTipoEndereco] = useState(null);
   const [enderecoUsuario, setEnderecoUsuario] = useState("");
+  const [ruaUsuario, setRuaUsuario] = useState("");
   const [enderecoOrigem, setEnderecoOrigem] = useState("");
   const [enderecoDestino, setEnderecoDestino] = useState("");
   const [enderecosCadastrados, setEnderecosCadastrados] = useState([
     { id: 1, nome: "Casa", endereco: "Rua das Flores, 123" },
     { id: 2, nome: "Hospital", endereco: "Hospital Central, 45" },
   ]);
+
+  // Campos do novo endereço
+const [numLogradouroUsuario, setNumLogradouroUsuario] = useState("");
+const [bairroUsuario, setBairroUsuario] = useState("");
+const [cidadeUsuario, setCidadeUsuario] = useState("");
+const [estadoUsuario, setEstadoUsuario] = useState("");
+const [complementoEndereco, setComplementoEndereco] = useState("");
+const [cepUsuario, setCepUsuario] = useState("");
+const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
+
 
   //Dropdownzin aqui
   const [genero, setGenero] = useState(null);
@@ -44,7 +55,27 @@ export default function Cadastro({ navigation }) {
     { label: 'Homem', value: 'homem' },
     { label: 'Mulher', value: 'mulher' },
     { label: 'Tanto faz', value: 'tanto_faz' },
+
+
+    
   ]);
+  
+const validarEtapa1 = () => data && horarioIn && horarioT;
+const validarEtapa2 = () => checked1 || checked2 || checked3 || checked4;
+const validarEtapa3 = () => textoOutro.trim() !== "";
+const validarEtapa4 = () => {
+  // um so
+  if (enderecoUsuario) return true;
+
+  // dois
+  return (
+    enderecoOrigem && enderecoOrigem.trim() !== "" &&
+    enderecoDestino && enderecoDestino.trim() !== ""
+  );
+};
+const validarEtapa5 = () => genero !== null;
+
+   const [modalFinal, setModalFinal] = useState(false);
 
   const totalEtapas = 5;
 
@@ -115,6 +146,7 @@ export default function Cadastro({ navigation }) {
   if (checked3) nomeServicosSelecionados.push('Locomoção');
   if (checked4) nomeServicosSelecionados.push('Outro');
   if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+  if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
 
   return (
     <View style={styles.container}>
@@ -123,11 +155,16 @@ export default function Cadastro({ navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
         </TouchableOpacity>
-        <Text style={styles.navTitulo}>Agendamento</Text>
+        <Text style={styles.navTitulo}>Solicitação</Text>
         <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
           <Ionicons name="settings-outline" size={28} color={colors.preto} />
         </TouchableOpacity>
       </View>
+
+            <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+              <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+            </TouchableOpacity>
+          
 
       {etapa === 1 && (
         <View style={styles.form}>
@@ -148,7 +185,16 @@ export default function Cadastro({ navigation }) {
           </TouchableOpacity>
 
           <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+            <TouchableOpacity
+              style={[styles.bFoto, { opacity: validarEtapa1() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa1()) {
+                  setEtapa(2);
+                } else {
+                  alert("Preencha todos os campos antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -184,7 +230,16 @@ export default function Cadastro({ navigation }) {
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(1)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
+            <TouchableOpacity               
+            style={[styles.bFoto, { opacity: validarEtapa2() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa2()) {
+                  setEtapa(3);
+                } else {
+                  alert("Selecione um ou mais campos antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -211,7 +266,16 @@ export default function Cadastro({ navigation }) {
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
+            <TouchableOpacity               
+            style={[styles.bFoto, { opacity: validarEtapa3() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa3()) {
+                  setEtapa(4);
+                } else {
+                  alert("Preencha o campo antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
@@ -260,48 +324,170 @@ export default function Cadastro({ navigation }) {
             </Pressable>
           )}
 
-          <Modal visible={modalVisivel} transparent animationType="slide" onRequestClose={() => setModalVisivel(false)}>
-            <View style={styles.modalFundo}>
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalTitulo}>Escolha um endereço</Text>
-                <FlatList
-                  data={enderecosCadastrados}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => (
-                    <TouchableOpacity
-                      style={styles.enderecoItem}
-                      onPress={() => {
-                        if (tipoEndereco === "usuario") setEnderecoUsuario(item.endereco);
-                        if (tipoEndereco === "origem") setEnderecoOrigem(item.endereco);
-                        if (tipoEndereco === "destino") setEnderecoDestino(item.endereco);
-                        setModalVisivel(false);
-                      }}
-                    >
-                      <Text style={styles.enderecoNome}>{item.nome}</Text>
-                      <Text style={styles.enderecoTexto}>{item.endereco}</Text>
-                    </TouchableOpacity>
-                  )}
-                />
+<Modal visible={modalVisivel} transparent animationType="slide" onRequestClose={() => setModalVisivel(false)}>
+  <View style={styles.modalFundo}>
+    <View style={styles.modalContainer}>
+      {!abrir ? (
+        <>
+          <Text style={styles.modalTitulo}>Escolha um endereço</Text>
 
-                <TouchableOpacity style={styles.outros} onPress={() => setAbrir(!abrir)} > 
-                  <Text style={styles.outrosText}>Adicionar novo Endereço </Text> <Ionicons name="add-circle" size={32} color= "#a4e9e5" />
-                </TouchableOpacity>
+          <FlatList
+            data={enderecosCadastrados}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.enderecoItem}
+                onPress={() => {
+                  if (tipoEndereco === "usuario") setEnderecoUsuario(item.endereco);
+                  if (tipoEndereco === "origem") setEnderecoOrigem(item.endereco);
+                  if (tipoEndereco === "destino") setEnderecoDestino(item.endereco);
+                  setModalVisivel(false);
+                }}
+              >
+                <Text style={styles.enderecoNome}>{item.nome}</Text>
+                <Text style={styles.enderecoTexto}>{item.endereco}</Text>
+              </TouchableOpacity>
+            )}
+          />
 
-                <TouchableOpacity style={styles.fecharModal} onPress={() => setModalVisivel(false)}>
-                  <Text style={styles.fecharText}>Fechar</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
+          <TouchableOpacity style={styles.outros} onPress={() => setAbrir(true)}>
+            <Text style={styles.outrosText}>Adicionar novo Endereço</Text>
+            <Ionicons name="add-circle" size={32} color="#a4e9e5" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.fecharModal} onPress={() => setModalVisivel(false)}>
+            <Text style={styles.fecharText}>Fechar</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          <Text style={styles.modalTitulo}>Cadastrar novo endereço</Text>
+          
+
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Nome do endereço (ex: Casa, Trabalho)"
+            value={nomeNovoEndereco}
+            onChangeText={setNomeNovoEndereco}
+          />
+
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="CEP"
+            keyboardType="numeric"
+            value={cepUsuario}
+            onChangeText={setCepUsuario}
+          />
+
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Rua / Avenida"
+            value={ruaUsuario}
+            onChangeText={setRuaUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Número"
+            keyboardType="numeric"
+            value={numLogradouroUsuario}
+            onChangeText={setNumLogradouroUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Bairro"
+            value={bairroUsuario}
+            onChangeText={setBairroUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Complemento (Apto, Casa, Bloco...)"
+            value={complementoEndereco}
+            onChangeText={setComplementoEndereco}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Cidade"
+            value={cidadeUsuario}
+            onChangeText={setCidadeUsuario}
+          />
+          <TextInput
+            style={styles.inputNovoEndereco}
+            placeholder="Estado"
+            value={estadoUsuario}
+            onChangeText={setEstadoUsuario}
+          />
+
+          <View style={styles.botoesAdd}>
+            <TouchableOpacity
+              style={styles.bFoto}
+              onPress={() => {
+                if (
+                  nomeNovoEndereco.trim() &&
+                  ruaUsuario.trim() &&
+                  numLogradouroUsuario.trim() &&
+                  bairroUsuario.trim() &&
+                  complementoEndereco.trim() &&
+                  cidadeUsuario.trim() &&
+                  estadoUsuario.trim() &&
+                  cepUsuario.trim()
+                ) {
+                  const novo = {
+                    id: enderecosCadastrados.length + 1,
+                    nome: nomeNovoEndereco,
+                    endereco: `${ruaUsuario}, ${numLogradouroUsuario}`,
+                  };
+                  setEnderecosCadastrados((prev) => [...prev, novo]); //atualizando a lista
+                  setNomeNovoEndereco("");
+                  setRuaUsuario("");
+                  setNumLogradouroUsuario("");
+                  setBairroUsuario("");
+                  setCidadeUsuario("");
+                  setComplementoEndereco("");
+                  setCepUsuario("");
+                  setEstadoUsuario("");
+                  setAbrir(false);
+                } else {
+                  alert("Preencha todos os campos antes de salvar!");
+                }
+
+              }}
+            >
+              <Text style={styles.buttonText}>Salvar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.bFoto, { backgroundColor: colors.cinza }]}
+              onPress={() => setAbrir(false)}
+            >
+              <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
+    </View>
+  </View>
+</Modal>
+
 
           <View style={styles.botoes}>
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(3)}>
               <Text style={styles.buttonText}>Voltar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(5)}>
+
+            <TouchableOpacity
+              style={[styles.bFoto, { opacity: validarEtapa4() ? 1 : 0.5 }]}
+              onPress={() => {
+                if (validarEtapa4()) {
+                  setEtapa(5);
+                } else {
+                  alert("Selecione ou cadastre um endereço antes de continuar!");
+                }
+              }}
+            >
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
+
         </View>
       )}
 
@@ -326,11 +512,36 @@ export default function Cadastro({ navigation }) {
           <View style={styles.botoes}>
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(4)}>
               <Text style={styles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('Home')}>
-              <Text style={styles.buttonText}>Finalizar</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> setModalFinal(true)
+              <TouchableOpacity
+                style={[styles.bFoto, { opacity: validarEtapa5() ? 1 : 0.5 }]}
+                onPress={() => {
+                  if (validarEtapa5()) {
+                    setModalFinal(true);
+                  } else {
+                    alert("Selecione uma opção antes de finalizar!");
+                  }
+                }}
+              >
+                <Text style={styles.buttonText}>Finalizar</Text>
+              </TouchableOpacity>
           </View>
+
+          <Modal visible={modalFinal} transparent animationType="slide" onRequestClose={() => setModalFinal(false)}>
+            <View style={styles.modalFundo}>
+              <View style={styles.modalContainer}>
+
+                <Text style={styles.modalTitulo}>Solicitação Feita com Sucesso!</Text>
+                <Text style={styles.modalSubTitulo}>Você receberá uma notificação quando um cuidador aceitar sua solicitação!</Text>
+
+                <View style={styles.botoes}>
+                  <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('Home')}>
+                    <Text style={styles.buttonText}>Entendi</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
 
         </View>
@@ -348,16 +559,33 @@ const styles = StyleSheet.create({
     alignItems: "center" 
   },
 
+  soundButton: {
+    position: 'absolute',
+    top: 430, 
+    right: 15, 
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    zIndex: 1002,
+  },
+  soundIcon: {
+    width: 65,
+    height: 65,
+  },
+
   nav: { 
     width: "100%", 
-    paddingTop: Platform.OS === "web" ? 20 : 45, 
-    paddingBottom: 10, 
-    paddingHorizontal: Platform.OS === "web" ? 40 : 20, 
-    height: Platform.OS === "web" ? height * 0.12 : height * 0.1, 
+    paddingTop: Platform.OS === "ios" ? 60 : 35, 
+    paddingBottom: 15, 
+    paddingHorizontal: 20, 
     flexDirection: "row", 
     justifyContent: "space-between", 
     alignItems: "center", 
-    backgroundColor: colors.azul 
+    backgroundColor: colors.azul,
   },
 
   navTitulo: { 
@@ -440,6 +668,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
      fontWeight: "600" 
   },
+  modalSubTitulo: { 
+    fontSize: 18,     
+    color: colors.preto,
+    textAlign: "center",
+    marginBottom: 20,
+  },
 
   progressContainer: { 
     flexDirection: "row", 
@@ -487,6 +721,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)", 
     justifyContent: "center", 
     alignItems: "center" 
+  
   },
   modalContainer: { 
     width: "85%", 
@@ -500,7 +735,8 @@ const styles = StyleSheet.create({
     fontSize: 22, 
     fontWeight: "bold", 
     color: colors.preto, 
-    marginBottom: 15 
+    marginBottom: 15 ,
+    textAlign: "center",
   },
 
   enderecoItem: {
@@ -521,6 +757,24 @@ const styles = StyleSheet.create({
     color: colors.preto, 
     opacity: 0.7 
   },
+
+  inputNovoEndereco: {
+  width: "100%",
+  height: 50,
+  borderWidth: 2,
+  borderColor: colors.preto,
+  borderRadius: 10,
+  paddingHorizontal: 15,
+  marginBottom: 10,
+  backgroundColor: colors.branco,
+},
+botoesAdd: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  width: "100%",
+  marginTop: 10,
+},
+
   fecharModal: { 
     marginTop: 15, 
     backgroundColor: colors.azul,
@@ -549,7 +803,7 @@ const styles = StyleSheet.create({
     borderColor: colors.preto,
     borderRadius: 10,
     width: '80%',
-     alignSelf: 'center',
+    alignSelf: 'center',
   },
 
 });

@@ -1,15 +1,16 @@
 import React, { useEffect, useContext, useState, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, Image,  ScrollView, SafeAreaView, Animated } from "react-native";
 import colors from './colors';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import axios from "axios";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-
 const { width, height } = Dimensions.get("window");
 
-export default function Home ({ navigation, route }) {
+
+
+export default function Home ({ navigation,AccessibilitySettings}) {
+const { increaseScale, decreaseScale, resetScale,scale } = useAccessibility();
 
   //FAMILIAR CONSTS
   // 🔹 Componente Bolinha Animada
@@ -93,95 +94,107 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
   }, [user]);
 
   return (
-<View style={styles.container} >
-  <View>
-   <View style={styles.Form1}></View>
-   <Image 
-     source={require('../../assets/images/Zeloo.png')}
-     style={styles.Logo}
-   />
-    <Image 
-     source={require('../../assets/images/Zeloo.png')}
-     style={styles.Logo}
-   />
- 
- <ScrollView
-  contentContainerStyle={styles.scrollContainer}
-  showsVerticalScrollIndicator={false}
->
-  <View style={styles.grid}>
-    {/* BOTÃO CONTRATO ATIVO MAIS RECENTE*/}
-    <View style={styles.cardcontratro}>
-  <Text style={styles.contractTitle}>Contrato ativo mais recente</Text>
+    <View style={styles.container}>
+    
+    {/* HEADER PADRONIZADO COMO O DE ATIVOS */}
+    <View style={styles.header}> 
+  {/* Logo alinhada à esquerda */}
+  <Image 
+    source={require('../../assets/images/logo.png')}
+    style={styles.LogoHeader}
+  />
 
-  <View style={styles.contractInfo}>
-    <Image 
-      source={require('../../assets/images/perfilicon.png')}
-      style={styles.contractIcon}
-    />
-    <View>
-      <Text style={styles.contractName}>Ana Maria Braga</Text>
-      <Text style={styles.contractStatus}>Status: <Text style={styles.contractPaid}>Pago </Text></Text>
-    </View>
-  </View>
-
-  <View style={styles.separator}></View>
-
-  <TouchableOpacity 
-    style={styles.viewMoreButton}
-    onPress={() => navigation.navigate('Servico')}
-  >
-    <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
+  {/* Ícone de configurações à direita */}
+  <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+    <Ionicons name="settings-outline" size={30 * scale} color={colors.preto} />
   </TouchableOpacity>
 </View>
+    <ScrollView
+      contentContainerStyle={styles.scrollContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.grid}>
+        {/* BOTÃO CONTRATO ATIVO MAIS RECENTE */}
+        <EscalarCard style={styles.cardcontratro} maxScale={1.2}>
+          
+            <EscalarText style={styles.viewMoreText}>Contrato ativo mais recente</EscalarText>
+              
+              <View style={[styles.contractInfo]}>
+              <EscalarImage 
+                source={require('../../assets/images/perfilicon.png')}
+                style={{
+                  width: 120 * Math.min(scale, 0.7), // cresce até 1.4x
+                  height: 90 * Math.min(scale, 0.7),
+                  resizeMode: 'contain',
+                  marginLeft: (scale - 1) * -100,
+                  marginBottom: (scale - 1) * 10,
+                }}
+              />
 
-    {/* BOTÃO SOLICITAR SERVIÇO */}
-    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Servico')}>
-      <Image source={require('../../assets/images/cuidadores.png')} style={styles.icon} />
-      <Text style={styles.cardText}>Solicitar Serviço</Text>
-    </TouchableOpacity>
+                <View 
+                  style={{
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    marginLeft: (scale - 1) * -40 // desloca para a esquerda quando aumenta
+                  }}
+                >
+                  <EscalarText style={styles.contractName}>Ana Maria braga</EscalarText>
+                  <EscalarText style={styles.contractStatus}>
+                    Status: <EscalarText style={styles.contractPaid}>Pago</EscalarText>
+                  </EscalarText>
+                </View>
+              </View>
 
-    {/* BOTÃO FAVORITOS */}
-    <View style={styles.favoritosContainer}>
-      <TouchableOpacity style={styles.card}>
-        <Image source={require('../../assets/images/favoritos.png')} style={styles.icon} />
-        <Text style={styles.cardText}>Favoritos</Text>
-      </TouchableOpacity>
+          <EscalarSeparator style={styles.separator} maxScale={1.1}></EscalarSeparator>
 
-      {/* BOTÃO DE SOM SOBREPOSTO */}
-      <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-        <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-      </TouchableOpacity>
-    </View>
+          <EscalarTouchable
+            style={styles.viewMoreButton}
+            onPress={() => navigation.navigate('Ativos')}
+          >
+            <EscalarText style={styles.viewMoreText}>Ver Outros Contratos</EscalarText>
+          </EscalarTouchable>
+        </EscalarCard>
 
-    {/* BOTÃO PERFIL */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
-      <Text style={styles.cardText}>Seu Perfil</Text>
-    </TouchableOpacity>
+        {/* BOTÕES PRINCIPAIS */}
+        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Servico')}>
+          <EscalarImage source={require('../../assets/images/cuidadores.png')} style={styles.icon} />
+          <EscalarText style={styles.cardText}>Solicitar Serviço</EscalarText>
+        </EscalarTouchable>
 
-    {/* BOTÃO LINKAGEM */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/linkagem.png')} style={styles.icon} />
-      <Text style={styles.cardText}>Linkagem</Text>
-    </TouchableOpacity>
+        <View style={styles.favoritosContainer}>
+          <EscalarTouchable style={styles.card}onPress={() => navigation.navigate('favoritos')}>
+            <EscalarImage source={require('../../assets/images/favoritos.png')} style={styles.icon} />
+            <EscalarText style={styles.cardText}>Favoritos</EscalarText>
+          </EscalarTouchable>
 
-    {/* BOTÃO CONVERSAS */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/conversas.png')} style={styles.icon} /> 
-      <Text style={styles.cardText}>Conversas</Text>
-    </TouchableOpacity>
+          <EscalarTouchable style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+            <EscalarImage source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+          </EscalarTouchable>
+        </View>
 
-    {/* BOTÃO FALE CONOSCO */}
-    <TouchableOpacity style={styles.card}>
-      <Image source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
-      <Text style={styles.cardText}>Fale Conosco</Text>
-    </TouchableOpacity>
+        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Perfil')}>
+          <EscalarImage source={require('../../assets/images/perfilicon.png')} style={styles.icon} />   
+          <EscalarText style={styles.cardText}>Seu Perfil</EscalarText>
+        </EscalarTouchable>
+
+        <EscalarTouchable style={styles.card}>
+          <EscalarImage source={require('../../assets/images/linkagem.png')} style={styles.icon} />
+          <EscalarText style={styles.cardText}>Linkagem</EscalarText>
+        </EscalarTouchable>
+
+        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Conversas')}>
+          <EscalarImage source={require('../../assets/images/conversas.png')}  style={styles.icon} /> 
+          <EscalarText style={styles.cardText}>Conversas</EscalarText>
+        </EscalarTouchable>
+
+        <EscalarTouchable style={styles.card}>
+          <EscalarImage source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
+          <EscalarText style={styles.cardText}>Fale Conosco</EscalarText>
+        </EscalarTouchable>
+      </View>
+    </ScrollView>
   </View>
-</ScrollView>
-   </View>
-</View>
-  );
+);
 }
 
 const styles = StyleSheet.create({
@@ -189,20 +202,28 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: '#fff',
     display:'hidden' ,
+   
   },
-  Logo: {
-    left: -210,
-    top: -124,
-    position: 'absolute',
+
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.azul,
+    paddingHorizontal: 10,
+    height: 130, // altura controlada da faixa
+ 
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 6,
   },
-  Form1: {
-    width: 10000,
-    height: 150,
-    aspectRatio: 2,
-    backgroundColor: '#a4e9e5',
-    position: 'absolute',
-    top: -20,
-    left: -60,
+  LogoHeader: {
+    width: 200,  // tamanho visual bom
+    height: 170,
+    resizeMode: 'contain',
+    marginLeft: 10, // espaçamento suave da borda
   },
 logout: {
   backgroundColor: '#fff',
@@ -214,17 +235,15 @@ logout: {
   borderColor: '#ccc'
 },
 grid: {
-  
-  marginTop: '35%',
+  marginTop: '10%',
   alignItems: 'center',
   overflow: 'hidden',
   flexDirection: 'row',
   flexWrap: 'wrap',
   justifyContent: 'center',
-  gap: 15,
+  gap: 20,
 },
 card: {
- 
   width: 150,
   height: 100,
   backgroundColor: '#a4e9e5',
@@ -238,13 +257,14 @@ card: {
   overflow: 'visible', // garante que o ícone pode “sair”
 },
 cardcontratro: {
-  width: 340,
+  width: 345,
   height: 170,
   backgroundColor: '#a4e9e5',
   borderRadius: 20,
   alignItems: 'center',
   justifyContent: 'center',
-  margin: 12,
+  marginBottom: 20,
+  marginTop: 16,
   elevation: 5,
   paddingVertical: 15,
   paddingHorizontal: 10,
@@ -253,7 +273,7 @@ contractTitle: {
   fontSize: 16,
   fontWeight: 'bold',
   color: '#000',
-  marginBottom: 10,
+  marginTop: 10,
 },
 
 contractInfo: {
@@ -264,12 +284,13 @@ contractInfo: {
   paddingHorizontal: 12,
   width: 300,
   height: 70,
-  marginBottom: 8,
+  marginTop: 8,
+ 
 },
 
 contractIcon: {
-  width: 80,
-  height: 80,
+  width: 90,
+  height: 90,
   marginRight: 10,
   resizeMode: 'contain',
 },
@@ -304,6 +325,7 @@ viewMoreButton: {
   borderRadius: 12,
   alignItems: 'center',
   paddingVertical: 8,
+  marginBottom: 10,
 },
 
 viewMoreText: {
@@ -333,6 +355,7 @@ scrollContainer: {
   alignItems: 'center',
   paddingVertical: 20,
   paddingBottom: 60, // evita corte no fim
+  
 },
 
 favoritosContainer: {
@@ -351,7 +374,7 @@ soundButton: {
 
   justifyContent: 'center',
   alignItems: 'center',
-  elevation: 10,
+ 
   zIndex: 10,
 },
 

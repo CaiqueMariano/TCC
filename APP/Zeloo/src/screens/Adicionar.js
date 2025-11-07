@@ -1,11 +1,13 @@
 import React, {useState, useContext} from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Dimensions, Image, Pressable } from "react-native";
 import colors from './colors';
+import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import axios from "axios";
 const { width, height } = Dimensions.get("window");
 
 export default function Adicionar ({ navigation }) {
+    const { increaseScale, decreaseScale, resetScale,scale } = useAccessibility();
     const { user } = useContext(UserContext);
     const [telefoneUsuario, setTelefoneUsuario] = useState('');
     const [usuario, setUsuario] = useState({
@@ -40,7 +42,7 @@ export default function Adicionar ({ navigation }) {
   return (
     <View style={styles.Container}>
 
-        <Text>Busque pelo telefone cadastrado:</Text>
+      <Text>Busque pelo telefone cadastrado:</Text>
       <TextInput
         style={styles.input}
         placeholder="Telefone"
