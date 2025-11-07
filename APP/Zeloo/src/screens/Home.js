@@ -5,7 +5,9 @@ import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSepara
 import { UserContext } from "./userContext";
 import axios from "axios";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
+
 const { width, height } = Dimensions.get("window");
+
 
 
 
