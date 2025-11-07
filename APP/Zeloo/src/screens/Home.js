@@ -182,8 +182,8 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
           <EscalarText style={styles.cardText}>Linkagem</EscalarText>
         </EscalarTouchable>
 
-        <EscalarTouchable style={styles.card}>
-          <EscalarImage source={require('../../assets/images/conversas.png')} style={styles.icon} /> 
+        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Conversas')}>
+          <EscalarImage source={require('../../assets/images/conversas.png')}  style={styles.icon} /> 
           <EscalarText style={styles.cardText}>Conversas</EscalarText>
         </EscalarTouchable>
 
