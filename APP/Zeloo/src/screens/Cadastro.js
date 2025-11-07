@@ -65,6 +65,7 @@ export default function Cadastro({ navigation }) {
     const resultado = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      aspect: [8, 8],
       quality: 1,
     });
 
@@ -80,6 +81,7 @@ export default function Cadastro({ navigation }) {
     const resultado = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      aspect: [8, 8],
       quality: 1,
     });
 
