@@ -30,7 +30,6 @@ import perfilProfissional from './src/screens/perfilProfissional';
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
 import PerguntasC from './src/screens/PerguntasC'
-import telaPagamento from './src/screens/telaPagamento'
 import pagamento from './src/screens/pagamento'
 import Conversas from './src/screens/Conversas'
 import { AccessibilityProvider } from './src/screens/AccessibilityContext';

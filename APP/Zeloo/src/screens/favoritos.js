@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -14,24 +14,27 @@ import {
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
 import colors from './colors';
-import Home from './Home';
 import { UserContext } from "./userContext";
+import Home from './Home';
+
 import { API_URL } from '../screens/link';
 const { width } = Dimensions.get('window');
 
 export default function Favoritos({ navigation }) {
   const { user } = useContext(UserContext);
   const [cuidadores, setCuidadores] = useState([]);
-  const [favoritos, setFavoritos] = useState([]); // já começa com todos
+  const [favoritos, setFavoritos] = useState([]); 
   const [pesquisa, setPesquisa] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [cuidadorSelecionado, setCuidadorSelecionado] = useState(null);
 
   useEffect(() => {
     axios
-    .get(`${API_URL}/api/favoritos/${user.idUsuario}`)
-    .then(response => setServico(response.data.data))
-    .catch(error => console.log(error));
+      .get(`${API_URL}/api/favoritos/${user.idUsuario}`)
+      .then(response => {
+        setCuidadores(response.data.data);
+      })
+      .catch(error => console.log(error));
   }, []);
 
   const confirmarDesfavoritar = (id) => {
@@ -41,7 +44,6 @@ export default function Favoritos({ navigation }) {
 
   const desfavoritar = () => {
     if (cuidadorSelecionado !== null) {
-      // Remove dos favoritos e da lista
       setFavoritos((prev) => prev.filter((fid) => fid !== cuidadorSelecionado));
       setCuidadores((prev) => prev.filter((c) => c.idProfissional !== cuidadorSelecionado));
       setModalVisible(false);
@@ -51,15 +53,13 @@ export default function Favoritos({ navigation }) {
 
   const renderItem = ({ item }) => (
     <View style={styles.cardRow}>
-      <Ionicons
-        name="person-circle-outline"
-        size={55}
-        color="#888"
-        style={{ marginRight: 12 }}
-      />
+      <Image
+                      source={{ uri: `${API_URL}/storage/${item.fotoProfissional}` }}
+                      style={styles.foto}
+                    />
       <View style={{ flex: 1 }}>
         <Text style={styles.nome}>{item.nomeProfissional || 'Nome sobrenome'}</Text>
-        <Text style={styles.mensagem}>Mensagem...</Text>
+        <Text style={styles.mensagem}>Entrar no perfil</Text>
       </View>
 
       <TouchableOpacity onPress={() => confirmarDesfavoritar(item.idProfissional)}>
@@ -160,6 +160,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
+  },
+  foto: {
+    width: 70,
+    height: 70,
+    borderRadius: 55,
+
+    borderWidth: 2,
+    borderColor: '#ccc',
+    marginRight: 20,
   },
   header: {
     width: '100%',

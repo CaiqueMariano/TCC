@@ -587,6 +587,7 @@ public function downloadDashboardPdf()
 
 //Favoritar
 public function favoritar(Request $request){
+    $idUsuario = $request->idUsuario;
     $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
     $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
 
@@ -596,6 +597,13 @@ public function favoritar(Request $request){
     $favoritar->idIdosoFamilia = $familia->idIdosoFamilia;
 
     $favoritar ->save();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Favoritado!',
+        
+    ],200);
+
 }
 //Ver Favoritos
 public function favoritos($idUsuario){

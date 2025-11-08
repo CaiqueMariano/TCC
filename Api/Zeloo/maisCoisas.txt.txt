@@ -4,11 +4,12 @@ npx expo start --host lan
 
 
 Criar migration
-php artisan make:migration create_tbContratoServico_table
+php artisan make:migration create_tbFavoritos_table
+
 php artisan make:mail FreeBanidoMail
 
 Criar Model
-php artisan make:model DenunciasFreeModel​
+php artisan make:model FavoritosModel​
 
 
 

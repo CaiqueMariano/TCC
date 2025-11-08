@@ -18,14 +18,7 @@ export default function Login({navigation}) {
   const { user } = useContext(UserContext);
   const[mostrarEdicao, setMostrarEdicao] = useState(false);
   const[mostrarExcluir, setMostrarExcluir] = useState(false);
-  const [usuario, setUsuario] = useState({
-    nomeUsuario: "",
-    tipoUsuario: "",
-    telefoneUsuario: "",
-    dataNasc: "",
-
-
-  });
+  const [usuario, setUsuario] = useState([]);
   
 
   const[nomeUsuario, setNomeUsuario] = useState('');
@@ -82,12 +75,12 @@ export default function Login({navigation}) {
 
       <TouchableOpacity onPress={() => setEditFoto(true)}>
         <Image 
-          source={require('../../assets/images/perfil.png')}
+          source={{uri: `${API_URL}/storage/${usuario.fotoUsuario}`}}
           style={styles.perfil}
         />
       </TouchableOpacity>
 
-      <Text style={styles.Nome}>Zericleuda dos Santos{usuario.nomeUsuario}</Text>
+      <Text style={styles.Nome}>{usuario.nomeUsuario}</Text>
 
       <View style={styles.Container2}>
 
