@@ -13,6 +13,7 @@ use App\Models\enderecoModel;
 use App\Models\enderecoUsuarioModel; 
 use App\Models\User;
 use App\Models\IdosoFamiliaModel;
+use App\Models\FavoritosModel;
 use App\Models\UsuarioModel;
 use App\Models\Denuncias;
 use App\Models\DenunciasFreeModel;
@@ -582,6 +583,37 @@ public function downloadDashboardPdf()
             'data'=> $servicos
         ],200);
     }
+
+
+//Favoritar
+public function favoritar(Request $request){
+    $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+    $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
+
+    $favoritar = new FavoritosModel();
+
+    $favoritar->idProfissional = $request-> idProfissional;
+    $favoritar->idIdosoFamilia = $familia->idIdosoFamilia;
+
+    $favoritar ->save();
+}
+//Ver Favoritos
+public function favoritos($idUsuario){
+    $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+    $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
+
+    $favoritos = DB::table('tb_favoritos')
+    ->join('tb_profissional', 'tb_favoritos.idProfissional', '=', 'tb_profissional.idProfissional')
+    ->where('tb_favoritos.idIdosoFamilia', $familia->idIdosoFamilia)
+    ->select('tb_favoritos.*', 'tb_profissional.*')
+    ->get();
+    
+    return response()->json([
+        'success' => true,
+        'message' => 'Favoritos encontrados',
+        'data'=> $favoritos
+    ],200);
+}
 
 
 //em ativo

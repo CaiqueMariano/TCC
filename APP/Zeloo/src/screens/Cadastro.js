@@ -5,6 +5,7 @@ import { TextInput } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as ImagePicker from 'expo-image-picker';
 import axios from "axios";
+import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get("window");
@@ -65,6 +66,7 @@ export default function Cadastro({ navigation }) {
     const resultado = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      aspect: [8, 8],
       quality: 1,
     });
 
@@ -80,6 +82,7 @@ export default function Cadastro({ navigation }) {
     const resultado = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
+      aspect: [8, 8],
       quality: 1,
     });
 
@@ -90,7 +93,7 @@ export default function Cadastro({ navigation }) {
 
     const [modalFotoVisible, setModalFotoVisible] = useState(false)
 
-  const totalEtapas = 3;
+  const totalEtapas = 5;
 
   const Progresso = () => (
     <View style={styles.progressContainer}>
@@ -142,7 +145,7 @@ export default function Cadastro({ navigation }) {
 
       if(response.data.success){
         setUser(response.data.data);
-        navigation.navigate("Login");
+        setEtapa(4);
       }else{
      
         console.log("Erro", response.data.message);
@@ -202,6 +205,7 @@ export default function Cadastro({ navigation }) {
 
 
 };
+  const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
 
   return (
     <View style={styles.container}>
@@ -216,8 +220,6 @@ export default function Cadastro({ navigation }) {
         source={require('../../assets/images/Zeloo.png')}
         style={styles.logo}
       />
-
-    
 
 {etapa === 1 && (
   <View style={styles.form}>
@@ -378,19 +380,63 @@ export default function Cadastro({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.bFoto, { opacity: imagem ? 1 : 0.5 }]}
-              onPress={() => {
-                if (imagem) {
-                 enviarDados();
-                } else {
-                  alert("Por favor, adicione uma foto antes de finalizar!");
-                }
-              }}
-            >
+                onPress={enviarDados}
+              >
+            
             <Text style={styles.buttonText}>Finalizar</Text>
           </TouchableOpacity>
         </View>
       </View>
     )}
+    {etapa === 4 && (
+      <View style={styles.form}>
+    
+    
+      
+        
+            <EscalarText style={styles.title}>Sua conta foi criada com sucesso!</EscalarText>
+            
+                  <EscalarImage
+                    source={require('../../assets/images/perguntas1.jpg')}
+                    style={styles.image}
+                />
+            
+            <EscalarText style={styles.text1}>Agora precisamos de algumas informações para garantir que o cuidador atenda às suas necessidades.</EscalarText>
+    
+    
+    
+        <View style={styles.botoes}>
+            <EscalarTouchable
+              style={styles.bFoto}
+                onPress={() => {setEtapa(5);}}
+              >
+                <EscalarText style={styles.buttonText}>Próximo</EscalarText>
+            </EscalarTouchable>
+        </View>
+      </View>
+    )}
+    
+    
+          {etapa === 5 && (
+            <View style={styles.form}>
+    
+            <EscalarText style={styles.title}>É de extrema importancia que seja honesto!</EscalarText>
+            
+                  <EscalarImage
+                    source={require('../../assets/images/Honestidade.png')}
+                    style={styles.image1}
+                />
+    
+                <View style={styles.botoes}>
+                    <EscalarTouchable
+                    style={styles.bFoto}
+                        onPress={() => navigation.navigate('PerguntasC')}
+                    >
+                        <EscalarText style={styles.buttonText}>Próximo</EscalarText>
+                    </EscalarTouchable>
+                </View>
+            </View>
+          )}
     </View>
   );
 }
@@ -460,6 +506,17 @@ const styles = StyleSheet.create({
     right: -50,
     borderTopLeftRadius: height * 0.09,
     borderTopRightRadius: height * 0.09,
+  },
+  text1: {
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: colors.preto,
+  },
+  image1:{
+    width: 200,
+    height: 150,
+    marginBottom: 15,
   },
   logo: {
     left: -190,

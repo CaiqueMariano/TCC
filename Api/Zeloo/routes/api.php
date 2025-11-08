@@ -18,6 +18,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+//Favoritar
+Route::post('/favoritar','App\Http\Controllers\ZelooController@favoritar');
+
+//Ver favoritos
+Route::get('/favoritos/{idUsuario}','App\Http\Controllers\ZelooController@favoritos');
 //PAGAMENTO
 Route::post('/pagar','App\Http\Controllers\ZelooController@pagar');
 //Ver servicos

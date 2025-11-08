@@ -16,6 +16,7 @@ import Home from "./src/screens/Home";
 import Ativos from "./src/screens/Ativos";
 import Apagar from "./src/screens/Apagar";
 import Pendente from "./src/screens/Pendente";
+import favoritos from "./src/screens/favoritos";
 import Perfil from "./src/screens/Perfil";
 import colors from './src/screens/colors';
 import telaPagamento from './src/screens/telaPagamento';
@@ -28,67 +29,17 @@ import { UserProvider } from "./src/screens/userContext";
 import perfilProfissional from './src/screens/perfilProfissional';
 import Contrato from './src/screens/Contrato';
 import Servico from './src/screens/Servico'
+import PerguntasC from './src/screens/PerguntasC'
+import telaPagamento from './src/screens/telaPagamento'
+import pagamento from './src/screens/pagamento'
+import Conversas from './src/screens/Conversas'
+import { AccessibilityProvider } from './src/screens/AccessibilityContext';
 const Stack = createNativeStackNavigator();
-/*const Tab = createBottomTabNavigator();
-
-// No futuro sera configuracoes e notificacoes
-function TabRoutes() {
-  return (
-   <Tab.Navigator screenOptions={{ 
-    headerShown: false, 
-    tabBarShowLabel: true,
-    tabBarActiveTintColor: colors.azul,
-    tabBarInactiveTintColor: colors.preto,
-    tabBarStyle: {
-          height: '10%',
-          position: Platform.OS === 'web' ? 'relative' : 'absolute',
-        },
-    }}>
-
-      <Tab.Screen
-        name="Início"
-        component={Home}
-        options={{
-          tabBarIcon:  ({color}) => (
-          <Ionicons name="home" size = {20} color={color}/>
-          ),
-        }}
-      /> 
-
-      <Tab.Screen 
-        name="Perfil" 
-        component={Perfil} 
-        options={{
-      
-          tabBarIcon:  ({color}) => (
-          <Ionicons name="person-circle" size = {20} color={color}/>
-          ),
-          
-        }}
-      /> 
-
-      
-      
-      <Tab.Screen 
-        name="Configurações" 
-        component={configuracoes} 
-        options={{
-          
-          tabBarIcon:  ({color}) => (
-          <Ionicons name="settings" size = {20} color={color}/>
-          ),
-        }}
-      /> 
-
-      
-
-    </Tab.Navigator>
-  );
-}*/
 
 export default function App() {
   return (
-    <UserProvider>
+<UserProvider>
+  <AccessibilityProvider>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
       
@@ -104,13 +55,18 @@ export default function App() {
         <Stack.Screen name="Pendente" component={Pendente} />
         <Stack.Screen name="Ativos" component={Ativos} />
         <Stack.Screen name="Contrato" component={Contrato} />
+        <Stack.Screen name="favoritos" component={favoritos} />
         <Stack.Screen name="configuracoes" component={configuracoes} />
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Cadastro" component={Cadastro} />
+        <Stack.Screen name="PerguntasC" component={PerguntasC} />
+        <Stack.Screen name="pagamento" component={pagamento} />
+        <Stack.Screen name="Conversas" component={Conversas} />
        
       </Stack.Navigator>
     </NavigationContainer>
-    </UserProvider>
+    </AccessibilityProvider>
+  </UserProvider>
   );
 }

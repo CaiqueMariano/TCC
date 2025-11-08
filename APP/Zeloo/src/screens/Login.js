@@ -126,13 +126,11 @@ export default function Login({navigation}) {
           <Text style={styles.buttonText} onPress={() => navigation.navigate('Cadastro')}>Cadastrar</Text>
         </TouchableOpacity>
       </View>
-
     </View>
-
-    </View>
-      
+      </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   Container: {

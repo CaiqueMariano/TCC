@@ -1,91 +1,112 @@
-import React, { useState, useEffect, useContext  } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native';
+import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import { API_URL } from '../screens/link';
 import axios from 'axios';
-import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import colors from "./colors";
 
-export default function telaPagamento({route, navigation}) {
+export default function telaPagamento({ route, navigation }) {
+  const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
   const { servico } = route.params;
-  const pagar = async () =>{
-    try{
-      const response = await axios.post(`${API_URL}/api/pagar`,{
-        idContrato:servico.idContrato
+
+  const pagar = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/api/pagar`, {
+        idContrato: servico.idContrato
       });
 
-      if(response.data.success){
-        alert('Pagamento Feito!')
+      if (response.data.success) {
+        alert('Pagamento Feito!');
         navigation.navigate("Ativos");
       }
-
-    }catch(error){
+    } catch (error) {
       console.log(error);
     }
-  }
-  
-
+  };
 
   return (
     <View style={styles.container}>
+      {/* 🔹 Barra superior */}
+      <View style={styles.nav}>
+        <EscalarTouchable onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back-outline" size={28 * scale} color={colors.preto} />
+        </EscalarTouchable>
 
-      {/* 🔹 Total */}
-      <Text style={styles.totalText}>Total: R${servico.precoPersonalizado}</Text>
-      <View style={styles.line} />
+        <EscalarText style={styles.navTitulo}>Tela de Pagamento</EscalarText>
 
-      {/* 🔹 Cuidador */}
-      <Text style={styles.cuidadorText}>Cuidador:{servico.nomeProfissional}</Text>
+        <EscalarTouchable onPress={() => navigation.navigate('configuracoes')}>
+          <Ionicons name="settings-outline" size={28 * scale} color={colors.preto} />
+        </EscalarTouchable>
+      </View>
 
-      <View style={styles.cuidadorSection}>
-        <Image
-          source={{ uri: 'https://cdn-icons-png.flaticon.com/512/6997/6997662.png' }}
-          style={styles.avatar}
-        />
+      {/* 🔹 Botão auditivo */}
+      <EscalarTouchable style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+        <EscalarImage source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
+      </EscalarTouchable>
 
-        <View style={styles.info}>
-          <Text style={styles.avaliacao}>
-            <Ionicons name="star" size={20} color="#daa520" /> 4,8 (120 avaliações)
-          </Text>
-          <Text style={styles.local}>
-            <Ionicons name="location-sharp" size={18} color="#d0342c" /> São Paulo, SP
-          </Text>
+      {/* 🔹 Conteúdo principal */}
+      <View style={styles.content}>
+        <EscalarText style={styles.totalText}>Total: R${servico.precoPersonalizado}</EscalarText>
+        <View style={styles.line} />
+
+        <EscalarText style={styles.cuidadorText}>Cuidador: {servico.nomeProfissional}</EscalarText>
+
+        <View style={styles.cuidadorSection}>
+          <Image
+            source={{ uri: `${API_URL}/storage/${servico.fotoProfissional}` }}
+            style={styles.avatar}
+          />
+
+          <View style={styles.info}>
+            <Text style={styles.avaliacao}>
+              <Ionicons name="star" size={20} color="#daa520" /> 4,8 (120 avaliações)
+            </Text>
+            <Text style={styles.local}>
+              <Ionicons name="location-sharp" size={18} color="#d0342c" /> São Paulo, SP
+            </Text>
+          </View>
         </View>
+
+        {/* 🔹 Botão perfil */}
+        <TouchableOpacity
+          style={styles.perfilButton}
+          onPress={() => navigation.navigate('perfilProfissional', { servico })}
+        >
+          <Text style={styles.perfilButtonText}>Olhar Perfil do Cuidador</Text>
+        </TouchableOpacity>
+
+        <View style={styles.line} />
+
+        {/* 🔹 Métodos de pagamento */}
+        <Text style={styles.metodoTitle}>Métodos de pagamento</Text>
+
+        <View style={styles.metodoItem}>
+          <MaterialIcons name="pix" size={24} color="#00b686" />
+          <Text style={styles.metodoText}>Pix</Text>
+        </View>
+
+        <View style={styles.metodoItem}>
+          <FontAwesome5 name="credit-card" size={20} color="#3b7ddd" />
+          <Text style={styles.metodoText}>Cartão de Crédito</Text>
+        </View>
+
+        <View style={styles.metodoItem}>
+          <FontAwesome5 name="credit-card" size={20} color="#f0ad00" />
+          <Text style={styles.metodoText}>Cartão de Débito</Text>
+        </View>
+
+        <View style={styles.line} />
+
+        {/* 🔹 Total final */}
+        <Text style={styles.totalFinal}>Total: R${servico.precoPersonalizado}</Text>
+
+        {/* 🔹 Botão pagar */}
+        <TouchableOpacity style={styles.pagamentoButton} onPress={pagar}>
+          <Text style={styles.pagamentoButtonText}>Efetuar Pagamento</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* 🔹 Botão perfil */}
-      <TouchableOpacity style={styles.perfilButton}>
-        <Text style={styles.perfilButtonText}>Olhar Perfil do Cuidador</Text>
-      </TouchableOpacity>
-
-      <View style={styles.line} />
-
-      {/* 🔹 Métodos de pagamento */}
-      <Text style={styles.metodoTitle}>Métodos de pagamento</Text>
-
-      <View style={styles.metodoItem}>
-        <MaterialIcons name="pix" size={24} color="#00b686" />
-        <Text style={styles.metodoText}>Pix</Text>
-      </View>
-
-      <View style={styles.metodoItem}>
-        <FontAwesome5 name="credit-card" size={20} color="#3b7ddd" />
-        <Text style={styles.metodoText}>Cartão de Crédito</Text>
-      </View>
-
-      <View style={styles.metodoItem}>
-        <FontAwesome5 name="credit-card" size={20} color="#f0ad00" />
-        <Text style={styles.metodoText}>Cartão de Débito</Text>
-      </View>
-
-      <View style={styles.line} />
-
-      {/* 🔹 Total final */}
-      <Text style={styles.totalFinal}>Total: R${servico.precoPersonalizado}</Text>
-
-      {/* 🔹 Botão pagar */}
-      <TouchableOpacity style={styles.pagamentoButton} onPress={pagar}>
-        <Text style={styles.pagamentoButtonText}>Efetuar Pagamento</Text>
-      </TouchableOpacity>
-
     </View>
   );
 }
@@ -93,18 +114,39 @@ export default function telaPagamento({route, navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#fff',
-    padding: 30,
+    backgroundColor: colors.branco,
+  },
+
+  nav: {
+    width: "100%",
+    paddingTop: Platform.OS === "ios" ? 60 : 35,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: colors.azul,
+  },
+
+  navTitulo: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.preto,
+  },
+
+  content: {
+    flex: 1,
+    paddingHorizontal: 25,
+    marginTop: 15,
   },
 
   totalText: {
-    marginTop: 20,
     fontSize: 20,
     fontWeight: '500',
   },
 
   line: {
+    width: '100%',
     height: 1,
     backgroundColor: '#000',
     marginVertical: 15,
@@ -119,12 +161,13 @@ const styles = StyleSheet.create({
   cuidadorSection: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 10,
   },
 
   avatar: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: '#eee',
   },
 
@@ -133,25 +176,27 @@ const styles = StyleSheet.create({
   },
 
   avaliacao: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '500',
     color: '#333',
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   local: {
-    fontSize: 20,
+    fontSize: 18,
     color: '#555',
   },
 
   perfilButton: {
     backgroundColor: '#aef2ea',
     borderRadius: 10,
-    paddingVertical: 5,
+    paddingVertical: 8,
     alignItems: 'center',
     marginTop: 20,
     borderWidth: 1,
     borderColor: '#000',
+    width: '90%',
+    alignSelf: 'center',
   },
 
   perfilButtonText: {
@@ -173,7 +218,7 @@ const styles = StyleSheet.create({
   },
 
   metodoText: {
-    fontSize: 20,
+    fontSize: 18,
     marginLeft: 10,
     color: '#333',
   },
@@ -188,11 +233,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#aef2ea',
     borderRadius: 10,
     paddingVertical: 10,
-    marginLeft: 30,
-    marginRight: 30,
+    width: '90%',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#000',
+    alignSelf: 'center',
   },
 
   pagamentoButtonText: {
@@ -202,4 +247,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
+  soundButton: {
+    position: 'absolute',
+    top: 430,
+    right: 15,
+    width: 45,
+    height: 45,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    zIndex: 1002,
+  },
+
+  soundIcon: {
+    width: 65,
+    height: 65,
+  },
 });

@@ -65,7 +65,6 @@ export default function BemVindo({ navigation }) {
           }}
         />
 
-        {/* Botões principais */}
         <View style={styles.mainButtons}>
           <TouchableWithoutFeedback onPress={() => navigation.navigate("Login")}>
             <View style={styles.button}>
