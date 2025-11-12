@@ -46,6 +46,41 @@ class ZelooController extends Controller
     public function dashboard(){
         return view('index');
     }
+// Deixando o grafico mais interativo com dados dinamicos 
+public function DashboardData()
+{
+    $reclamacoesPorMes = DB::table('denuncias')
+        ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
+        ->groupBy('mes')
+        ->orderBy('mes')
+        ->pluck('total');
+
+    $cuidadoresAtivos = DB::table('tb_profissional')
+        ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
+        ->groupBy('mes')
+        ->orderBy('mes')
+        ->pluck('total');
+
+    $tiposReclamacoes = DB::table('denuncias')
+        ->select('motivoDenuncia', DB::raw('COUNT(*) as total'))
+        ->groupBy('motivoDenuncia')
+        ->pluck('total', 'motivoDenuncia');
+
+    // Simulação temporária
+    $receitaMensal = [1200, 1500, 1800, 2000, 2500, 3000];
+    $rentabilidadeAnual = [5, 7, 6, 8, 9, 10, 12, 11, 13, 14, 15, 16];
+
+    $semDados = $reclamacoesPorMes->isEmpty() && $cuidadoresAtivos->isEmpty() && $tiposReclamacoes->isEmpty();
+
+    return response()->json([
+        'reclamacoesPorMes' => $reclamacoesPorMes,
+        'cuidadoresAtivos' => $cuidadoresAtivos,
+        'tiposReclamacoes' => $tiposReclamacoes,
+        'receitaMensal' => $receitaMensal,
+        'rentabilidadeAnual' => $rentabilidadeAnual,
+        'semDados' => $semDados,
+    ]);
+}
 
     public function registro()
     {

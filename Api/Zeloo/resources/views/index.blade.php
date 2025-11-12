@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
             --primary-green: #4CAF50;
@@ -241,6 +242,15 @@
         </div>
     </div>
 
+      <div style="text-align: center; margin-top: 20px;">
+    <a href="{{ route('download.dashboard.pdf') }}" 
+       class="btn btn-primary" 
+       style="display:inline-block; background-color:#4DEB6F; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; transition:0.3s;">
+       📄 Baixar Relatório PDF
+    </a>
+</div>
+
+
     <!-- Gráficos -->
     <div class="container mb-5">
         <div class="row">
@@ -339,234 +349,141 @@
 
          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
      
-          <script>
-         // Navbar scroll effect
-         window.addEventListener('scroll', function() {
-             const navbar = document.getElementById('mainNavbar');
-             if (window.scrollY > 50) {
-                 navbar.classList.add('scrolled');
-             } else {
-                 navbar.classList.remove('scrolled');
-             }
-         });
-     </script>
-     
-     <script>
-         // Aguardar o carregamento da página
-         document.addEventListener('DOMContentLoaded', function() {
-             // Gráfico de Reclamações
-             const reclamacoesCtx = document.getElementById('reclamacoesChart');
-             if (reclamacoesCtx) {
-                 new Chart(reclamacoesCtx, {
-                     type: 'line',
-                     data: {
-                         labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                         datasets: [{
-                             label: 'Reclamações',
-                             data: [120, 145, 135, 160, 180, 200],
-                             borderColor: '#4CAF50',
-                             backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                             borderWidth: 3,
-                             fill: true,
-                             tension: 0.4
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         maintainAspectRatio: false,
-                         plugins: {
-                             legend: {
-                                 display: false
-                             }
-                         },
-                         scales: {
-                             y: {
-                                 beginAtZero: true,
-                                 grid: {
-                                     color: 'rgba(0,0,0,0.05)'
-                                 }
-                             },
-                             x: {
-                                 grid: {
-                                     display: false
-                                 }
-                             }
-                         }
-                     }
-                 });
-             }
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+     const response = await fetch("{{ url('/dashboard-data') }}");
 
-                           // Gráfico de Cuidadores Ativos
-              const cuidadoresCtx = document.getElementById('cuidadoresChart');
-              if (cuidadoresCtx) {
-                  new Chart(cuidadoresCtx, {
-                      type: 'bar',
-                      data: {
-                          labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                          datasets: [{
-                              label: 'Cuidadores Ativos',
-                              data: [140, 145, 150, 148, 152, 156],
-                              backgroundColor: [
-                                  'rgba(76, 175, 80, 0.8)',
-                                  'rgba(76, 175, 80, 0.8)',
-                                  'rgba(76, 175, 80, 0.8)',
-                                  'rgba(76, 175, 80, 0.8)',
-                                  'rgba(76, 175, 80, 0.8)',
-                                  'rgba(76, 175, 80, 0.8)'
-                              ],
-                              borderColor: '#4CAF50',
-                              borderWidth: 1
-                          }]
-                      },
-                      options: {
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                              legend: {
-                                  display: false
-                              }
-                          },
-                          scales: {
-                              y: {
-                                  beginAtZero: true,
-                                  grid: {
-                                      color: 'rgba(0,0,0,0.05)'
-                                  }
-                              },
-                              x: {
-                                  grid: {
-                                      display: false
-                                  }
-                              }
-                          }
-                      }
-                  });
-              }
+    const data = await response.json();
+        
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            const response = await fetch("/dashboard-data"); // rota do Laravel
+            const data = await response.json();
 
-              // Gráfico de Receita
-              const receitaCtx = document.getElementById('receitaChart');
-              if (receitaCtx) {
-                  new Chart(receitaCtx, {
-                      type: 'bar',
-                      data: {
-                          labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                          datasets: [{
-                              label: 'Receita (R$)',
-                              data: [32000, 38000, 42000, 45000, 48000, 52000],
-                              backgroundColor: [
-                                  'rgba(129, 199, 132, 0.8)',
-                                  'rgba(129, 199, 132, 0.8)',
-                                  'rgba(129, 199, 132, 0.8)',
-                                  'rgba(129, 199, 132, 0.8)',
-                                  'rgba(129, 199, 132, 0.8)',
-                                  'rgba(129, 199, 132, 0.8)'
-                              ],
-                              borderColor: '#81C784',
-                              borderWidth: 1
-                          }]
-                      },
-                      options: {
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                              legend: {
-                                  display: false
-                              }
-                          },
-                          scales: {
-                              y: {
-                                  beginAtZero: true,
-                                  grid: {
-                                      color: 'rgba(0,0,0,0.05)'
-                                  }
-                              },
-                              x: {
-                                  grid: {
-                                      display: false
-                                  }
-                              }
-                          }
-                      }
-                  });
-              }
+            if (data.semDados) {
+                // 🚨 Exibe aviso se não houver dados
+                const aviso = document.createElement("div");
+                aviso.innerText = "Sem dados disponíveis no momento.";
+                aviso.style.textAlign = "center";
+                aviso.style.fontWeight = "bold";
+                aviso.style.color = "gray";
+                document.getElementById("graficoContainer")?.appendChild(aviso);
+                return;
+            }
 
-              // Gráfico de Rentabilidade
-              const rentabilidadeCtx = document.getElementById('rentabilidadeChart');
-              if (rentabilidadeCtx) {
-                  new Chart(rentabilidadeCtx, {
-                      type: 'line',
-                      data: {
-                          labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                          datasets: [{
-                              label: 'Rentabilidade (%)',
-                              data: [18.5, 19.2, 20.1, 21.3, 22.0, 21.8, 22.5, 23.1, 23.8, 24.2, 23.9, 23.5],
-                              borderColor: '#A5D6A7',
-                              backgroundColor: 'rgba(165, 214, 167, 0.1)',
-                              borderWidth: 3,
-                              fill: true,
-                              tension: 0.4
-                          }]
-                      },
-                      options: {
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                              legend: {
-                                  display: false
-                              }
-                          },
-                          scales: {
-                              y: {
-                                  beginAtZero: true,
-                                  grid: {
-                                      color: 'rgba(0,0,0,0.05)'
-                                  }
-                              },
-                              x: {
-                                  grid: {
-                                      display: false
-                                  }
-                              }
-                          }
-                      }
-                  });
-              }
+            const ctx = document.getElementById("graficoDenuncias")?.getContext("2d");
+            if (!ctx) return;
 
-             // Gráfico de Pizza - Tipos de Reclamações
-             const tiposReclamacoesCtx = document.getElementById('tiposReclamacoesChart');
-             if (tiposReclamacoesCtx) {
-                 new Chart(tiposReclamacoesCtx, {
-                     type: 'doughnut',
-                     data: {
-                         labels: ['Negligência no Cuidado', 'Atraso no Atendimento', 'Má Comunicação', 'Assédio', 'Outros'],
-                         datasets: [{
-                             data: [35, 25, 20, 15, 5],
-                             backgroundColor: [
-                                 '#4CAF50',
-                                 '#81C784',
-                                 '#A5D6A7',
-                                 '#C8E6C9',
-                                 '#E8F5E8'
-                             ],
-                             borderWidth: 0
-                         }]
-                     },
-                     options: {
-                         responsive: true,
-                         maintainAspectRatio: false,
-                         plugins: {
-                             legend: {
-                                 position: 'bottom',
-                                 labels: {
-                                     padding: 20,
-                                     usePointStyle: true
-                                 }
-                             }
-                         }
-                     }
-                 });
-             }
-         });
-     </script>
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(data.tiposReclamacoes),
+                    datasets: [{
+                        label: "Total de Denúncias",
+                        data: Object.values(data.tiposReclamacoes),
+                        borderWidth: 1,
+                        backgroundColor: "rgba(54, 162, 235, 0.6)"
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Erro ao carregar dados do dashboard:", error);
+            alert("Ocorreu um erro ao carregar o gráfico.");
+        }
+    });
+    // === Reclamações ===
+    const reclamacoesCtx = document.getElementById('reclamacoesChart');
+    new Chart(reclamacoesCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            datasets: [{
+                label: 'Reclamações',
+                data: data.reclamacoesPorMes,
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76,175,80,0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // === Cuidadores ===
+    const cuidadoresCtx = document.getElementById('cuidadoresChart');
+    new Chart(cuidadoresCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+            datasets: [{
+                label: 'Cuidadores Ativos',
+                data: data.cuidadoresAtivos,
+                backgroundColor: '#4CAF50'
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    // === Tipos de Reclamações ===
+    const tiposCtx = document.getElementById('tiposReclamacoesChart');
+    new Chart(tiposCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(data.tiposReclamacoes),
+            datasets: [{
+                data: Object.values(data.tiposReclamacoes),
+                backgroundColor: ['#4CAF50','#81C784','#A5D6A7','#C8E6C9','#E8F5E9']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+    // === Receita Mensal ===
+const receitaCtx = document.getElementById('receitaChart');
+new Chart(receitaCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+        datasets: [{
+            label: 'Receita (R$)',
+            data: data.receitaMensal,
+            backgroundColor: '#81C784'
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+
+// === Rentabilidade Anual ===
+const rentabilidadeCtx = document.getElementById('rentabilidadeChart');
+new Chart(rentabilidadeCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+        datasets: [{
+            label: 'Rentabilidade (%)',
+            data: data.rentabilidadeAnual,
+            borderColor: '#4CAF50',
+            backgroundColor: 'rgba(76,175,80,0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+});
+});
+</script>
+
 </body>
 </html>

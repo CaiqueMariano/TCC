@@ -27,6 +27,8 @@ Route::post('/login','App\Http\Controllers\ZelooController@loginAdm');
 Route::get('/banir','App\Http\Controllers\ZelooController@banir')->middleware(Authenticate::class);
 Route::get('/denuncias','App\Http\Controllers\ZelooController@denuncias')->name('denuncias')->middleware(Authenticate::class);
 Route::get('/denunciados','App\Http\Controllers\ZelooController@denunciados')->name('denunciados')->middleware(Authenticate::class);
+Route::get('/dashboard-data', [ZelooController::class, 'DashboardData'])
+    ->name('dashboard.data');
 
 
 Route::get('/admin/download-dashboard-pdf', [ZelooController::class, 'downloadDashboardPdf'])
