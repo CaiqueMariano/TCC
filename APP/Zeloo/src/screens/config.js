@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import colors from "./colors";
 import {
   StyleSheet,
   Text,
@@ -115,7 +116,7 @@ export default function Configuracoes() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#F8F9F9',
+    backgroundColor: '#fff',
     alignItems: 'center',
     padding: 0
   },
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#C7F1F0',
+    backgroundColor: colors.azul,
     width: '100%',
     paddingTop: 40,
     paddingBottom: 10,
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
   optionBox: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#C7F1F0',
+    backgroundColor: colors.azul,
     borderRadius: 20,
     width: 140,
     height: 95,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#C7F1F0',
+    backgroundColor: colors.azul,
     borderRadius: 20,
     width: '85%',
     height: 90,
@@ -207,7 +208,7 @@ const styles = StyleSheet.create({
   optionAmpliar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#C7F1F0',
+    backgroundColor: colors.azul,
     borderRadius: 20,
     height: 90,
     width: '85%',
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#C7F1F0',
+    backgroundColor: colors.azul,
     borderRadius: 20,
     height: 90,
     width: '85%',
