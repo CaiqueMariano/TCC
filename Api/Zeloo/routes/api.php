@@ -18,6 +18,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//Desfavoritar
+Route::delete('/desfavoritar/{idProfissional}/{idUsuario}','App\Http\Controllers\ZelooController@desfavoritar');
 
 //Favoritar
 Route::post('/favoritar','App\Http\Controllers\ZelooController@favoritar');

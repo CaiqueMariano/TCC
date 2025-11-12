@@ -1,11 +1,37 @@
-import React from 'react';
+import React,{useState, useContext} from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { UserContext } from './userContext';
+import { API_URL } from './link';
+
 import Background from '../components/Background';
 
-export default function Login() {
-  const navigation = useNavigation();
+export default function Login({navigation}) {
+  const { setUser } = useContext(UserContext);
+  const [mensagem, setMensagem] = useState('');
+  const  [emailProfissional, setEmail] = useState('');
+  const  [senhaProfissional, setSenha] = useState('');
+const enviarLogin = async () => {
+    try {
+      const response = await axios.post(`${API_URL}/api/loginFree`, {
+        emailProfissional,
+        senhaProfissional,
+      });
+  
+      if (response.data.success) {
+        setUser(response.data.data);
+        navigation.navigate("Home");
+      } else {
+        console.log(response.data.message)
+        setMensagem('E-mail ou senha incorretos');
+      }
+  
+    } catch (error) {
+        console.log(response.data.message, error)
+        setMensagem('E-mail ou senha incorretos');
+    }
+  };
   return (
     <Background>
       <View style={styles.logoWrapper}>
@@ -14,16 +40,21 @@ export default function Login() {
       <View style={styles.container}>
         <View style={styles.loginBox}>
           <Text style={styles.loginTitle}>Login</Text>
+          <View style={styles.mensagem}>
+            <Text style={styles.mensagemText}>{mensagem}</Text>
+          </View>
           <TextInput
             style={styles.input}
             placeholder="Email"
             placeholderTextColor="#444"
             keyboardType="email-address"
+            onChangeText={setEmail}
             autoCapitalize="none"
           />
           <TextInput
             style={styles.input}
             placeholder="Senha"
+            onChangeText={setSenha}
             placeholderTextColor="#444"
             secureTextEntry
           />
@@ -36,9 +67,9 @@ export default function Login() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.button, styles.buttonPrimary]}
-              onPress={() => navigation.navigate('Home')}
+              onPress={enviarLogin}
             >
-              <Text style={styles.buttonText}>Logar</Text>
+              <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -52,6 +83,12 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
+  mensagem:{
+    marginBottom:10,
+},
+mensagemText:{
+    color:'red',
+},  
   container: {
     flex: 1,
     alignItems: 'center',

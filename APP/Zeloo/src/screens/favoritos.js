@@ -42,13 +42,14 @@ export default function Favoritos({ navigation }) {
     setModalVisible(true);
   };
 
-  const desfavoritar = () => {
-    if (cuidadorSelecionado !== null) {
-      setFavoritos((prev) => prev.filter((fid) => fid !== cuidadorSelecionado));
-      setCuidadores((prev) => prev.filter((c) => c.idProfissional !== cuidadorSelecionado));
-      setModalVisible(false);
-      setCuidadorSelecionado(null);
-    }
+  const desfavoritar = async () => {
+    try{
+
+    await axios.delete(`${API_URL}/api/desfavoritar/${cuidadorSelecionado}/${user.idUsuario}`);
+    navigation.replace("favoritos");
+  }catch(error){
+    console.log(error);
+  }
   };
 
   const renderItem = ({ item }) => (

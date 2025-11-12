@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('dataNascProfissional');
             $table->string('generoProfissional');
             $table->string('senhaProfissional');
-            $table->integer('documentosProfissional');
+            $table->bigInteger('documentosProfissional');
             $table->string('biografiaProfissional');
             $table->decimal('valorMin', 8, 2);
             $table->string('statusProfissional');

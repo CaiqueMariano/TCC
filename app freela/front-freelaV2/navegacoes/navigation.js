@@ -9,20 +9,18 @@ import Pedidos from '../screens/pedidos';
 import Perfil from '../screens/Perfil';
 import Login from '../screens/Login';
 import SobreNos from '../screens/SobreNos';
+import { UserProvider } from "../screens/userContext";
 import Configuracoes from '../screens/Configuracoes';
 
 const Stack = createNativeStackNavigator();
-
-function LoginScreen() {
-  return <Login />;
-}
-
 export default function App() {
   return (
+    
+<UserProvider>
     <ThemeProvider> 
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
         <Stack.Screen name="pedidos" component={Pedidos} options={{ headerShown: false }} />
@@ -32,6 +30,7 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     </ThemeProvider>
+    </UserProvider>
   );
 }
 

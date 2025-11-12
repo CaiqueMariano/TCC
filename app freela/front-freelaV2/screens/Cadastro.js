@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform, Alert, Dimensions, ScrollView } from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../temas/ThemeContext';
 import Background from '../components/Background';
+import axios from "axios";
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
-
+import { API_URL } from '../screens/link';
 const { width } = Dimensions.get("window");
 
 export default function Cadastro() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   
+  const [open, setOpen] = useState(false);
+    const [value, setValue] = useState('idoso');
+    const [items, setItems] = useState([
+      { label: 'Masculino', value: 'masculino' },
+      { label: 'Feminino', value: 'feminino' },
+      { label: 'Outro', value: 'outro' },
+    ]);
   // Estados para controle das etapas e dados
   const [etapa, setEtapa] = useState(1);
   const [nomeProfissional, setNomeProfissional] = useState('');
@@ -21,12 +30,27 @@ export default function Cadastro() {
   const [senhaProfissional, setSenhaProfissional] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [biografia, setBiografia] = useState('');
+  const [dataNasc,setDataNascUsuario] = useState("");
   const [valorMinimo, setValorMinimo] = useState('');
-  const [areaAtuacao, setAreaAtuacao] = useState('');
-  const [mostrarDropdownArea, setMostrarDropdownArea] = useState(false);
-  const [servicosOferecidos, setServicosOferecidos] = useState('');
+  const [cpf, setCpf] = useState('');
   const [imagem, setImagem] = useState(null);
 
+  const formatarData = (texto) => {
+    // Remove tudo que não é número
+    let numeros = texto.replace(/\D/g, '');
+  
+    // Limita a 8 dígitos
+    if (numeros.length > 8) numeros = numeros.slice(0, 8);
+  
+    // Formata DD/MM/AAAA
+    if (numeros.length >= 5) {
+      numeros = numeros.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
+    } else if (numeros.length >= 3) {
+      numeros = numeros.replace(/(\d{2})(\d{1,2})/, '$1/$2');
+    }
+  
+    setDataNascUsuario(numeros);
+  };
   // Formatações simples
   const formatarTelefone = (texto) => {
     let numeros = texto.replace(/\D/g, '');
@@ -98,7 +122,7 @@ export default function Cadastro() {
   // Componente de progresso
   const Progresso = () => (
     <View style={styles.progressContainer}>
-      {Array.from({ length: 3 }).map((_, index) => (
+      {Array.from({ length: 4 }).map((_, index) => (
         <View
           key={index}
           style={[
@@ -109,6 +133,68 @@ export default function Cadastro() {
       ))}
     </View>
   );
+
+  // Função de envio de dados
+  const enviarDados = async () => {
+    try {
+      if (
+        !nomeProfissional.trim() ||
+        !emailProfissional.trim() ||
+        !senhaProfissional.trim()
+      ) {
+        Alert.alert("Atenção", "Preencha nome, e-mail e senha.");
+        return;
+      }
+
+      const partes = dataNasc.split('/');
+      const telefoneLimpo = telefoneProfissional.replace(/\D/g, '');
+    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
+      const formData = new FormData();
+      formData.append("nomeProfissional", nomeProfissional);
+      formData.append("emailProfissional", emailProfissional);
+      formData.append("telefoneProfissional", telefoneLimpo);
+      formData.append("dataNascProfissional", dataFormatada);
+      formData.append("generoProfissional", value);
+      formData.append("senhaProfissional", senhaProfissional);
+      formData.append("documentosProfissional", cpf);
+      formData.append("biografiaProfissional", biografia);
+      formData.append("valorMin", valorMinimo.replace(/\D/g, "")); 
+
+      if (imagem) {
+      
+        const filename = imagem.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+  
+        formData.append('fotoProfissional', {
+          uri: imagem,
+          name: filename,
+          type
+        });
+      }
+
+
+      const response = await axios.post(`${API_URL}/api/profissional`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      if (response.data.success) {
+        Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
+        navigation.goBack();
+      } else {
+        Alert.alert("Erro", "Falha ao realizar o cadastro.");
+      }
+    } catch (error) {
+      if (error.response) {
+        console.log("Erro do servidor:", error.response.data);
+      } else if (error.request) {
+        console.log("Sem resposta do servidor:", error.request);
+      } else {
+        console.log("Erro na requisição:", error.message);
+      }
+    }
+  };
   return (
     <Background>
       <View style={styles.logoWrapper}>
@@ -123,14 +209,22 @@ export default function Cadastro() {
             <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
               <TextInput
                 style={styles.input}
-                placeholder="Nome profissional"
+                placeholder="Nome Completo"
                 placeholderTextColor="#444"
                 value={nomeProfissional}
                 onChangeText={setNomeProfissional}
               />
               <TextInput
                 style={styles.input}
-                placeholder="E-mail profissional"
+                placeholder="CPF"
+                placeholderTextColor="#444"
+                keyboardType="numeric"
+                value={cpf}
+                onChangeText={setCpf}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="E-mail"
                 placeholderTextColor="#444"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -139,7 +233,7 @@ export default function Cadastro() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Telefone profissional"
+                placeholder="Telefone"
                 placeholderTextColor="#444"
                 keyboardType="phone-pad"
                 value={telefoneProfissional}
@@ -148,7 +242,7 @@ export default function Cadastro() {
               <View style={styles.senhaContainer}>
                 <TextInput
                   style={styles.senhaInput}
-                  placeholder="Senha profissional"
+                  placeholder="Senha"
                   placeholderTextColor="#444"
                   secureTextEntry={!mostrarSenha}
                   value={senhaProfissional}
@@ -166,8 +260,35 @@ export default function Cadastro() {
           )}
 
           {etapa === 2 && (
+            <View style={styles.scrollArea} contentContainerStyle={styles.scrollContent} >
+              <View style={styles.dropdowncontainerV} >
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                placeholder="Gênero"
+                setItems={setItems}
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
+              />
+            </View>
+           
+               <TextInput 
+          style={styles.input} 
+          placeholder="Data de nascimento" 
+          keyboardType="numeric"
+          value={dataNasc}
+          onChangeText={formatarData}
+          />
+              
+            </View>
+          )}
+          {etapa === 3 && (
             <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
-              <TextInput
+           
+            <TextInput
                 style={[styles.input, styles.textarea]}
                 placeholder="Biografia"
                 placeholderTextColor="#444"
@@ -184,44 +305,12 @@ export default function Cadastro() {
                 value={valorMinimo}
                 onChangeText={formatarValor}
               />
-              <View style={styles.dropdownContainer}>
-                <TouchableOpacity style={styles.dropdownHeader} onPress={() => setMostrarDropdownArea(!mostrarDropdownArea)}>
-                  <Text style={styles.dropdownHeaderText}>{areaAtuacao || 'Área de atuação'}</Text>
-                  <Ionicons name={mostrarDropdownArea ? 'chevron-up' : 'chevron-down'} size={20} color="#444" />
-                </TouchableOpacity>
-                {mostrarDropdownArea && (
-                  <View style={styles.dropdownList}>
-                    {[
-                      'Cuidador de idosos',
-                      'Serviço de compras',
-                      'Transporte',
-                      'Acompanhante médico',
-                      'Enfermagem',
-                    ].map((opcao) => (
-                      <TouchableOpacity
-                        key={opcao}
-                        style={styles.dropdownItem}
-                        onPress={() => { setAreaAtuacao(opcao); setMostrarDropdownArea(false); }}
-                      >
-                        <Text style={styles.dropdownItemText}>{opcao}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-              <TextInput
-                style={[styles.input, styles.textarea]}
-                placeholder="Serviços oferecidos (descreva)"
-                placeholderTextColor="#444"
-                value={servicosOferecidos}
-                onChangeText={setServicosOferecidos}
-                multiline
-                textAlignVertical="top"
-              />
+
+              
             </ScrollView>
           )}
 
-          {etapa === 3 && (
+          {etapa === 4 && (
             <>
               <Text style={styles.photoTitle}>Adicione uma foto sua</Text>
               <Image
@@ -239,6 +328,7 @@ export default function Cadastro() {
             </>
           )}
 
+
           <View style={styles.buttonRow}>
             <TouchableOpacity 
               style={[styles.button, styles.buttonSecondary]} 
@@ -251,17 +341,15 @@ export default function Cadastro() {
             <TouchableOpacity 
               style={[styles.button, styles.buttonPrimary]}
               onPress={() => {
-                if (etapa < 3) {
+                if (etapa < 4) {
                   setEtapa(etapa + 1);
                 } else {
-                  // Finalizar cadastro - aqui você pode integrar com sua API
-                  Alert.alert('Sucesso', 'Cadastro concluído!');
-                  navigation.goBack();
+                  enviarDados();
                 }
               }}
             >
               <Text style={styles.buttonText}>
-                {etapa < 3 ? 'Seguinte' : 'Finalizar'}
+                {etapa < 4 ? 'Seguinte' : 'Finalizar'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -276,6 +364,9 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
+  dropdowncontainerV:{
+     marginBottom:10,
+  },  
   container: {
     flex: 1,
     alignItems: 'center',
@@ -403,6 +494,14 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     width: '100%',
     marginBottom: 16,
+  },
+  dropDownContainer: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "black",
+    borderRadius: 10,
+    width: width * 0.6,
+    zIndex: 2,
   },
   dropdownHeader: {
     flexDirection: 'row',

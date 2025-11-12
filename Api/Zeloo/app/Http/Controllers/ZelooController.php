@@ -605,6 +605,24 @@ public function favoritar(Request $request){
     ],200);
 
 }
+
+
+//Desfavoritar
+    
+public function desfavoritar($idProfissional, $idUsuario){
+    $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+    $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
+
+    FavoritosModel::where('idIdosoFamilia','=',$familia->idIdosoFamilia)
+    ->where('idProfissional', '=', $idProfissional)
+    ->delete();
+
+    return response()->json([
+        'success' => true,
+        'message'=> 'Desfavoritado!',
+        'code'=>200]
+    );
+}
 //Ver Favoritos
 public function favoritos($idUsuario){
     $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
@@ -811,6 +829,7 @@ public function vizualizarContratoTerminado($idProfissional){
             ], 401);
         }
 
+        
         
     return response()->json([
         'success' => true,
