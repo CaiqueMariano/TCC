@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "front-freela",
-    "slug": "snack-fdd4f84c-296b-4681-a761-0ecf3e11f2a9",
+    "slug": "snack-30283ccf-b01e-403e-a8ae-b1fc9e497c46",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,8 +26,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router",
-      "expo-font"
+      "expo-asset"
     ]
   }
 }
