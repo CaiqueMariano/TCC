@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
 import Cadastro from './screens/Cadastro';
 import Home from './screens/Home';
-import Pedidos from './screens/Pedidos';
+import Pedidos from './screens/pedidos';
 import { useState } from 'react';
 import {UserProvider, userProvider} from './screens/userContext';
 import Contratos from './screens/Contratos';
