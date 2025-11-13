@@ -1,14 +1,14 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, Image, Dimensions, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { LineChart } from 'react-native-chart-kit';
-import Background from '../components/Background';
-
+import React,{useContext} from 'react';
+import { UserContext } from "./userContext";
 export default function Home() {
   const navigation = useNavigation();
   const screenWidth = Dimensions.get('window').width;
-
+  const { user } = useContext(UserContext);
   const chartData = {
     labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
     datasets: [
@@ -34,8 +34,14 @@ export default function Home() {
   };
 
   return (
-    <Background>
-      {/* Top bar removida para mais espaço útil */}
+    <ImageBackground
+      source={require('../assets/screenshot.jpeg')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.topBar}>
+        <Text style={styles.topBarText}>Home</Text>
+      </View>
 
       <ScrollView contentContainerStyle={styles.container}>
         {/* CARD 1 - Proposta recomendada */}
@@ -51,11 +57,11 @@ export default function Home() {
               <Text style={styles.personName}>Maria Oliveira</Text>
               <Text style={styles.locationText}>São Paulo - SP</Text>
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star-half" size={14} color="#b08cff" />
-                <Ionicons name="star-outline" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star-half" size={14} color="#FFD700" />
+                <Ionicons name="star-outline" size={14} color="#FFD700" />
               </View>
             </View>
             <View style={styles.valueContainer}>
@@ -108,11 +114,11 @@ export default function Home() {
               <Text style={styles.personName}>João Cuidador</Text>
               <Text style={styles.locationText}>Bairro Vila Nova - Curitiba/PR</Text>
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star-outline" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star-outline" size={14} color="#FFD700" />
               </View>
               <Text style={styles.profileDetail}>Média de avaliação: 4.0</Text>
               <Text style={styles.profileDetail}>Tempo no app: 1 ano e 3 meses</Text>
@@ -140,20 +146,14 @@ export default function Home() {
 
           {/* Gráfico de linha */}
           <View style={{ marginTop: 16 }}>
-            {Platform.OS !== 'web' ? (
-              <LineChart
-                data={chartData}
-                width={screenWidth - 48}
-                height={180}
-                chartConfig={chartConfig}
-                bezier
-                style={{ borderRadius: 12 }}
-              />
-            ) : (
-              <View style={styles.chartPlaceholder}>
-                <Text style={styles.chartPlaceholderText}>Gráfico indisponível no web</Text>
-              </View>
-            )}
+            <LineChart
+              data={chartData}
+              width={screenWidth - 48} // considerando padding
+              height={180}
+              chartConfig={chartConfig}
+              bezier
+              style={{ borderRadius: 12 }}
+            />
           </View>
         </View>
 
@@ -168,21 +168,21 @@ export default function Home() {
         </TouchableOpacity>
         <TouchableOpacity
   style={styles.navItem}
-  onPress={() => navigation.navigate('pedidos')}>
+  onPress={() => navigation.navigate("Pedidos")}>
   <Ionicons name="chatbubble-ellipses-outline" size={22} color="#fff" />
   <Text style={styles.navLabel}>Pedidos</Text>
 </TouchableOpacity>
 
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Contratos')}>
           <Ionicons name="time-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Histórico</Text>
+          <Text style={styles.navLabel}>Contratos</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Perfil')}>
+        <TouchableOpacity style={styles.navItem}>
           <Ionicons name="person-outline" size={22} color="#fff" />
           <Text style={styles.navLabel}>Perfil</Text>
         </TouchableOpacity>
       </View>
-    </Background>
+    </ImageBackground>
   );
 }
 
@@ -203,11 +203,10 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 12,
-    paddingBottom: 96,
-    flexGrow: 1,
+    paddingBottom: 100,
   },
   card: {
-    backgroundColor: '#e2d9ff',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -218,7 +217,7 @@ const styles = StyleSheet.create({
   },
   kpiBox: {
     flex: 1,
-    backgroundColor: '#e2d9ff',
+    backgroundColor: 'rgba(255,255,255,0.95)',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -234,17 +233,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#555',
     marginTop: 4,
-  },
-  chartPlaceholder: {
-    height: 180,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chartPlaceholderText: {
-    fontSize: 12,
-    color: '#666',
   },
   cardTitle: {
     fontSize: 16,
@@ -322,16 +310,15 @@ const styles = StyleSheet.create({
   },
   bottomBar: {
     position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 12,
-    paddingVertical: 10,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingVertical: 8,
     paddingHorizontal: 12,
     backgroundColor: 'rgba(0,0,0,0.85)',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderRadius: 14,
   },
   navItem: {
     flex: 1,
