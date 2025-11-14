@@ -1,18 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
+  Pressable,
   StyleSheet,
   Image,
   ScrollView,
   TouchableOpacity,
+  Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
-
+import minhaimagem from '../assets/correct.png';
 export default function PedidosDisponiveis() {
   const navigation = useNavigation();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const pedidos = [
     {
@@ -70,10 +73,55 @@ export default function PedidosDisponiveis() {
   };
 
   return (
+
+    
     <Background>
       {/* Top bar removida para manter consistência com as outras telas */}
 
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container1}>
+        <Pressable 
+    style={styles.openButton} 
+    onPress={() => setModalVisible(true)}
+  >Abrir Modal</Pressable>
+      <Modal
+        animationType="fade"    
+        transparent={true}        
+        visible={modalVisible}    
+        onRequestClose={() => {   
+          setModalVisible(false);
+        }}
+      >
+
+<View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalText}>Recebimentos</Text>
+        <Image source={minhaimagem} style={styles.modalFoto} />
+        <View style={styles.modalInfo}>
+    <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
+  </View>
+
+
+       <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: '#7C4DFF', }]} 
+              onPress={() => {
+                setModalVisible(false);
+                navigation.navigate('Dashboard'); 
+              }}
+            >
+              <Text style={styles.buttonText}>Visualizar Ganhos</Text>
+            </TouchableOpacity>
+
+          
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: '#9575CD',}]} 
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>Fechar</Text>
+            </TouchableOpacity>
+
+          </View>
+        </View>
+      </Modal>
         {pedidos.map((item) => (
           <View key={item.id} style={styles.card}>
 
@@ -159,7 +207,7 @@ const styles = StyleSheet.create({
   buttonPrimary: {
     backgroundColor: '#0a84ff',
     paddingHorizontal: 20,
-    paddingVertical: 6, // antes era 10
+    paddingVertical: 6, 
     borderRadius: 8,
     alignSelf: 'flex-end',
   },
@@ -168,10 +216,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
+    fontFamily:'roboto',
+  
   },
   card: {
     backgroundColor: '#e2d9ff',
-    borderRadius: 15,
+    borderRadius: 15, 
     padding: 30,
     marginBottom: 20,
   },
@@ -267,4 +317,60 @@ const styles = StyleSheet.create({
     color: '#0a84ff',
     fontWeight: '700',
   },
+  container1: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 25,
+    borderRadius: 12,
+    width: '80%',
+    alignItems: 'center',
+  },
+  modalText: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 25,
+  },
+  actionButton: {
+    width: '100%',
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalFoto: {
+    width: 120,            
+    height: 120,           
+    borderRadius: 60,      
+    marginBottom: 15,
+    resizeMode: 'cover',
+  },
+  modalReceivedText:{
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 12,         
+    color: '#83DBC2',
+  },
+  modalInfo:{
+    flexDirection: 'row',      
+    alignItems: 'center',    
+    marginBottom: 20,       
+    justifyContent: 'flex-start',
+  }
+  
+  
 });
