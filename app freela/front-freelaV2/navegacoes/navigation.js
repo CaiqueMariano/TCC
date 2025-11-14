@@ -11,6 +11,8 @@ import Login from '../screens/Login';
 import SobreNos from '../screens/SobreNos';
 import { UserProvider } from "../screens/userContext";
 import Configuracoes from '../screens/Configuracoes';
+import Ativos from '../screens/Contratos';
+
 
 const Stack = createNativeStackNavigator();
 export default function App() {
@@ -27,6 +29,7 @@ export default function App() {
         <Stack.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
         <Stack.Screen name="SobreNos" component={SobreNos} options={{ headerShown: false }} />
         <Stack.Screen name="Configuracoes" component={Configuracoes} options={{ headerShown: false }} />
+        <Stack.Screen name="Ativos" component={Ativos} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </ThemeProvider>

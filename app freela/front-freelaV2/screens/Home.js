@@ -71,30 +71,30 @@ export default function Home() {
         </View>
 
         {/* CARD 2 - Últimas avaliações */}
-       <View style={styles.card}>
-  <Text style={styles.cardTitle}>Últimas avaliações</Text>
-  <View style={styles.feedbackRow}>
-    {[
-      { name: 'Carlos Souza', rating: 5 },
-      { name: 'Ana Lima', rating: 4 },
-      { name: 'Pedro Martins', rating: 3 },
-    ].map((item, index) => (
-      <View key={index} style={styles.feedbackItem}>
-        <Text style={styles.feedbackName}>{item.name}:</Text>
-        <View style={styles.starsContainer}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Ionicons
-              key={i}
-              name={i < item.rating ? 'star' : 'star-outline'}
-              size={16}
-              color="#b08cff"
-            />
-          ))}
-        </View>
-      </View>
-    ))}
-  </View>
-</View>
+       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Ativos')}>
+          <Text style={styles.cardTitle}>Últimas avaliações</Text>
+          <View style={styles.feedbackRow}>
+            {[
+              { name: 'Carlos Souza', rating: 5 },
+              { name: 'Ana Lima', rating: 4 },
+              { name: 'Pedro Martins', rating: 3 },
+            ].map((item, index) => (
+              <View key={index} style={styles.feedbackItem}>
+                <Text style={styles.feedbackName}>{item.name}:</Text>
+                <View style={styles.starsContainer}>
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Ionicons
+                      key={i}
+                      name={i < item.rating ? 'star' : 'star-outline'}
+                      size={16}
+                      color="#b08cff"
+                    />
+                  ))}
+                </View>
+              </View>
+            ))}
+          </View>
+        </TouchableOpacity>
 
         {/* CARD 3 - Seu perfil */}
         <View style={styles.card}>
