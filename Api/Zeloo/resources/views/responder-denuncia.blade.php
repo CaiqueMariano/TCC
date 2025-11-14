@@ -217,6 +217,8 @@
         </div>
     </nav>
 
+
+
     <!-- Header da Seção -->
     <div class="container-fluid bg-light py-3">
         <div class="container">
@@ -227,6 +229,15 @@
             <p class="text-muted mb-0 mt-1">Gerencie e analise todas as denúncias do sistema</p>
         </div>
     </div>
+
+     <div class="container my-4">
+    <form action="{{ route('buscarDenuncia') }}" method="GET" class="d-flex" style="gap: 10px;">
+        <input type="text" name="q" class="form-control" placeholder="Pesquisar por nome do usuario " value="{{ request('q') }}">
+        <button class="btn btn-success">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+    </form>
+</div>
 
 
 

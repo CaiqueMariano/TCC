@@ -29,6 +29,11 @@ Route::get('/denuncias','App\Http\Controllers\ZelooController@denuncias')->name(
 Route::get('/denunciados','App\Http\Controllers\ZelooController@denunciados')->name('denunciados')->middleware(Authenticate::class);
 Route::get('/dashboard-data', [ZelooController::class, 'DashboardData'])
     ->name('dashboard.data');
+    // buscar denunciados pelo nome
+
+Route::get('/denuncias', [ZelooController::class, 'pesquisa']);
+
+Route::get('/responder-denuncia', [ZelooController::class, 'buscarDenuncia'])->name('buscarDenuncia');
 
 
 Route::get('/admin/download-dashboard-pdf', [ZelooController::class, 'downloadDashboardPdf'])

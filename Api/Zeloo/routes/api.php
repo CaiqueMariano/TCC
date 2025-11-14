@@ -111,3 +111,6 @@ Route::post('/profissional','App\Http\Controllers\ZelooController@storeProfissio
 
 Route::post('/telefone','App\Http\Controllers\ZelooController@storeTelefoneApi');
 
+//cadastro denuncia
+
+Route::post('/denuncias', [ZelooController::class, 'storeDenunciaApi']);

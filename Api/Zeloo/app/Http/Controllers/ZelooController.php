@@ -109,8 +109,53 @@ public function downloadDashboardPdf()
     // Retornar download do PDF
     return $pdf->download('dashboard.pdf');
 }
+// pesquisa por nome
 
-  
+public function pesquisa(Request $request)
+{
+    $search = $request->input('search');
+
+    $usuarios = DB::table('denuncias')
+        ->join('tb_usuario', 'denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
+        ->select(
+            'denuncias.idDenuncias',
+            'tb_usuario.nomeUsuario as nome',
+            'denuncias.motivoDenuncia as motivo',
+            'denuncias.descDenuncia as desc',
+            'denuncias.evidenciaDenuncia as evidencia',
+            'tb_usuario.tipoUsuario as origem'
+        )
+        ->when($search, function ($query, $search) {
+            return $query->where('tb_usuario.nomeUsuario', 'LIKE', "%{$search}%");
+        })
+        ->paginate(10);
+        
+        return view('denuncias', compact('usuarios'));
+
+}
+public function buscarDenuncia(Request $request)
+{
+    $q = $request->input('q');
+
+    $usuarios = \DB::table('denuncias')
+        ->join('tb_usuario', 'denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
+        ->select(
+            'denuncias.idDenuncias as id',
+            'tb_usuario.nomeUsuario as nome',
+            'denuncias.motivoDenuncia as motivo',
+            'denuncias.descDenuncia as desc',
+            'denuncias.evidenciaDenuncia as evidencia',
+            'tb_usuario.tipoUsuario as origem'
+        )
+        ->when($q, function ($query, $q) {
+            return $query->where('tb_usuario.nomeUsuario', 'LIKE', "%$q%");
+        })
+        ->paginate(10);
+
+    return view('responder-denuncia', compact('usuarios'));
+}
+
+
     
 
     /*LOGIN ADM*/

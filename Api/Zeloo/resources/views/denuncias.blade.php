@@ -228,6 +228,17 @@
         </div>
     </div>
 
+    
+<div class="container mt-4">
+    <form action="{{ url('denuncias') }}" method="GET" class="d-flex">
+        <input type="text" name="search" class="form-control me-2" placeholder="Buscar denunciado pelo nome..." 
+               value="{{ request('search') }}">
+        <button class="btn btn-primary">
+            <i class="bi bi-search"></i>
+        </button>
+    </form>
+</div>
+
 
 
     <!--CARDS DO BIXOOO!!!-->
