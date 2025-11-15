@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '../temas/ThemeContext';
 import Cadastro from '../screens/Cadastro';
 import Home from '../screens/Home';
-import Pedidos from '../screens/pedidos';
+import Pedidos from '../screens/Pedidos';
 import Perfil from '../screens/Perfil';
 import Login from '../screens/Login';
 import SobreNos from '../screens/SobreNos';

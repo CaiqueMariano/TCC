@@ -1,4 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { API_URL } from './link';
+import { UserContext } from './userContext';
 import {View,Text,ScrollView,Platform,TouchableOpacity,Animated,Dimensions,StyleSheet, Image,} from 'react-native';
 
 const ABAS = [
@@ -8,11 +11,23 @@ const ABAS = [
 ];
 
 export default function Contratos() {
+  const {user} = useContext(UserContext);
   const [abaAtiva, definirAbaAtiva] = useState(0);
+  const [status, setStatus] = useState("");
+  const [ativos, setAtivos] = useState([]);
+const [pendentes, setPendentes] = useState([]);
+const [cancelados, setCancelados] = useState([]);
+
   const indicador = useRef(new Animated.Value(0)).current;
   const { width } = Dimensions.get('window');
   const larguraAba = width / ABAS.length;
 
+  useEffect(() => {
+    if (abaAtiva === 0) setStatus("ativo");
+    if (abaAtiva === 1) setStatus("Aguardando Pagamento");
+    if (abaAtiva === 2) setStatus("Cancelado");
+  }, [abaAtiva]);
+  
   useEffect(() => {
     Animated.spring(indicador, {
       toValue: abaAtiva * larguraAba,
@@ -21,6 +36,21 @@ export default function Contratos() {
       bounciness: 8,
     }).start();
   }, [abaAtiva, larguraAba, indicador]);
+
+  useEffect(()=>{
+    if (!status) return;
+    console.log("BUSCANDO:", status);
+    axios
+      .get(`${API_URL}/api/vizualizarContratosFree/${user.idProfissional}/${status}`)
+      .then(response => {
+        if (status === "ativo") setAtivos(response.data.data);
+      if (status === "Aguardando Pagamento") setPendentes(response.data.data);
+      if (status === "Cancelado") setCancelados(response.data.data);
+      })
+      .catch(error => console.log("ERRO:", error));
+  },[status])
+  
+
 
   return (
     <View style={styles.container}>
@@ -78,79 +108,48 @@ export default function Contratos() {
             <Text style={styles.titulo}>Ativos</Text>
             <Text style={styles.subtitulo}>Contrato ativo mais recente</Text>
 
-            <View style={styles.cartaoIdoso}>
-              <View style={styles.cabecalhoIdoso}>
-                <Image
-                  source={require('../assets/perfilicon.png')}
-                  style={styles.fotoIdoso}
-                />
-                <View>
-                  <Text style={styles.nomeIdoso}>Sr. garanhao</Text>
-                  <Text style={styles.subInfoIdoso}>Idade: 78 anos</Text>
+            {ativos.map((item, index) => {
+               const anoNasc = new Date(item.dataNasc).getFullYear();
+               const anoAtual = new Date().getFullYear();
+               const idade = anoAtual - anoNasc;
+             
+               return (
+                <View key={index} style={styles.cartaoIdoso}>
+
+                <View style={styles.cabecalhoIdoso}>
+                  <Image
+                    source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
+                    style={styles.fotoIdoso}
+                  />
+                  <View>
+                    <Text style={styles.nomeIdoso}>{item.nomeUsuario}</Text>
+                    <Text style={styles.subInfoIdoso}>Idade: {idade}</Text>
+                  </View>
+                </View>
+  
+                <View style={styles.caixaInformacoes}>
+                  <Text style={styles.textoInfo}>
+                    <Text style={styles.rotuloInfo}>Preço: </Text>
+                    <Text style={styles.rotuloP}>R${item.precoPersonalizado}</Text>
+                  </Text>
+  
+                  <Text style={styles.textoInfo}>
+                    <Text style={styles.rotuloInfo}>Dia: {item.dataServico}</Text>
+                  </Text>
+  
+                  <Text style={styles.textoInfo}>
+                    <Text style={styles.rotuloInfo}>Horário: </Text>
+                    {item.horaInicioServico}
+                  </Text>
+  
+                  <TouchableOpacity style={styles.botaoM}> 
+                    <Text style={styles.mais}>Ver Mais</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
+               );
+              })}
 
-              <View style={styles.caixaInformacoes}>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Preço: </Text>
-                  <Text style={styles.rotuloP}>R$ 100,00</Text>
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Dia: </Text>Segunda-feira
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Horário: </Text>14h às 18h
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Acompanhamento: </Text>
-                  medico
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Endereço: </Text>caseiro gostosao
-                </Text>
-                <TouchableOpacity style={styles.botaoM}> 
-                  <Text style={styles.mais}>Ver Mais</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-             <View style={styles.separator}></View>
-
-            <View style={styles.cartaoIdoso}>
-              <View style={styles.cabecalhoIdoso}>
-                <Image
-                  source={require('../assets/perfilicon.png')}
-                  style={styles.fotoIdoso}
-                />
-                <View>
-                  <Text style={styles.nomeIdoso}>Sra. Garanhona </Text>
-                  <Text style={styles.subInfoIdoso}>Idade: 99 anos</Text>
-                </View>
-              </View>
-
-              <View style={styles.caixaInformacoes}>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Preço: </Text>
-                  <Text style={styles.rotuloP}>R$ 100,00</Text>
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Dia: </Text>Segunda-feira
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Horário: </Text>14h às 18h
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Acompanhamento: </Text>
-                  medico
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Endereço: </Text>caseiro gostosao
-                </Text>
-                <TouchableOpacity style={styles.botaoM}> 
-                  <Text style={styles.mais}>Ver Mais</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
 
           </ScrollView>
         )}
@@ -163,41 +162,47 @@ export default function Contratos() {
             <Text style={styles.titulo}>Pendentes</Text>
             <Text style={styles.subtitulo}>Contratos esperando o pagamento</Text>
 
-            <View style={styles.cartaoIdoso}>
-              <View style={styles.cabecalhoIdoso}>
-                <Image
-                  source={require('../assets/perfilicon.png')}
-                  style={styles.fotoIdoso}
-                />
-                <View>
-                  <Text style={styles.nomeIdoso}>Cheio das dividas</Text>
-                  <Text style={styles.subInfoIdoso}>Idade: 78 anos</Text>
+            {pendentes.map((item, index) => {
+               const anoNasc = new Date(item.dataNasc).getFullYear();
+               const anoAtual = new Date().getFullYear();
+               const idade = anoAtual - anoNasc;
+             
+               return (
+                <View key={index} style={styles.cartaoIdoso}>
+
+                <View style={styles.cabecalhoIdoso}>
+                  <Image
+                    source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
+                    style={styles.fotoIdoso}
+                  />
+                  <View>
+                    <Text style={styles.nomeIdoso}>{item.nomeUsuario}</Text>
+                    <Text style={styles.subInfoIdoso}>Idade: {idade}</Text>
+                  </View>
+                </View>
+  
+                <View style={styles.caixaInformacoes}>
+                  <Text style={styles.textoInfo}>
+                    <Text style={styles.rotuloInfo}>Preço: </Text>
+                    <Text style={styles.rotuloP}>R${item.precoPersonalizado}</Text>
+                  </Text>
+  
+                  <Text style={styles.textoInfo}>
+                    <Text style={styles.rotuloInfo}>Dia: {item.dataServico}</Text>
+                  </Text>
+  
+                  <Text style={styles.textoInfo}>
+                    <Text style={styles.rotuloInfo}>Horário: </Text>
+                    {item.horaInicioServico}
+                  </Text>
+  
+                  <TouchableOpacity style={styles.botaoM}> 
+                    <Text style={styles.mais}>Ver Mais</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
-
-              <View style={styles.caixaInformacoes}>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Preço: </Text>
-                  <Text style={styles.rotuloPP}>R$ 100,00</Text>
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Dia: </Text>Segunda-feira
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Horário: </Text>14h às 18h
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Acompanhamento: </Text>
-                  medico
-                </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Endereço: </Text>caseiro gostosao
-                </Text>
-              </View>
-              <TouchableOpacity style={styles.botaoC}> 
-                <Text style={styles.cancel}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
+               );
+              })}
           </ScrollView>
        
         )}
@@ -210,34 +215,47 @@ export default function Contratos() {
             <Text style={styles.titulo}>Cancelados</Text>
             <Text style={styles.subtitulo}>Contratos cancelados</Text>
 
-            <View style={styles.cartaoIdoso}>
+            {cancelados.map((item, index) => {
+               const anoNasc = new Date(item.dataNasc).getFullYear();
+               const anoAtual = new Date().getFullYear();
+               const idade = anoAtual - anoNasc;
+             
+               return (
+            <View key={index} style={styles.cartaoIdoso}>
+
               <View style={styles.cabecalhoIdoso}>
                 <Image
-                  source={require('../assets/perfilicon.png')}
+                  source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
                   style={styles.fotoIdoso}
                 />
                 <View>
-                  <Text style={styles.nomeIdoso}>Indeciso</Text>
-                  <Text style={styles.subInfoIdoso}>Idade: 78 anos</Text>
+                  <Text style={styles.nomeIdoso}>{item.nomeUsuario}</Text>
+                  <Text style={styles.subInfoIdoso}>Idade: {idade}</Text>
                 </View>
               </View>
 
               <View style={styles.caixaInformacoes}>
                 <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Dia: </Text>Segunda-feira
+                  <Text style={styles.rotuloInfo}>Preço: </Text>
+                  <Text style={styles.rotuloP}>R${item.precoPersonalizado}</Text>
                 </Text>
+
                 <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Horário: </Text>14h às 18h
+                  <Text style={styles.rotuloInfo}>Dia: {item.dataServico}</Text>
                 </Text>
+
                 <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Acompanhamento: </Text>
-                  medico
+                  <Text style={styles.rotuloInfo}>Horário:</Text>
+                  {item.horaInicioServico}
                 </Text>
-                <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Endereço: </Text>caseiro gostosao
-                </Text>
+
+                <TouchableOpacity style={styles.botaoM}> 
+                  <Text style={styles.mais}>Ver Mais</Text>
+                </TouchableOpacity>
               </View>
             </View>
+               );
+              })}
           </ScrollView>
         )}
       </View>
