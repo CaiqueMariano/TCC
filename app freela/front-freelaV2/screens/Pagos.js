@@ -2,59 +2,43 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  Pressable,
   StyleSheet,
   Image,
   ScrollView,
   TouchableOpacity,
-  Modal
+  Modal,
+  Pressable,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
-import minhaimagem from '../assets/correct.png';
 
-export default function pedidos() {
-
-
-
-
+export default function Pendentes() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
 
   const pedidos = [
-   
-  
     {
-      id: 1,
-      nome: 'Sebastião Melo',
-      cidade: '📌Vila olimpia - SP',
-      nota: 3.5,
-      avaliaçoes: 47,
-      pedido: 'senhor de idade, precisa de (acompanhamento doméstico)',
-      imagem: 'https://i.pravatar.cc/150?img=70',
-    },
-    {
-      id: 2,
-      nome: 'José Ricardo',
-      cidade: '📌Guarulhos - SP',
-      nota: 3,
-      avaliaçoes: 23,
-      pedido: 'senhor de idade, precisa de (acompanhamento doméstico)',
-      imagem: 'https://i.pravatar.cc/150?img=63',
+      id: 1, nome: 'João dos Santos',
+      cidade: '📌Jardim Europa - SP',
+      nota: 3.7, 
+      avaliacoes: 43,
+      pedido: 'senhor de idade, precisa de ajuda com (compras no mercado)',
+      imagem: 'https://i.pravatar.cc/150?img=65',
     },
   ];
 
   const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    const full = Math.floor(rating);
+    const half = rating % 1 !== 0;
+
     return (
       <View style={{ flexDirection: 'row' }}>
-        {[...Array(fullStars)].map((_, i) => (
+        {[...Array(full)].map((_, i) => (
           <Ionicons key={i} name="star" size={14} color="#b08cff" />
         ))}
-        {hasHalfStar && <Ionicons name="star-half" size={14} color="#b08cff" />}
+        {half && <Ionicons name="star-half" size={14} color="#b08cff" />}
         {[...Array(5 - Math.ceil(rating))].map((_, i) => (
           <Ionicons key={i} name="star-outline" size={14} color="#b08cff" />
         ))}
@@ -63,140 +47,139 @@ export default function pedidos() {
   };
 
   return (
-
-    
     <Background>
-       <SafeAreaView
-              style={[styles.safeArea, ]}
-            >
-      {/* Top bar removida para manter consistência com as outras telas */}
+      <SafeAreaView style={styles.safeArea}>
+        
+        <ScrollView contentContainerStyle={styles.container}>
 
+          {/* HEADER */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+              <Ionicons name="arrow-back-outline" size={28} />
+            </TouchableOpacity>
 
-      <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
+            <Text style={styles.title}>Serviços</Text>
 
-       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="arrow-back-outline" size={28} />
-      </TouchableOpacity>
-        <Text style={styles.title}> Serviços </Text>
-         <TouchableOpacity onPress={() => navigation.navigate('Configuracoes')}>
-           <Ionicons name="settings-outline" size={28} />
-         </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Configuracoes')}>
+              <Ionicons name="settings-outline" size={28} />
+            </TouchableOpacity>
+          </View>
 
-      </View>
-      <View style={styles.headerTabs}>
+          {/* TABS */}
+          <View style={styles.headerTabs}>
+            <TouchableOpacity onPress={() => navigation.navigate('Pedidos')}>
+              <Text style={styles.tabText}>Doméstico</Text>
+            </TouchableOpacity>
+
+           <TouchableOpacity onPress={() => navigation.navigate('pendentes')}>
+              <Text style={styles.tabText}>Médico</Text>
+            </TouchableOpacity>
+
             <View style={styles.activeTab}>
-            <Text style={styles.activeTabText}>Doméstico</Text>
-            <View style={styles.activeIndicator} />
-        </View>
+              <Text style={styles.activeTabText}>Mercado</Text>
+              <View style={styles.activeIndicator} />
+            </View>
+          </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('pendentes')}>
-          <Text style={styles.tabText}>Mèdico</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Pagos')}>
-    <Text style={styles.tabText}>Mercado</Text>
-  </TouchableOpacity>
-      </View>
-
-
-         {/* Segundo ScrollView REMOVIDO - era o erro */}
-
-          <Pressable 
-            style={styles.openButton}
-            onPress={() => setModalVisible(true)}
-          >
+          {/* BOTÃO TESTE MODAL */}
+          <Pressable style={styles.openButton} onPress={() => setModalVisible(true)}>
             <Text>Abrir Modal</Text>
           </Pressable>
 
-          {/* Modal */}
+          {/* MODAL */}
           <Modal
             animationType="fade"
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => setModalVisible(false)}
           >
-            <View style={styles.overlay}>
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalText}>Recebimentos</Text>
-           <Image source={require('../assets/correct.png')} style={styles.profileImage} />
-           <View style={styles.modalInfo}></View>
-                <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: '#7C4DFF' }]}
-                  onPress={() => {
-                    setModalVisible(false);
-                    navigation.navigate('Dashboard');
-                  }}
-                >
-                  <Text style={styles.buttonText}>Visualizar Ganhos</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.buttonText}>Fechar</Text>
-                </TouchableOpacity>
-
-              </View>
+      <View style={styles.overlay}>
+                   <View style={styles.modalContainer}>
+                     <Text style={styles.modalText}>Recebimentos</Text>
+                <Image source={require('../assets/correct.png')} style={styles.profileImage} />
+                <View style={styles.modalInfo}></View>
+                     <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
+     
+                     <TouchableOpacity
+                       style={[styles.actionButton, { backgroundColor: '#7C4DFF' }]}
+                       onPress={() => {
+                         setModalVisible(false);
+                         navigation.navigate('Dashboard');
+                       }}
+                     >
+                       <Text style={styles.buttonText}>Visualizar Ganhos</Text>
+                     </TouchableOpacity>
+     
+                     <TouchableOpacity
+                       style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+                       onPress={() => setModalVisible(false)}
+                     >
+                       <Text style={styles.buttonText}>Fechar</Text>
+                     </TouchableOpacity>
+     
+                   </View>
             </View>
           </Modal>
 
+          {/* LISTA */}
+         
+                 {pedidos.map((item) => (
+                   <View key={item.id} style={styles.card}>
+         
+                     <View style={styles.cardContent}>
+                       <Image source={{ uri: item.imagem }} style={styles.profileImage} />
+                       <View style={styles.infoSection}>
+                         <Text style={styles.personName}>{item.nome}</Text>
+                         <Text style={styles.locationText}>{item.cidade}</Text>
+                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                           {renderStars(item.nota)}
+                           <Text style={styles.requestText}>( {item.avaliacoes} avaliaçôes )</Text>
+                         </View>
+                       </View>
+                       <View style={styles.valueContainer}>
+                         <Text style={styles.valueText}>{item.valor}</Text>
+                       </View>
+                     </View>
+                    <Text style={styles.pedido}>Pedido:</Text> <Text style={styles.requestText}>{item.pedido}</Text>
+         
+                     <View style={styles.requestContainer}>
+                
+                     <TouchableOpacity
+                       style={[styles.button, styles.buttonPrimary]}
+                       onPress={() => navigation.navigate('Home')}
+                     >
+                       <Text style={styles.buttonText}>Ver Mais</Text>
+                     </TouchableOpacity>
+                   </View>
+                   </View>
+                 ))}
+        
 
-        {pedidos.map((item) => (
-          <View key={item.id} style={styles.card}>
+        </ScrollView>
 
-            <View style={styles.cardContent}>
-              <Image source={{ uri: item.imagem }} style={styles.profileImage} />
-              <View style={styles.infoSection}>
-                <Text style={styles.personName}>{item.nome}</Text>
-                <Text style={styles.locationText}>{item.cidade}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {renderStars(item.nota)}
-                  <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçôes )</Text>
-                </View>
-              </View>
-              <View style={styles.valueContainer}>
-                <Text style={styles.valueText}>{item.valor}</Text>
-              </View>
-            </View>
-           <Text style={styles.pedido}>Pedido:</Text> <Text style={styles.requestText}>{item.pedido}</Text>
+        {/* BOTTOM BAR */}
+        <View style={styles.bottomBar}>
+          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
+            <Ionicons name="home-outline" size={22} color="#fff" />
+            <Text style={styles.navLabel}>Home</Text>
+          </TouchableOpacity>
 
-            <View style={styles.requestContainer}>
-       
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary]}
-              onPress={() => navigation.navigate('Home')}
-            >
-              <Text style={styles.buttonText}>Ver Mais</Text>
-            </TouchableOpacity>
-          </View>
-          </View>
-        ))}
-      </ScrollView>
-       
+          <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="chatbubble-ellipses-outline" size={22} color="#0a84ff" />
+            <Text style={[styles.navLabel, styles.navLabelActive]}>Pedidos</Text>
+          </TouchableOpacity>
 
-      {/* Tab bar para navegação */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="chatbubble-ellipses-outline" size={22} color="#0a84ff" />
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Pedidos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="time-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Histórico</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Perfil')}>
-          <Ionicons name="person-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.navItem}>
+            <Ionicons name="time-outline" size={22} color="#fff" />
+            <Text style={styles.navLabel}>Histórico</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Perfil')}>
+            <Ionicons name="person-outline" size={22} color="#fff" />
+            <Text style={styles.navLabel}>Perfil</Text>
+          </TouchableOpacity>
+        </View>
+
       </SafeAreaView>
     </Background>
   );

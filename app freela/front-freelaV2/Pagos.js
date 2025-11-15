@@ -1,49 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
-  Pressable,
   StyleSheet,
   Image,
   ScrollView,
   TouchableOpacity,
-  Modal
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
-import minhaimagem from '../assets/correct.png';
 
-export default function pedidos() {
-
-
-
-
+export default function pendentes() {
   const navigation = useNavigation();
-  const [modalVisible, setModalVisible] = useState(false);
+  
 
   const pedidos = [
-   
-  
     {
       id: 1,
-      nome: 'Sebastião Melo',
-      cidade: '📌Vila olimpia - SP',
-      nota: 3.5,
-      avaliaçoes: 47,
-      pedido: 'senhor de idade, precisa de (acompanhamento doméstico)',
-      imagem: 'https://i.pravatar.cc/150?img=70',
+      nome: 'João dos Santos',
+      cidade: '📌Jardim Europa - SP',
+      nota: 3.7,
+      avaliaçoes: 43,
+      pedido: 'senhor de idade, precisa de ajuda com (compras no mercado)',
+      imagem: 'https://i.pravatar.cc/150?img=65',
     },
-    {
-      id: 2,
-      nome: 'José Ricardo',
-      cidade: '📌Guarulhos - SP',
-      nota: 3,
-      avaliaçoes: 23,
-      pedido: 'senhor de idade, precisa de (acompanhamento doméstico)',
-      imagem: 'https://i.pravatar.cc/150?img=63',
-    },
+
   ];
 
   const renderStars = (rating) => {
@@ -63,14 +46,11 @@ export default function pedidos() {
   };
 
   return (
-
-    
     <Background>
        <SafeAreaView
               style={[styles.safeArea, ]}
             >
       {/* Top bar removida para manter consistência com as outras telas */}
-
 
       <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -84,99 +64,57 @@ export default function pedidos() {
          </TouchableOpacity>
 
       </View>
-      <View style={styles.headerTabs}>
+       <View style={styles.headerTabs}>
+
+      <TouchableOpacity onPress={() => navigation.navigate('Pedidos')}>
+          <Text style={styles.tabText}>Doméstico</Text>
+        </TouchableOpacity>
+
+
+  <TouchableOpacity onPress={() => navigation.navigate('Pendentes')}>
+    <Text style={styles.tabText}>Medico</Text>
+  </TouchableOpacity>
+
+    
             <View style={styles.activeTab}>
-            <Text style={styles.activeTabText}>Doméstico</Text>
+            <Text style={styles.activeTabText}>Mercado</Text>
             <View style={styles.activeIndicator} />
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('pendentes')}>
-          <Text style={styles.tabText}>Mèdico</Text>
-        </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Pagos')}>
-    <Text style={styles.tabText}>Mercado</Text>
-  </TouchableOpacity>
       </View>
-
-
-         {/* Segundo ScrollView REMOVIDO - era o erro */}
-
-          <Pressable 
-            style={styles.openButton}
-            onPress={() => setModalVisible(true)}
-          >
-            <Text>Abrir Modal</Text>
-          </Pressable>
-
-          {/* Modal */}
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}
-          >
-            <View style={styles.overlay}>
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalText}>Recebimentos</Text>
-           <Image source={require('../assets/correct.png')} style={styles.profileImage} />
-           <View style={styles.modalInfo}></View>
-                <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: '#7C4DFF' }]}
-                  onPress={() => {
-                    setModalVisible(false);
-                    navigation.navigate('Dashboard');
-                  }}
-                >
-                  <Text style={styles.buttonText}>Visualizar Ganhos</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.buttonText}>Fechar</Text>
-                </TouchableOpacity>
-
-              </View>
-            </View>
-          </Modal>
-
 
         {pedidos.map((item) => (
           <View key={item.id} style={styles.card}>
-
-            <View style={styles.cardContent}>
-              <Image source={{ uri: item.imagem }} style={styles.profileImage} />
-              <View style={styles.infoSection}>
-                <Text style={styles.personName}>{item.nome}</Text>
-                <Text style={styles.locationText}>{item.cidade}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {renderStars(item.nota)}
-                  <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçôes )</Text>
-                </View>
-              </View>
-              <View style={styles.valueContainer}>
-                <Text style={styles.valueText}>{item.valor}</Text>
-              </View>
-            </View>
-           <Text style={styles.pedido}>Pedido:</Text> <Text style={styles.requestText}>{item.pedido}</Text>
-
-            <View style={styles.requestContainer}>
-       
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary]}
-              onPress={() => navigation.navigate('Home')}
-            >
-              <Text style={styles.buttonText}>Ver Mais</Text>
-            </TouchableOpacity>
+          
+                      <View style={styles.cardContent}>
+                        <Image source={{ uri: item.imagem }} style={styles.profileImage} />
+                        <View style={styles.infoSection}>
+                          <Text style={styles.personName}>{item.nome}</Text>
+                          <Text style={styles.locationText}>{item.cidade}</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            {renderStars(item.nota)}
+                            <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçôes )</Text>
+                          </View>
+                        </View>
+                        <View style={styles.valueContainer}>
+                          <Text style={styles.valueText}>{item.valor}</Text>
+                        </View>
+                      </View>
+                     <Text style={styles.pedido}>Pedido:</Text> <Text style={styles.requestText}>{item.pedido}</Text>
+          
+                      <View style={styles.requestContainer}>
+                 
+                      <TouchableOpacity
+                        style={[styles.button, styles.buttonPrimary]}
+                        onPress={() => navigation.navigate('Home')}
+                      >
+                        <Text style={styles.buttonText}>Ver Mais</Text>
+                      </TouchableOpacity>
           </View>
           </View>
         ))}
       </ScrollView>
-       
 
       {/* Tab bar para navegação */}
       <View style={styles.bottomBar}>
@@ -249,6 +187,11 @@ title: {
     fontWeight: 'bold',
 
   },
+  pedido: {
+  fontSize: 20,
+  color: '#333',
+  fontWeight: '500',
+},
   
   activeIndicator: {
     width: 40,
@@ -283,7 +226,7 @@ title: {
   buttonPrimary: {
     backgroundColor: '#0a84ff',
     paddingHorizontal: 20,
-    paddingVertical: 6, 
+    paddingVertical: 6, // antes era 10
     borderRadius: 8,
     alignSelf: 'flex-end',
   },
@@ -292,12 +235,10 @@ title: {
     color: '#fff',
     fontWeight: '600',
     fontSize: 16,
-    fontFamily:'roboto',
-  
   },
   card: {
     backgroundColor: '#e2d9ff',
-    borderRadius: 15, 
+    borderRadius: 15,
     padding: 30,
     marginBottom: 20,
   },
@@ -352,14 +293,14 @@ title: {
     alignItems: 'center',
     borderRadius: 14,
   },
-  requestContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 8,
-  },
-pedido: {
-  fontSize: 20,
+requestContainer: {
+  flexDirection: 'row',
+  alignItems: 'flex-start',   // mantém o topo alinhado
+  justifyContent: 'space-between',
+  marginTop: 8,
+},
+valueReceivedText: {
+  fontSize: 18,
   color: '#333',
   fontWeight: '500',
 },
@@ -373,6 +314,7 @@ requestText: {
   flex: 1,                    // ✅ Faz o texto ocupar o espaço disponível
   flexWrap: 'wrap',           // ✅ Permite quebrar linha se for longo
 },
+
   bottomBar: {
     position: 'absolute',
     left: 12,
@@ -402,109 +344,4 @@ requestText: {
     color: '#0a84ff',
     fontWeight: '700',
   },
-
-  actionButton: {
-    width: '100%',
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-// === MODAL ===
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    padding: 20,
-    alignItems: 'center',
-  },
-
-  modalText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-
-  modalFoto: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 12,
-  },
-
-  modalInfo: { marginBottom: 12 },
-
-  modalReceivedText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-
-  actionButton: {
-    width: '100%',
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-
-  openButton: {
-    padding: 12,
-    backgroundColor: '#ddd',
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    padding: 25,
-    borderRadius: 12,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 25,
-  },
-  modalFoto: {
-    width: 120,            
-    height: 120,           
-    borderRadius: 60,      
-    marginBottom: 15,
-    resizeMode: 'cover',
-  },
-  modalReceivedText:{
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 12,         
-    color: '#83DBC2',
-  },
-  modalInfo:{
-    flexDirection: 'row',      
-    alignItems: 'center',    
-    marginBottom: 20,       
-    justifyContent: 'flex-start',
-  }
-  
-  
 });
-  
-

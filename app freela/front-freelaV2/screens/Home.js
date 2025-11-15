@@ -168,7 +168,7 @@ export default function Home() {
         </TouchableOpacity>
         <TouchableOpacity
   style={styles.navItem}
-  onPress={() => navigation.navigate('pedidos')}>
+  onPress={() => navigation.navigate('Pedidos')}>
   <Ionicons name="chatbubble-ellipses-outline" size={22} color="#fff" />
   <Text style={styles.navLabel}>Pedidos</Text>
 </TouchableOpacity>

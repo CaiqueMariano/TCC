@@ -5,7 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '../temas/ThemeContext';
 import Cadastro from '../screens/Cadastro';
 import Home from '../screens/Home';
-import Pedidos from '../screens/pedidos';
+import Pedidos from '../screens/Pedidos';
+import Pagos from '../screens/Pagos';
+import pendentes from '../screens/pendentes';
 import Perfil from '../screens/Perfil';
 import Login from '../screens/Login';
 import SobreNos from '../screens/SobreNos';
@@ -26,8 +28,10 @@ export default function App() {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
+        <Stack.Screen name="Pagos" component={Pagos} options={{ headerShown: false }} />
+        <Stack.Screen name="pendentes" component={pendentes} options={{ headerShown: false }} />
         <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-        <Stack.Screen name="pedidos" component={Pedidos} options={{ headerShown: false }} />
+        <Stack.Screen name="Pedidos" component={Pedidos} options={{ headerShown: false }} />
         <Stack.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
         <Stack.Screen name="SobreNos" component={SobreNos} options={{ headerShown: false }} />
         <Stack.Screen name="Configuracoes" component={Configuracoes} options={{ headerShown: false }} />
