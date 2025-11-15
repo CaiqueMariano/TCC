@@ -15,7 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
 import minhaimagem from '../assets/correct.png';
 
-export default function pedidos() {
+export default function Pedidos() {
 
 
 
@@ -52,55 +52,44 @@ export default function pedidos() {
     return (
       <View style={{ flexDirection: 'row' }}>
         {[...Array(fullStars)].map((_, i) => (
-          <Ionicons key={i} name="star" size={14} color="#b08cff" />
+          <Ionicons key={i} name="star" size={14} color="#FFD700" />
         ))}
-        {hasHalfStar && <Ionicons name="star-half" size={14} color="#b08cff" />}
+        {hasHalfStar && <Ionicons name="star-half" size={14} color="#FFD700" />}
         {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <Ionicons key={i} name="star-outline" size={14} color="#b08cff" />
+          <Ionicons key={i} name="star-outline" size={14} color="#FFD700" />
         ))}
       </View>
     );
   };
 
   return (
-
-    
     <Background>
-       <SafeAreaView
-              style={[styles.safeArea, ]}
-            >
-      {/* Top bar removida para manter consistência com as outras telas */}
-
-
-      <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-
-       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="arrow-back-outline" size={28} />
-      </TouchableOpacity>
-        <Text style={styles.title}> Serviços </Text>
-         <TouchableOpacity onPress={() => navigation.navigate('Configuracoes')}>
-           <Ionicons name="settings-outline" size={28} />
-         </TouchableOpacity>
-
-      </View>
-      <View style={styles.headerTabs}>
+      <SafeAreaView style={styles.safeArea}>
+        {/* Top bar removida para manter consistência com as outras telas */}
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+              <Ionicons name="arrow-back-outline" size={28} />
+            </TouchableOpacity>
+            <Text style={styles.title}>Serviços</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Configuracoes')}>
+              <Ionicons name="settings-outline" size={28} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.headerTabs}>
             <View style={styles.activeTab}>
-            <Text style={styles.activeTabText}>Doméstico</Text>
-            <View style={styles.activeIndicator} />
-        </View>
+              <Text style={styles.activeTabText}>Doméstico</Text>
+              <View style={styles.activeIndicator} />
+            </View>
+            <TouchableOpacity onPress={() => navigation.navigate('pendentes')}>
+              <Text style={styles.tabText}>Mèdico</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Pagos')}>
+              <Text style={styles.tabText}>Mercado</Text>
+            </TouchableOpacity>
+          </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('pendentes')}>
-          <Text style={styles.tabText}>Mèdico</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => navigation.navigate('Pagos')}>
-    <Text style={styles.tabText}>Mercado</Text>
-  </TouchableOpacity>
-      </View>
-
-
-         {/* Segundo ScrollView REMOVIDO - era o erro */}
+          {/* Segundo ScrollView REMOVIDO - era o erro */}
 
           <Pressable 
             style={styles.openButton}
@@ -119,8 +108,8 @@ export default function pedidos() {
             <View style={styles.overlay}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalText}>Recebimentos</Text>
-           <Image source={require('../assets/correct.png')} style={styles.profileImage} />
-           <View style={styles.modalInfo}></View>
+                <Image source={require('../assets/correct.png')} style={styles.profileImage} />
+                <View style={styles.modalInfo}></View>
                 <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
 
                 <TouchableOpacity
@@ -144,48 +133,46 @@ export default function pedidos() {
             </View>
           </Modal>
 
-
-        {pedidos.map((item) => (
-          <View key={item.id} style={styles.card}>
-
-            <View style={styles.cardContent}>
-              <Image source={{ uri: item.imagem }} style={styles.profileImage} />
-              <View style={styles.infoSection}>
-                <Text style={styles.personName}>{item.nome}</Text>
-                <Text style={styles.locationText}>{item.cidade}</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  {renderStars(item.nota)}
-                  <Text style={styles.requestText}>( {item.avaliaçoes} avaliaçôes )</Text>
+          {pedidos.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View style={styles.cardContent}>
+                <Image source={{ uri: item.imagem }} style={styles.profileImage} />
+                <View style={styles.infoSection}>
+                  <Text style={styles.personName}>{item.nome}</Text>
+                  <Text style={styles.locationText}>{item.cidade}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {renderStars(item.nota)}
+                    <Text style={styles.requestText}>({item.avaliaçoes} avaliaçôes)</Text>
+                  </View>
+                </View>
+                <View style={styles.valueContainer}>
+                  <Text style={styles.valueText}>R$ --</Text>
                 </View>
               </View>
-              <View style={styles.valueContainer}>
-                <Text style={styles.valueText}>{item.valor}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                <Text style={styles.pedido}>Pedido:</Text>
+                <Text style={styles.requestText}>{item.pedido}</Text>
+              </View>
+              <View style={styles.requestContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonPrimary]}
+                  onPress={() => navigation.navigate('Home')}
+                >
+                  <Text style={styles.buttonText}>Ver Mais</Text>
+                </TouchableOpacity>
               </View>
             </View>
-           <Text style={styles.pedido}>Pedido:</Text> <Text style={styles.requestText}>{item.pedido}</Text>
+          ))}
+        </ScrollView>
 
-            <View style={styles.requestContainer}>
-       
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary]}
-              onPress={() => navigation.navigate('Home')}
-            >
-              <Text style={styles.buttonText}>Ver Mais</Text>
-            </TouchableOpacity>
-          </View>
-          </View>
-        ))}
-      </ScrollView>
-       
-
-      {/* Tab bar para navegação */}
-      <View style={styles.bottomBar}>
+        {/* Tab bar para navegação */}
+        <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
           <Ionicons name="home-outline" size={22} color="#fff" />
           <Text style={styles.navLabel}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="chatbubble-ellipses-outline" size={22} color="#0a84ff" />
+          <Ionicons name="chatbubble-ellipses-outline" size={22} color="#b08cff" />
           <Text style={[styles.navLabel, styles.navLabelActive]}>Pedidos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
@@ -196,7 +183,7 @@ export default function pedidos() {
           <Ionicons name="person-outline" size={22} color="#fff" />
           <Text style={styles.navLabel}>Perfil</Text>
         </TouchableOpacity>
-      </View>
+        </View>
       </SafeAreaView>
     </Background>
   );
@@ -253,7 +240,7 @@ title: {
   activeIndicator: {
     width: 40,
     height: 4,
-    backgroundColor: '#0a84ff', // linha verde embaixo do ativo
+    backgroundColor: '#b08cff', // linha lilás embaixo do ativo
     borderRadius: 2,
     marginTop: 4,
     
@@ -281,7 +268,7 @@ title: {
   },
   
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#b08cff',
     paddingHorizontal: 20,
     paddingVertical: 6, 
     borderRadius: 8,
@@ -296,7 +283,7 @@ title: {
   
   },
   card: {
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#8b6bc7',
     borderRadius: 15, 
     padding: 30,
     marginBottom: 20,
@@ -305,7 +292,7 @@ title: {
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 8,
-    color: '#333',
+    color: '#fff',
   },
   cardContent: {
     flexDirection: 'row',
@@ -324,11 +311,11 @@ title: {
   personName: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#111',
+    color: '#fff',
   },
   locationText: {
     fontSize: 13,
-    color: '#555',
+    color: '#f0f0f0',
     marginVertical: 2,
   },
   valueContainer: {
@@ -337,7 +324,7 @@ title: {
   valueText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0a84ff',
+    color: '#fff',
   },
   bottomBar: {
     position: 'absolute',
@@ -360,13 +347,13 @@ title: {
   },
 pedido: {
   fontSize: 20,
-  color: '#333',
+  color: '#fff',
   fontWeight: '500',
 },
 
 requestText: {
   fontSize: 15,
-  color: '#333',
+  color: '#fff',
   fontWeight: '500',
   marginLeft: 10,             // ✅ Corrigido: L maiúsculo
   textAlign: 'left',          // ✅ Alinha o texto à esquerda
@@ -399,7 +386,7 @@ requestText: {
     color: '#fff',
   },
   navLabelActive: {
-    color: '#0a84ff',
+    color: '#b08cff',
     fontWeight: '700',
   },
 

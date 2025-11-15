@@ -193,7 +193,7 @@ export default function Perfil({ route }) {
 
           <TouchableOpacity
             style={styles.navItem}
-            onPress={() => navigation.navigate("pedidos")}
+            onPress={() => navigation.navigate("Pedidos")}
           >
             <Ionicons
               name="chatbubble-ellipses-outline"
@@ -212,7 +212,7 @@ export default function Perfil({ route }) {
             style={styles.navItem}
             onPress={() => navigation.navigate("Perfil")}
           >
-            <Ionicons name="person-outline" size={22} color="#0a84ff" />
+            <Ionicons name="person-outline" size={22} color="#b08cff" />
             <Text style={[styles.navLabel, styles.navLabelActive]}>Perfil</Text>
           </TouchableOpacity>
         </View>
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
   },
 
   navLabelActive: {
-    color: "#0a84ff",
+    color: "#b08cff",
     fontWeight: "700",
   },
 

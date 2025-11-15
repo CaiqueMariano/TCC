@@ -15,7 +15,7 @@ export default function Home() {
       {
         data: [2, 4, 6, 8, 10, 12],
         strokeWidth: 2,
-        color: () => '#0a84ff',
+        color: () => '#b08cff',
       },
     ],
   };
@@ -23,21 +23,22 @@ export default function Home() {
   const chartConfig = {
     backgroundGradientFrom: '#fff',
     backgroundGradientTo: '#fff',
-    color: () => '#0a84ff',
+    color: () => '#b08cff',
     labelColor: () => '#333',
     strokeWidth: 2,
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: '#0a84ff',
+      stroke: '#b08cff',
     },
   };
 
   return (
     <Background>
-      {/* Top bar removida para mais espaço útil */}
-
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView 
+        contentContainerStyle={styles.container}
+        style={styles.scrollView}
+      >
         {/* CARD 1 - Proposta recomendada */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Proposta recomendada</Text>
@@ -51,11 +52,11 @@ export default function Home() {
               <Text style={styles.personName}>Maria Oliveira</Text>
               <Text style={styles.locationText}>São Paulo - SP</Text>
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star-half" size={14} color="#b08cff" />
-                <Ionicons name="star-outline" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star-half" size={14} color="#FFD700" />
+                <Ionicons name="star-outline" size={14} color="#FFD700" />
               </View>
             </View>
             <View style={styles.valueContainer}>
@@ -87,7 +88,7 @@ export default function Home() {
                       key={i}
                       name={i < item.rating ? 'star' : 'star-outline'}
                       size={16}
-                      color="#b08cff"
+                      color="#FFD700"
                     />
                   ))}
                 </View>
@@ -108,11 +109,11 @@ export default function Home() {
               <Text style={styles.personName}>João Cuidador</Text>
               <Text style={styles.locationText}>Bairro Vila Nova - Curitiba/PR</Text>
               <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star-outline" size={14} color="#b08cff" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star" size={14} color="#FFD700" />
+                <Ionicons name="star-outline" size={14} color="#FFD700" />
               </View>
               <Text style={styles.profileDetail}>Média de avaliação: 4.0</Text>
               <Text style={styles.profileDetail}>Tempo no app: 1 ano e 3 meses</Text>
@@ -163,7 +164,7 @@ export default function Home() {
       {/* BARRA INFERIOR */}
       <View style={styles.bottomBar}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home-outline" size={22} color="#0a84ff" />
+          <Ionicons name="home-outline" size={22} color="#b08cff" />
           <Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -190,6 +191,9 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
+  scrollView: {
+    flex: 1,
+  },
   topBar: {
     width: '100%',
     backgroundColor: '#000',
@@ -203,11 +207,12 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: 12,
+    paddingTop: 50,
     paddingBottom: 96,
     flexGrow: 1,
   },
   card: {
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#8b6bc7',
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -218,7 +223,7 @@ const styles = StyleSheet.create({
   },
   kpiBox: {
     flex: 1,
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#8b6bc7',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -228,11 +233,11 @@ const styles = StyleSheet.create({
   kpiValue: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#0a84ff',
+    color: '#fff',
   },
   kpiLabel: {
     fontSize: 12,
-    color: '#555',
+    color: '#fff',
     marginTop: 4,
   },
   chartPlaceholder: {
@@ -250,7 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 8,
-    color: '#333',
+    color: '#fff',
   },
   cardContent: {
     flexDirection: 'row',
@@ -269,11 +274,11 @@ const styles = StyleSheet.create({
   personName: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#111',
+    color: '#fff',
   },
   locationText: {
     fontSize: 13,
-    color: '#555',
+    color: '#f0f0f0',
     marginVertical: 2,
   },
   ratingRow: {
@@ -285,14 +290,14 @@ const styles = StyleSheet.create({
   valueText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0a84ff',
+    color: '#fff',
   },
   requestContainer: {
     marginTop: 4,
   },
   requestText: {
     fontSize: 14,
-    color: '#333',
+    color: '#fff',
     fontWeight: '500',
   },
   feedbackRow: {
@@ -317,7 +322,7 @@ const styles = StyleSheet.create({
   },
   profileDetail: {
     fontSize: 13,
-    color: '#444',
+    color: '#fff',
     marginTop: 2,
   },
   bottomBar: {
@@ -344,14 +349,14 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   navLabelActive: {
-    color: '#0a84ff',
+    color: '#b08cff',
     fontWeight: '700',
   },
   feedbackName: {
   fontSize: 14,
   fontWeight: '500',
   marginRight: 6,
-  color: '#333',
+  color: '#fff',
 },
 starsContainer: {
   flexDirection: 'row',

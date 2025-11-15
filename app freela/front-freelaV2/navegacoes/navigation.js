@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '../temas/ThemeContext';
+import BemVindo from '../screens/BemVindo';
 import Cadastro from '../screens/Cadastro';
 import Home from '../screens/Home';
 import Pedidos from '../screens/Pedidos';
@@ -25,7 +26,8 @@ export default function App() {
   return (
     <ThemeProvider> 
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="BemVindo">
+        <Stack.Screen name="BemVindo" component={BemVindo} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
         <Stack.Screen name="Pagos" component={Pagos} options={{ headerShown: false }} />

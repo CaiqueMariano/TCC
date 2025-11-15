@@ -103,7 +103,7 @@ export default function Cadastro() {
           key={index}
           style={[
             styles.progressStep,
-            { backgroundColor: etapa > index ? '#0a84ff' : '#ccc' },
+            { backgroundColor: etapa > index ? '#b08cff' : '#ccc' },
           ]}
         />
       ))}
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   loginBox: {
     width: '70%',
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#8b6bc7',
     padding: 20,
     paddingVertical: 28,
     minHeight: 320,
@@ -355,12 +355,12 @@ const styles = StyleSheet.create({
   buttonSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#0a84ff',
+    borderColor: '#b08cff',
     marginRight: 8,
     flex: 1,
   },
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#b08cff',
     marginLeft: 8,
     flex: 1,
   },
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonTextSecondary: {
-    color: '#0a84ff',
+    color: '#fff',
   },
   progressContainer: {
     flexDirection: 'row',
@@ -457,7 +457,7 @@ const styles = StyleSheet.create({
   photoButton: {
     flex: 1,
     height: 44,
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#b08cff',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',

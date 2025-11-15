@@ -37,11 +37,11 @@ export default function Pendentes() {
     return (
       <View style={{ flexDirection: 'row' }}>
         {[...Array(full)].map((_, i) => (
-          <Ionicons key={i} name="star" size={14} color="#b08cff" />
+          <Ionicons key={i} name="star" size={14} color="#FFD700" />
         ))}
-        {half && <Ionicons name="star-half" size={14} color="#b08cff" />}
+        {half && <Ionicons name="star-half" size={14} color="#FFD700" />}
         {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <Ionicons key={i} name="star-outline" size={14} color="#b08cff" />
+          <Ionicons key={i} name="star-outline" size={14} color="#FFD700" />
         ))}
       </View>
     );
@@ -50,7 +50,6 @@ export default function Pendentes() {
   return (
     <Background>
       <SafeAreaView style={styles.safeArea}>
-        
         <ScrollView contentContainerStyle={styles.container}>
 
           {/* HEADER */}
@@ -94,68 +93,62 @@ export default function Pendentes() {
             visible={modalVisible}
             onRequestClose={() => setModalVisible(false)}
           >
-      <View style={styles.overlay}>
-                   <View style={styles.modalContainer}>
-                     <Text style={styles.modalText}>Recebimentos</Text>
+            <View style={styles.overlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalText}>Recebimentos</Text>
                 <Image source={require('../assets/correct.png')} style={styles.profileImage} />
                 <View style={styles.modalInfo}></View>
-                     <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
-     
-                     <TouchableOpacity
-                       style={[styles.actionButton, { backgroundColor: '#7C4DFF' }]}
-                       onPress={() => {
-                         setModalVisible(false);
-                         navigation.navigate('Dashboard');
-                       }}
-                     >
-                       <Text style={styles.buttonText}>Visualizar Ganhos</Text>
-                     </TouchableOpacity>
-     
-                     <TouchableOpacity
-                       style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
-                       onPress={() => setModalVisible(false)}
-                     >
-                       <Text style={styles.buttonText}>Fechar</Text>
-                     </TouchableOpacity>
-     
-                   </View>
+                <Text style={styles.modalReceivedText}>Recebeu R$1120 reais</Text>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#7C4DFF' }]}
+                  onPress={() => {
+                    setModalVisible(false);
+                    navigation.navigate('Dashboard');
+                  }}
+                >
+                  <Text style={styles.buttonText}>Visualizar Ganhos</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>Fechar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </Modal>
 
           {/* LISTA */}
-         
-                 {pedidos.map((item) => (
-                   <View key={item.id} style={styles.card}>
-         
-                     <View style={styles.cardContent}>
-                       <Image source={{ uri: item.imagem }} style={styles.profileImage} />
-                       <View style={styles.infoSection}>
-                         <Text style={styles.personName}>{item.nome}</Text>
-                         <Text style={styles.locationText}>{item.cidade}</Text>
-                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                           {renderStars(item.nota)}
-                           <Text style={styles.requestText}>( {item.avaliacoes} avaliaçôes )</Text>
-                         </View>
-                       </View>
-                       <View style={styles.valueContainer}>
-                         <Text style={styles.valueText}>{item.valor}</Text>
-                       </View>
-                     </View>
-                    <Text style={styles.pedido}>Pedido:</Text> <Text style={styles.requestText}>{item.pedido}</Text>
-         
-                     <View style={styles.requestContainer}>
-                
-                     <TouchableOpacity
-                       style={[styles.button, styles.buttonPrimary]}
-                       onPress={() => navigation.navigate('Home')}
-                     >
-                       <Text style={styles.buttonText}>Ver Mais</Text>
-                     </TouchableOpacity>
-                   </View>
-                   </View>
-                 ))}
-        
-
+          {pedidos.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <View style={styles.cardContent}>
+                <Image source={{ uri: item.imagem }} style={styles.profileImage} />
+                <View style={styles.infoSection}>
+                  <Text style={styles.personName}>{item.nome}</Text>
+                  <Text style={styles.locationText}>{item.cidade}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    {renderStars(item.nota)}
+                    <Text style={styles.requestText}>({item.avaliacoes} avaliaçôes)</Text>
+                  </View>
+                </View>
+                <View style={styles.valueContainer}>
+                  <Text style={styles.valueText}>R$ --</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                <Text style={styles.pedido}>Pedido:</Text>
+                <Text style={styles.requestText}>{item.pedido}</Text>
+              </View>
+              <View style={styles.requestContainer}>
+                <TouchableOpacity
+                  style={[styles.button, styles.buttonPrimary]}
+                  onPress={() => navigation.navigate('Home')}
+                >
+                  <Text style={styles.buttonText}>Ver Mais</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
         </ScrollView>
 
         {/* BOTTOM BAR */}
@@ -166,7 +159,7 @@ export default function Pendentes() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="chatbubble-ellipses-outline" size={22} color="#0a84ff" />
+            <Ionicons name="chatbubble-ellipses-outline" size={22} color="#b08cff" />
             <Text style={[styles.navLabel, styles.navLabelActive]}>Pedidos</Text>
           </TouchableOpacity>
 
@@ -237,7 +230,7 @@ title: {
   activeIndicator: {
     width: 40,
     height: 4,
-    backgroundColor: '#0a84ff', // linha verde embaixo do ativo
+    backgroundColor: '#b08cff', // linha lilás embaixo do ativo
     borderRadius: 2,
     marginTop: 4,
     
@@ -265,7 +258,7 @@ title: {
   },
   
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#b08cff',
     paddingHorizontal: 20,
     paddingVertical: 6, 
     borderRadius: 8,
@@ -280,7 +273,7 @@ title: {
   
   },
   card: {
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#8b6bc7',
     borderRadius: 15, 
     padding: 30,
     marginBottom: 20,
@@ -289,7 +282,7 @@ title: {
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 8,
-    color: '#333',
+    color: '#fff',
   },
   cardContent: {
     flexDirection: 'row',
@@ -308,11 +301,11 @@ title: {
   personName: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#111',
+    color: '#fff',
   },
   locationText: {
     fontSize: 13,
-    color: '#555',
+    color: '#f0f0f0',
     marginVertical: 2,
   },
   valueContainer: {
@@ -321,7 +314,7 @@ title: {
   valueText: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#0a84ff',
+    color: '#fff',
   },
   bottomBar: {
     position: 'absolute',
@@ -344,13 +337,13 @@ title: {
   },
 pedido: {
   fontSize: 20,
-  color: '#333',
+  color: '#fff',
   fontWeight: '500',
 },
 
 requestText: {
   fontSize: 15,
-  color: '#333',
+  color: '#fff',
   fontWeight: '500',
   marginLeft: 10,             // ✅ Corrigido: L maiúsculo
   textAlign: 'left',          // ✅ Alinha o texto à esquerda
@@ -383,7 +376,7 @@ requestText: {
     color: '#fff',
   },
   navLabelActive: {
-    color: '#0a84ff',
+    color: '#b08cff',
     fontWeight: '700',
   },
 
@@ -491,4 +484,5 @@ requestText: {
   
 });
   
+
 

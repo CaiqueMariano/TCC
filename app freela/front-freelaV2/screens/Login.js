@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
   },
   loginBox: {
     width: '70%',
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#8b6bc7',
     padding: 20,
     paddingVertical: 28,
     minHeight: 320,
@@ -120,11 +120,11 @@ const styles = StyleSheet.create({
   buttonSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#0a84ff',
+    borderColor: '#b08cff',
     marginRight: 8,
   },
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#b08cff',
     marginLeft: 8,
   },
   buttonText: {
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonTextSecondary: {
-    color: '#0a84ff',
+    color: '#fff',
   },
 });
 
