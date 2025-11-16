@@ -10,11 +10,12 @@ const { width, height } = Dimensions.get("window");
 
 export default function Contrato({ navigation }) {
   const { user } = useContext(UserContext);
-
+ 
   const [servicos, setServico] = useState([]);
 
   useEffect(()=>{
-    axios.get(`${API_URL}/api/vizualizarContratoAPagar/${user.idUsuario}`)
+    
+    axios.get(`${API_URL}/api/vizualizarContratos/${user.idUsuario}/Aguardando Pagamento`)
     .then(response => setServico(response.data.data))
     .catch(error => console.log(error));
   },[])

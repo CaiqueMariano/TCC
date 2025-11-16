@@ -71,7 +71,7 @@ export default function Home() {
         </View>
 
         {/* CARD 2 - Últimas avaliações */}
-       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Ativos')}>
+       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Contratos')}>
           <Text style={styles.cardTitle}>Últimas avaliações</Text>
           <View style={styles.feedbackRow}>
             {[
@@ -121,7 +121,9 @@ export default function Home() {
         </View>
 
         {/* CARD 4 - Dashboard */}
+        
         <View style={styles.card}>
+        <TouchableOpacity onPress={()=> navigation.navigate('Dashboard')}>
           <Text style={styles.cardTitle}>Dashboard</Text>
           <View style={styles.dashboardRow}>
             <View style={styles.kpiBox}>
@@ -137,6 +139,7 @@ export default function Home() {
               <Text style={styles.kpiLabel}>Média</Text>
             </View>
           </View>
+          </TouchableOpacity>
 
           {/* Gráfico de linha */}
           <View style={{ marginTop: 16 }}>
@@ -160,28 +163,6 @@ export default function Home() {
         <StatusBar style="light" />
       </ScrollView>
 
-      {/* BARRA INFERIOR */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home-outline" size={22} color="#0a84ff" />
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-  style={styles.navItem}
-  onPress={() => navigation.navigate('pedidos')}>
-  <Ionicons name="chatbubble-ellipses-outline" size={22} color="#fff" />
-  <Text style={styles.navLabel}>Pedidos</Text>
-</TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="time-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Histórico</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Perfil')}>
-          <Ionicons name="person-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
     </Background>
   );
 }

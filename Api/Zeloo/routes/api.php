@@ -18,6 +18,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+//Extrato
+//Postar
+Route::post('/extrato','App\Http\Controllers\ZelooController@extrato');
+//Buscar
+Route::get('/buscarExtrato/{idProfissional}','App\Http\Controllers\ZelooController@buscarExtrato');
+//CONTAS
+Route::get('/contasExtrato/{idProfissional}/{mes}','App\Http\Controllers\ZelooController@contasExtrato');
 //Desfavoritar
 Route::delete('/desfavoritar/{idProfissional}/{idUsuario}','App\Http\Controllers\ZelooController@desfavoritar');
 
@@ -28,16 +36,17 @@ Route::post('/favoritar','App\Http\Controllers\ZelooController@favoritar');
 Route::get('/favoritos/{idUsuario}','App\Http\Controllers\ZelooController@favoritos');
 //PAGAMENTO
 Route::post('/pagar','App\Http\Controllers\ZelooController@pagar');
+//finalizar
+Route::post('/finalizar','App\Http\Controllers\ZelooController@finalizar');
 //Ver servicos
 //Aguardando aceitar buscarServicosN
+
 Route::post('/buscarServicosN/{idUsuario}','App\Http\Controllers\ZelooController@buscarServicosN');
-//CONTRATOS
-//EM ANDAMENTO vizualizarContratoAndamento
-Route::get('/vizualizarContratoAtivo/{idUsuario}','App\Http\Controllers\ZelooController@vizualizarContratoAtivo');
-//INATIVO
-Route::post('/vizualizarContratoTerminado/{idUsuario}','App\Http\Controllers\ZelooController@vizualizarContratoTerminado');
-//A PAGAR
-Route::get('/vizualizarContratoAPagar/{idUsuario}','App\Http\Controllers\ZelooController@vizualizarContratoAPagar');
+//LISTAR CONTRATOS 
+//usuario:
+Route::get('/vizualizarContratos/{idUsuario}/{status}','App\Http\Controllers\ZelooController@vizualizarContratos');
+//FREE:
+Route::get('/vizualizarContratosFree/{idProfissional}/{status}','App\Http\Controllers\ZelooController@vizualizarContratosFree');
 
 //listarEndereco
 Route::post('/listarEndereco','App\Http\Controllers\ZelooController@listarEndereco');

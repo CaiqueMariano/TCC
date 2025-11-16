@@ -11,10 +11,57 @@ import Login from '../screens/Login';
 import SobreNos from '../screens/SobreNos';
 import { UserProvider } from "../screens/userContext";
 import Configuracoes from '../screens/Configuracoes';
+import Icon from "react-native-vector-icons/Feather";
+import Icons from "react-native-vector-icons/AntDesign";
 import Ativos from '../screens/Contratos';
-
-
+import Dashboard from "../screens/Dashboard";
+import Contratos from "../screens/Contratos";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+function AppTabs() {
+  return (
+    <Tab.Navigator screenOptions={{
+      headerShown: false,
+      tabBarStyle: {
+        backgroundColor: '#fff',
+        height: 100,
+        borderTopWidth: 0,
+        elevation: 10,
+      },
+      tabBarActiveTintColor: "#b08cff",
+      tabBarInactiveTintColor: "#888",
+    }}>
+      
+      <Tab.Screen name="Home" component={Home} options={{
+          tabBarLabel: "Início",
+          tabBarIcon: ({ color }) => (
+            <Icon name="home" size={24} color={color} />
+          )
+        }} />
+      <Tab.Screen name="Pedidos" component={Pedidos} options={{
+          tabBarLabel: "Pedidos",
+          tabBarIcon: ({ color }) => (
+            <Icons name="ordered-list" size={24} color={color} />
+          )
+        }} />
+      <Tab.Screen name="Contratos" component={Contratos} options={{
+          tabBarLabel: "Contratos",
+          tabBarIcon: ({ color }) => (
+            <Icons name="solution" size={24} color={color} />
+          )
+        }} />
+      <Tab.Screen name="Perfil" component={Perfil} options={{
+          tabBarLabel: "Perfil",
+          tabBarIcon: ({ color }) => (
+            <Icon name="user" size={24} color={color} />
+          )
+        }} />
+      
+    </Tab.Navigator>
+  );
+}
 export default function App() {
   return (
     
@@ -24,12 +71,15 @@ export default function App() {
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
-        <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-        <Stack.Screen name="pedidos" component={Pedidos} options={{ headerShown: false }} />
-        <Stack.Screen name="Perfil" component={Perfil} options={{ headerShown: false }} />
+        <Stack.Screen 
+        name="Tabs" 
+        component={AppTabs} 
+        options={{ headerShown: false }} 
+      />
+
         <Stack.Screen name="SobreNos" component={SobreNos} options={{ headerShown: false }} />
-        <Stack.Screen name="Configuracoes" component={Configuracoes} options={{ headerShown: false }} />
-        <Stack.Screen name="Ativos" component={Ativos} options={{ headerShown: false }} />
+        <Stack.Screen name="Dashboard" component={Dashboard} />
+        <Stack.Screen name="Configuracoes" component={Configuracoes} />
       </Stack.Navigator>
     </NavigationContainer>
     </ThemeProvider>

@@ -181,41 +181,7 @@ export default function Perfil({ route }) {
           </View>
         </ScrollView>
 
-        {/* Barra de navegação inferior */}
-        <View style={styles.bottomBar}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Home")}
-          >
-            <Ionicons name="home-outline" size={22} color="#fff" />
-            <Text style={styles.navLabel}>Home</Text>
-          </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("pedidos")}
-          >
-            <Ionicons
-              name="chatbubble-ellipses-outline"
-              size={22}
-              color="#fff"
-            />
-            <Text style={styles.navLabel}>Pedidos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="time-outline" size={22} color="#fff" />
-            <Text style={styles.navLabel}>Histórico</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Perfil")}
-          >
-            <Ionicons name="person-outline" size={22} color="#0a84ff" />
-            <Text style={[styles.navLabel, styles.navLabelActive]}>Perfil</Text>
-          </TouchableOpacity>
-        </View>
       </SafeAreaView>
     </Background>
   );

@@ -3,21 +3,22 @@ import axios from 'axios';
 import { API_URL } from './link';
 import { UserContext } from './userContext';
 import {View,Text,ScrollView,Platform,TouchableOpacity,Animated,Dimensions,StyleSheet, Image,} from 'react-native';
-
+import CustomModal from './Modal';
 const ABAS = [
   { chave: 'ativos', titulo: 'Ativos' },
   { chave: 'pendentes', titulo: 'Pendentes' },
   { chave: 'cancelados', titulo: 'Cancelados' },
 ];
 
-export default function Contratos() {
+export default function Contratos({navigation}) {
   const {user} = useContext(UserContext);
   const [abaAtiva, definirAbaAtiva] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
   const [status, setStatus] = useState("");
   const [ativos, setAtivos] = useState([]);
-const [pendentes, setPendentes] = useState([]);
-const [cancelados, setCancelados] = useState([]);
-
+  const [pendentes, setPendentes] = useState([]);
+  const [cancelados, setCancelados] = useState([]);
+  
   const indicador = useRef(new Animated.Value(0)).current;
   const { width } = Dimensions.get('window');
   const larguraAba = width / ABAS.length;
@@ -49,14 +50,64 @@ const [cancelados, setCancelados] = useState([]);
       })
       .catch(error => console.log("ERRO:", error));
   },[status])
+
+  const finalizar = async (item) => {
+    try {
+      const hoje = new Date();
+      const horas = String(hoje.getHours()).padStart(2, '0');
+      const minutos = String(hoje.getMinutes()).padStart(2, '0');
+      const segundos = String(hoje.getSeconds()).padStart(2, '0');
+
+
+
+      const horario = `${horas}:${minutos}:${segundos}`;
+
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0'); // 0–11 → soma 1
+      const dia = String(hoje.getDate()).padStart(2, '0');
+
+      const dataFormatada = `${ano}-${mes}-${dia}`;
+      const response = await axios.post(`${API_URL}/api/finalizar`, {
+        idContrato: item.idContrato
+      });
+
+      const extrato = await axios.post(`${API_URL}/api/extrato`,{
+        idProfissional: user.idProfissional,
+        idContrato:item.idContrato,
+        valor: item.precoPersonalizado,
+        dataExtrato: dataFormatada,
+        horarioExtrato: horario,
+      });
+
+      if (response.data.success) {
+        setModalVisible(true);
+      }
+
+      if(extrato.data.success){
+        console.log("sucesso");
+      }else{
+        console.log("erro")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    
+  };
   
 
 
   return (
     <View style={styles.container}>
-      <View style={styles.navBar}>
-        <Text style={styles.tituloNav}>Contratos</Text>
-      </View>
+       <CustomModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onNavigateDashboard={() => {
+          setModalVisible(false);
+          navigation.navigate('Dashboard');
+        }}
+      />
+     
 
       <View accessibilityRole="tablist" style={styles.barraAbas}>
         <View style={{ position: 'relative' }}>
@@ -144,6 +195,10 @@ const [cancelados, setCancelados] = useState([]);
   
                   <TouchableOpacity style={styles.botaoM}> 
                     <Text style={styles.mais}>Ver Mais</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.botaoM} onPress={()=>finalizar(item)}> 
+                    <Text style={styles.mais}>Terminar</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -323,6 +378,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   barraAbas: {
+    paddingTop:50,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',

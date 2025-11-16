@@ -31,7 +31,7 @@ export default function Ativos({ navigation }) {
 
   useEffect(() => {
     axios
-      .get(`${API_URL}/api/vizualizarContratoAtivo/${user.idUsuario}`)
+      .get(`${API_URL}/api/vizualizarContratos/${user.idUsuario}/ativo`)
       .then(response => setServico(response.data.data))
       .catch(error => console.log(error));
   }, []);

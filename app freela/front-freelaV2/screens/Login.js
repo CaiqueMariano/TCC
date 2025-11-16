@@ -21,7 +21,7 @@ const enviarLogin = async () => {
   
       if (response.data.success) {
         setUser(response.data.data);
-        navigation.navigate("Home");
+        navigation.replace("Tabs");
       } else {
         console.log(response.data.message)
         setMensagem('E-mail ou senha incorretos');
