@@ -56,6 +56,14 @@ export default function Home() {
     <Text style={styles.textoBotaoDashboard}>Ir para Dashboard</Text>
   </TouchableOpacity>
 
+    <TouchableOpacity
+    style={styles.botaoDashboard}
+    onPress={() => navigation.navigate('Conversas')}
+  >
+    <Ionicons name="chatbubbles-outline" size={32} color="#fff" style={{ marginBottom: 6 }} />
+    <Text style={styles.textoBotaoDashboard}>Ir para Conversas</Text>
+  </TouchableOpacity>
+
 </ScrollView>
 
 
