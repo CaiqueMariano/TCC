@@ -1,365 +1,209 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
-import Background from '../components/Background';
 
 export default function Home() {
   const navigation = useNavigation();
-  const screenWidth = Dimensions.get('window').width;
+  const [abaAtiva, setAbaAtiva] = useState(0);
 
-  const chartData = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-    datasets: [
-      {
-        data: [2, 4, 6, 8, 10, 12],
-        strokeWidth: 2,
-        color: () => '#b08cff',
-      },
-    ],
-  };
-
-  const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientTo: '#fff',
-    color: () => '#b08cff',
-    labelColor: () => '#333',
-    strokeWidth: 2,
-    propsForDots: {
-      r: '4',
-      strokeWidth: '2',
-      stroke: '#b08cff',
-    },
-  };
+  const abas = [
+    { titulo: 'Home', icone: 'home-outline', rota: 'Home' },
+    { titulo: 'Contratos', icone: 'document-text-outline', rota: 'Contratos' },
+    { titulo: 'Perfil', icone: 'person-outline', rota: 'Perfil' },
+  ];
 
   return (
-    <Background>
-      <ScrollView 
-        contentContainerStyle={styles.container}
-        style={styles.scrollView}
-      >
-        {/* CARD 1 - Proposta recomendada */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Proposta recomendada</Text>
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
 
-          <View style={styles.cardContent}>
-            <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
-              style={styles.profileImage}
-            />
-            <View style={styles.infoSection}>
-              <Text style={styles.personName}>Maria Oliveira</Text>
-              <Text style={styles.locationText}>São Paulo - SP</Text>
-              <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star-half" size={14} color="#FFD700" />
-                <Ionicons name="star-outline" size={14} color="#FFD700" />
-              </View>
-            </View>
-            <View style={styles.valueContainer}>
-              <Text style={styles.valueText}>R$ 180,00</Text>
-            </View>
-          </View>
-
-          <View style={styles.requestContainer}>
-            <Text style={styles.requestText}>
-              Pedido: Mercado e supervisão
-            </Text>
-          </View>
-        </View>
-
-        {/* CARD 2 - Últimas avaliações */}
-       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Ativos')}>
-          <Text style={styles.cardTitle}>Últimas avaliações</Text>
-          <View style={styles.feedbackRow}>
-            {[
-              { name: 'Carlos Souza', rating: 5 },
-              { name: 'Ana Lima', rating: 4 },
-              { name: 'Pedro Martins', rating: 3 },
-            ].map((item, index) => (
-              <View key={index} style={styles.feedbackItem}>
-                <Text style={styles.feedbackName}>{item.name}:</Text>
-                <View style={styles.starsContainer}>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Ionicons
-                      key={i}
-                      name={i < item.rating ? 'star' : 'star-outline'}
-                      size={16}
-                      color="#FFD700"
-                    />
-                  ))}
-                </View>
-              </View>
-            ))}
-          </View>
-        </TouchableOpacity>
-
-        {/* CARD 3 - Seu perfil */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Meu perfil</Text>
-          <View style={styles.profileSection}>
-            <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=8' }}
-              style={styles.profileImageLarge}
-            />
-            <View style={styles.profileInfo}>
-              <Text style={styles.personName}>João Cuidador</Text>
-              <Text style={styles.locationText}>Bairro Vila Nova - Curitiba/PR</Text>
-              <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star" size={14} color="#FFD700" />
-                <Ionicons name="star-outline" size={14} color="#FFD700" />
-              </View>
-              <Text style={styles.profileDetail}>Média de avaliação: 4.0</Text>
-              <Text style={styles.profileDetail}>Tempo no app: 1 ano e 3 meses</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* CARD 4 - Dashboard */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Dashboard</Text>
-          <View style={styles.dashboardRow}>
-            <View style={styles.kpiBox}>
-              <Text style={styles.kpiValue}>12</Text>
-              <Text style={styles.kpiLabel}>Pedidos mês</Text>
-            </View>
-            <View style={styles.kpiBox}>
-              <Text style={styles.kpiValue}>R$ 2.450</Text>
-              <Text style={styles.kpiLabel}>Ganhos</Text>
-            </View>
-            <View style={styles.kpiBox}>
-              <Text style={styles.kpiValue}>4.2</Text>
-              <Text style={styles.kpiLabel}>Média</Text>
-            </View>
-          </View>
-
-          {/* Gráfico de linha */}
-          <View style={{ marginTop: 16 }}>
-            {Platform.OS !== 'web' ? (
-              <LineChart
-                data={chartData}
-                width={screenWidth - 48}
-                height={180}
-                chartConfig={chartConfig}
-                bezier
-                style={{ borderRadius: 12 }}
-              />
-            ) : (
-              <View style={styles.chartPlaceholder}>
-                <Text style={styles.chartPlaceholderText}>Gráfico indisponível no web</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        <StatusBar style="light" />
-      </ScrollView>
-
-      {/* BARRA INFERIOR */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Ionicons name="home-outline" size={22} color="#b08cff" />
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-  style={styles.navItem}
-  onPress={() => navigation.navigate('Pedidos')}>
-  <Ionicons name="chatbubble-ellipses-outline" size={22} color="#fff" />
-  <Text style={styles.navLabel}>Pedidos</Text>
-</TouchableOpacity>
-
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="time-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Histórico</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Perfil')}>
-          <Ionicons name="person-outline" size={22} color="#fff" />
-          <Text style={styles.navLabel}>Perfil</Text>
-        </TouchableOpacity>
+      <View style={styles.navBar}>
+        <Text style={styles.tituloNav}>Home</Text>
       </View>
-    </Background>
+
+      <ScrollView
+  contentContainerStyle={styles.scrollContainer}
+  showsVerticalScrollIndicator={false}
+>
+
+  <View style={styles.cartao}>
+    <Text style={styles.tituloSecao}>Contrato ativo mais recente</Text>
+
+    <View style={styles.cabecalhoIdoso}>
+      <Image
+        source={require('../assets/perfilicon.png')}
+        style={styles.fotoIdoso}
+      />
+      <View>
+        <Text style={styles.nomeIdoso}>Ana Maria Braga</Text>
+        <Text style={styles.subInfoIdoso}>Status: Pago</Text>
+      </View>
+    </View>
+
+    <TouchableOpacity
+      style={styles.botaoOutline}
+      onPress={() => navigation.navigate('Contratos')}
+    >
+      <Text style={styles.textoBotaoOutline}>Ver contratos</Text>
+    </TouchableOpacity>
+  </View>
+
+  <TouchableOpacity
+    style={styles.botaoDashboard}
+    onPress={() => navigation.navigate('Dashboard')}
+  >
+    <Ionicons name="analytics-outline" size={32} color="#fff" style={{ marginBottom: 6 }} />
+    <Text style={styles.textoBotaoDashboard}>Ir para Dashboard</Text>
+  </TouchableOpacity>
+
+</ScrollView>
+
+
+      <StatusBar style="dark" />
+
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  topBar: {
-    width: '100%',
-    backgroundColor: '#000',
+  navBar: {
+    backgroundColor: '#b08cff',
+    paddingTop: 40,
     paddingVertical: 16,
-    paddingHorizontal: 16,
+    alignItems: 'center',
   },
-  topBarText: {
+  tituloNav: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '700',
-  },
-  container: {
-    padding: 12,
-    paddingTop: 50,
-    paddingBottom: 96,
-    flexGrow: 1,
-  },
-  card: {
-    backgroundColor: '#8b6bc7',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-  },
-  dashboardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  kpiBox: {
-    flex: 1,
-    backgroundColor: '#8b6bc7',
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    marginHorizontal: 4,
-    alignItems: 'center',
-  },
-  kpiValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#fff',
-  },
-  kpiLabel: {
-    fontSize: 12,
-    color: '#fff',
-    marginTop: 4,
-  },
-  chartPlaceholder: {
-    height: 180,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chartPlaceholderText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
-    color: '#fff',
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  profileImage: {
-    width: 54,
-    height: 54,
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  infoSection: {
-    flex: 1,
-  },
-  personName: {
-    fontSize: 15,
     fontWeight: '600',
-    color: '#fff',
   },
-  locationText: {
-    fontSize: 13,
-    color: '#f0f0f0',
-    marginVertical: 2,
+
+  botaoDashboard: {
+  backgroundColor: '#b08cff',
+  borderRadius: 12,
+  paddingVertical: 16,
+  alignItems: 'center',
+  marginTop: 20,
+},
+
+textoBotaoDashboard: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '700',
+},
+
+
+  scrollContainer: {
+    padding: 20,
   },
-  ratingRow: {
-    flexDirection: 'row',
+
+  cartao: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
-  valueContainer: {
-    alignItems: 'flex-end',
-  },
-  valueText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  requestContainer: {
-    marginTop: 4,
-  },
-  requestText: {
-    fontSize: 14,
-    color: '#fff',
-    fontWeight: '500',
-  },
-  feedbackRow: {
-    flexDirection: 'column',
-  },
-  feedbackItem: {
-    flexDirection: 'row',
-    marginBottom: 6,
-  },
-  profileSection: {
+
+  cabecalhoIdoso: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10,
   },
-  profileImageLarge: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
+
+  fotoIdoso: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     marginRight: 12,
   },
-  profileInfo: {
-    flex: 1,
+
+  nomeIdoso: {
+    fontSize: 18,
+    fontWeight: '700',
   },
-  profileDetail: {
-    fontSize: 13,
-    color: '#fff',
-    marginTop: 2,
+
+  subInfoIdoso: {
+    color: '#555',
   },
-  bottomBar: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 12,
+
+  botaoOutline: {
+    borderColor: '#b08cff',
+    borderWidth: 2,
+    borderRadius: 12,
     paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    marginTop: 12,
     alignItems: 'center',
-    borderRadius: 14,
   },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navLabel: {
-    marginTop: 2,
-    fontSize: 12,
-    color: '#fff',
-  },
-  navLabelActive: {
+
+  textoBotaoOutline: {
     color: '#b08cff',
     fontWeight: '700',
   },
-  feedbackName: {
-  fontSize: 14,
-  fontWeight: '500',
-  marginRight: 6,
-  color: '#fff',
-},
-starsContainer: {
-  flexDirection: 'row',
-},
 
+  containerPesquisa: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    marginBottom: 20,
+    marginTop: 20,
+  },
+
+  campoPesquisa: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+  },
+
+  tituloSecao: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    marginTop: 10,
+  },
+
+  cardServico: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 16,
+  },
+
+  cardServicoConteudo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  fotoServico: {
+    width: 54,
+    height: 54,
+    borderRadius: 8,
+    marginRight: 14,
+  },
+
+  infoServico: {
+    flex: 1,
+  },
+
+  nomeServico: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+
+  cidadeServico: {
+    fontSize: 14,
+    color: '#777',
+  },
+
+  tipoServico: {
+    fontSize: 14,
+    marginTop: 4,
+    fontWeight: '500',
+  },
 });
+
