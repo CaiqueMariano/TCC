@@ -1,370 +1,427 @@
-import React, { useEffect, useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { useTheme } from "../temas/ThemeContext";
-import Background from "../components/Background";
+import React, { useState, useRef, useEffect } from 'react';
+import { Modal } from 'react-native';
+import {View,Text,StyleSheet,Image,TouchableOpacity,Animated,Dimensions,ScrollView,} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-// Simulação de API
-async function fetchProfileFromAPI(id) {
-  return new Promise((resolve) =>
-    setTimeout(() => {
-      resolve({
-        id,
-        name: "Diana Buarque",
-        city: "Niterói",
-        state: "RJ",
-        rating: 4.7,
-        reviewsCount: 36,
-        yearsExperience: 7,
-        description:
-          "Profissional dedicada, responsável e com ampla experiência no cuidado a idosos.",
-        balance: 5879.9,
-        avatarUrl: null,
-      });
-    }, 600)
-  );
-}
 
-export default function Perfil({ route }) {
-  const navigation = useNavigation();
-  const { theme } = useTheme();
-  const profileId = route?.params?.profileId || "diana123";
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+
+const ABAS = [
+  { chave: 'renda', titulo: 'Renda / Extrato' },
+  { chave: 'info', titulo: 'Informações' },
+  
+];
+
+
+export default function PerfilCuidador({ navigation }) {
+  const [abaAtiva, definirAbaAtiva] = useState(0);
+  const indicador = useRef(new Animated.Value(0)).current;
+
+  const [modalVisivel, setModalVisivel] = useState(false);
+const [itemSelecionado, setItemSelecionado] = useState(null);
+
+const abrirModalExtrato = (item) => {
+  setItemSelecionado(item);
+  setModalVisivel(true);
+};
+
+
+  const { width } = Dimensions.get('window');
+  const larguraAba = width / ABAS.length;
 
   useEffect(() => {
-    let mounted = true;
-    fetchProfileFromAPI(profileId)
-      .then((data) => {
-        if (mounted) {
-          setProfile(data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (mounted) {
-          setError(err.message || "Erro ao carregar perfil");
-          setLoading(false);
-        }
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [profileId]);
+    Animated.spring(indicador, {
+      toValue: abaAtiva * larguraAba,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 8,
+    }).start();
+  }, [abaAtiva]);
 
-  const handleWithdraw = () => {
-    if (!profile) return;
-    alert(`Saque de R$ ${profile.balance.toFixed(2)} solicitado!`);
-  };
+return (
+  <View style={styles.container}>
 
-  if (loading)
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={theme.primary} />
+    <View style={styles.navBar}>
+      <Text style={styles.tituloNav}>Perfil do Cuidador</Text>
+    </View>
+
+    <View style={styles.blocoTopo}>
+      <Image
+        source={require('../assets/perfilicon.png')}
+        style={styles.foto}
+      />
+
+      <View style={{ marginLeft: 16 }}>
+        <Text style={styles.nome}>Mariazinha Oliveira</Text>
+        <Text style={styles.idade}>35 anos</Text>
+
+        <View style={styles.linhaEndereco}>
+          <Ionicons name="star" size={18} color="#b08cff" />
+          <Text style={styles.endereco}>4,8</Text>
+        </View>
       </View>
-    );
+    </View>
 
-  if (error)
-    return (
-      <View style={styles.centered}>
-        <Text style={{ color: theme.error }}>{error}</Text>
-      </View>
-    );
+    <View accessibilityRole="tablist" style={styles.barraAbas}>
+      <View style={{ position: 'relative' }}>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            height: 3,
+            width: larguraAba - 32,
+            left: 16,
+            bottom: 0,
+            transform: [{ translateX: indicador }],
+            borderRadius: 2,
+            backgroundColor: '#b08cff',
+          }}
+        />
 
-  return (
-    <Background>
-      <SafeAreaView
-        style={[styles.safeArea, ]}
-      >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* Cabeçalho */}
-          <View style={styles.header}>
-            <Text style={[styles.name, { color: theme.text }]}>
-              {profile.name}
-            </Text>
+        <View style={{ flexDirection: 'row' }}>
+          {ABAS.map((aba, indice) => (
             <TouchableOpacity
-              style={styles.settingsButton}
-              onPress={() => navigation.navigate("Configuracoes")}
-            >
-              <Ionicons
-                name="settings-outline"
-                size={26}
-                color={theme.primary}
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Card principal */}
-          <View style={[styles.card, { backgroundColor: theme.card }]}>
-            {/* Avatar */}
-            <View style={styles.avatarContainer}>
-              {profile.avatarUrl ? (
-                <Image
-                  source={{ uri: profile.avatarUrl }}
-                  style={styles.avatar}
-                />
-              ) : (
-                <View
-                  style={[
-                    styles.avatarPlaceholder,
-                    { backgroundColor: theme.avatarBg },
-                  ]}
-                >
-                  <Text
-                    style={[styles.avatarLetter, { color: theme.avatarText }]}
-                  >
-                    {profile.name.charAt(0)}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            {/* Localização e dados */}
-            <Text style={[styles.location, { color: theme.textSecondary }]}>
-              📍 {profile.city} - {profile.state}
-            </Text>
-            <Text style={[styles.info, { color: theme.textSecondary }]}>
-              ⭐ {profile.rating} ({profile.reviewsCount} avaliações)
-            </Text>
-            <Text style={[styles.info, { color: theme.textSecondary }]}>
-              ⏳ {profile.yearsExperience} anos de experiência
-            </Text>
-
-            {/* Descrição */}
-            <Text style={[styles.sectionTitle, { color: theme.primary }]}>
-              Descrição de Serviços
-            </Text>
-            <Text style={[styles.description, { color: theme.text }]}>
-              {profile.description}
-            </Text>
-
-            {/* Saldo */}
-            <View
-              style={[
-                styles.balanceContainer,
-                { backgroundColor: theme.balanceBg },
-              ]}
+              key={aba.chave}
+              style={styles.botaoAba}
+              onPress={() => definirAbaAtiva(indice)}
             >
               <Text
-                style={[styles.balanceLabel, { color: theme.textSecondary }]}
-              >
-                Saldo Disponível
-              </Text>
-              <Text style={[styles.balanceValue, { color: theme.balanceText }]}>
-                R$ {profile.balance.toFixed(2)}
-              </Text>
-              <TouchableOpacity
                 style={[
-                  styles.withdrawButton,
-                  { backgroundColor: theme.withdrawButton },
+                  styles.textoAba,
+                  abaAtiva === indice && styles.textoAbaAtiva,
                 ]}
-                onPress={handleWithdraw}
               >
-                <Text
-                  style={[styles.withdrawText, { color: theme.withdrawText }]}
-                >
-                  SACAR
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </ScrollView>
-
-        {/* Barra de navegação inferior */}
-        <View style={styles.bottomBar}>
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Home")}
-          >
-            <Ionicons name="home-outline" size={22} color="#fff" />
-            <Text style={styles.navLabel}>Home</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Pedidos")}
-          >
-            <Ionicons
-              name="chatbubble-ellipses-outline"
-              size={22}
-              color="#fff"
-            />
-            <Text style={styles.navLabel}>Pedidos</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.navItem}>
-            <Ionicons name="time-outline" size={22} color="#fff" />
-            <Text style={styles.navLabel}>Histórico</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.navItem}
-            onPress={() => navigation.navigate("Perfil")}
-          >
-            <Ionicons name="person-outline" size={22} color="#b08cff" />
-            <Text style={[styles.navLabel, styles.navLabelActive]}>Perfil</Text>
-          </TouchableOpacity>
+                {aba.titulo}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-      </SafeAreaView>
-    </Background>
-  );
+      </View>
+    </View>
+
+    <View style={styles.conteudo}>
+ 
+      {abaAtiva === 0 && (
+        <ScrollView style={styles.conteudoScroll} showsVerticalScrollIndicator={false}>
+
+          <Text style={styles.tituloSecao}>Renda Mensal</Text>
+
+          <View style={styles.cartao}>
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Total no mês:</Text> R$ 3.250,00
+            </Text>
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Serviços feitos:</Text> 12 serviços
+            </Text>
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Horas trabalhadas:</Text> 87h
+            </Text>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.botaoVerExtrato}
+            onPress={() => navigation.navigate("Extratos")}
+          >
+            <Text style={styles.textoBotaoVerExtrato}>Ver extratos</Text>
+          </TouchableOpacity>
+
+      
+          <Text style={styles.tituloFeedback}>Feedbacks</Text>
+
+          <View style={styles.cardComentario}>
+            <View style={styles.Comentario}>
+              <Image
+                source={require('../assets/perfilicon.png')}
+                style={styles.fotoComentario}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.nomeComentario}>Garanhao fa paçoca</Text>
+                <Text style={styles.dataComentario}>02/11/2025</Text>
+              </View>
+            </View>
+
+            <Text style={styles.textoComentario}>
+              Ótima profissional, paciente e muito atenciosa. Recomendo fortemente.
+            </Text>
+          </View>
+
+        </ScrollView>
+      )}
+
+
+      {abaAtiva === 1 && (
+        <ScrollView style={styles.conteudoScroll} showsVerticalScrollIndicator={false}>
+
+          <Text style={styles.tituloSecao}>Informações do Cuidador</Text>
+
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Tempo de Experiência:</Text> 5 anos
+            </Text>
+
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Disponibilidade:</Text> Diurno e Noturno
+            </Text>
+
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Genêro:</Text> Mulher
+            </Text>
+
+            <View style={styles.separador} />
+
+            <Text style={styles.tituloSecao}>Experiências</Text>
+
+            <Text style={styles.linhaInfo}> Idosos com Alzheimer</Text>
+            <Text style={styles.linhaInfo}> Idosos acamados</Text>
+            <Text style={styles.linhaInfo}> Idosos com comportamento agressivo</Text>
+
+            <View style={styles.separador} />
+
+            <Text style={styles.tituloSecao}>Especializações</Text>
+
+            <Text style={styles.linhaInfo}> Primeiros socorros</Text>
+            <Text style={styles.linhaInfo}> Administração de medicamentos</Text>
+            <Text style={styles.linhaInfo}> Cuidados pós-operatórios</Text>
+
+          <TouchableOpacity 
+            style={styles.botaoEditar}
+            onPress={() => navigation.navigate("EditarPerfil")}
+          >
+            <Text style={styles.textoBotaoEditar}>Editar Perfil</Text>
+          </TouchableOpacity>
+
+        </ScrollView>
+      )}
+
+    </View>
+
+  </View>
+);
 }
 
 const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1
-   },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+separador: {
+  height: 1,
+  backgroundColor: '#E5E7EB',
+  marginVertical: 20,
+},
 
-  scrollContainer: {
-    alignItems: "center",
-    padding: 16,
-    paddingBottom: 120,
-    flexGrow: 1,
+  navBar: {
+    backgroundColor: '#b08cff',
+    paddingTop: 40,
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  tituloNav: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
   },
 
-  header: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+  rotulo: {
+    fontWeight: '600',
+  },
+
+  blocoTopo: {
+    flexDirection: 'row',
+    padding: 20,
+    alignItems: 'center',
+  },
+  foto: {
+    width: 95,
+    height: 95,
+    borderRadius: 50,
+  },
+  nome: {
+    fontSize: 22,
+    fontWeight: '700',
+  },
+  idade: {
+    fontSize: 15,
+    color: '#555',
+    marginTop: 4,
+  },
+
+  linhaEndereco: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  endereco: {
+    marginLeft: 4,
+    fontSize: 15,
+    color: '#444',
+  },
+
+  barraAbas: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  botaoAba: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  textoAba: {
+    color: '#6B7280',
+    fontSize: 14,
+  },
+  textoAbaAtiva: {
+    color: '#000',
+    fontWeight: '600',
+  },
+botaoVerExtrato: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#b08cff',
+  paddingVertical: 14,
+  borderRadius: 12,
+  marginTop: 10,
+  gap: 8,
+},
+
+botaoEditar: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#b08cff',
+  paddingVertical: 14,
+  borderRadius: 12,
+  marginTop: 45,
+  gap: 8,
+},
+
+textoBotaoVerExtrato: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600',
+},
+
+textoBotaoEditar: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600',
+},
+
+  conteudo: {
+    flex: 1,
+  },
+
+  conteudoScroll: {
+    padding: 20,
+  },
+
+  tituloSecao: {
+    fontSize: 22,
+    fontWeight: '700',
     marginBottom: 16,
   },
 
-  settingsButton: { 
-    padding: 6 
+  tituloExtrato: {
+    marginTop: 20,
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 16,
   },
 
-  name: { 
-    fontSize: 22, 
-    fontWeight: "700", 
-    textAlign: "center" 
-  },
-
-  card: {
-    width: "95%",
-    borderRadius: 24,
-    alignItems: "center",
-    padding: 20,
-    boxShadow: "0px 2px 10px rgba(0,0,0,0.25)",
-    elevation: 8,
-  },
-
-  avatarContainer: { 
-    marginBottom: 10
-   },
-
-  avatarPlaceholder: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  avatarLetter: { 
-    fontSize: 46, 
-    fontWeight: "bold"
-   },
-
-  location: { 
-    fontSize: 15, 
-    marginBottom: 4
-   },
-
-  info: { 
-    fontSize: 14, 
-    marginBottom: 3 
-  },
-
-  sectionTitle: { 
-    fontSize: 17, 
-    fontWeight: "700", 
-    marginTop: 12
-   },
-
-  description: { 
-    textAlign: "center", 
-    marginTop: 6, 
-    lineHeight: 20 
-  },
-
-  balanceContainer: {
-    borderRadius: 12,
+  cartao: {
+    backgroundColor: '#fff',
     padding: 16,
-    marginTop: 22,
-    width: "100%",
-    alignItems: "center",
+    borderRadius: 16,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
   },
 
-  balanceLabel: { 
-    fontSize: 13, 
-    color: "#333" 
+
+
+itemExtratoLinha: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  paddingVertical: 10,
+  borderBottomWidth: 1,
+  borderBottomColor: '#eee',
+},
+
+dataExtrato: {
+  fontSize: 14,
+  fontWeight: '600',
+  color: '#333',
+},
+
+tipoExtrato: {
+  fontSize: 13,
+  color: '#777',
+},
+
+ladoDireito: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 6,
+},
+
+valorPositivo: {
+  fontWeight: '700',
+  color: '#3ab940',
+  fontSize: 14,
+},
+
+  valorPositivo: {
+    fontWeight: '600',
+    color: 'green',
   },
 
-  balanceValue: { 
-    fontSize: 24, 
-    fontWeight: "700", 
-    marginVertical: 8 
+  tituloFeedback: {
+    marginTop: 20,
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 16,
   },
 
-  withdrawButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    marginTop: 6,
+  cardComentario: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
   },
 
-  withdrawText: {
-    fontWeight: "bold",
-    fontSize: 15,
+  Comentario: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
   },
 
-  bottomBar: {
-    position: "absolute",
-    left: 12,
-    right: 12,
-    bottom: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: "rgba(0,0,0,0.85)",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderRadius: 14,
+  fotoComentario: {
+    width: 45,
+    height: 45,
+    borderRadius: 22,
+    marginRight: 12,
   },
 
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+  nomeComentario: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
   },
 
-  navLabel: {
-    marginTop: 2,
+  dataComentario: {
     fontSize: 12,
-    color: "#fff",
+    color: '#777',
+    marginTop: 2,
   },
 
-  navLabelActive: {
-    color: "#b08cff",
-    fontWeight: "700",
+  textoComentario: {
+    fontSize: 15,
+    lineHeight: 20,
+    color: '#333',
   },
-
-  centered: { 
-    flex: 1, 
-    justifyContent: "center", 
-    alignItems: "center" 
-  },
-
 });
