@@ -261,7 +261,7 @@ export default function Cadastro({ navigation }) {
           onChangeText={formatarData}
           />
 
-
+   {/*
             <View style={styles.dropdowncontainer}>
               <DropDownPicker
                 open={open}
@@ -273,7 +273,7 @@ export default function Cadastro({ navigation }) {
                 style={styles.dropdown}
                 dropDownContainerStyle={styles.dropDownContainer}
               />
-            </View>
+            </View>*/}
 
           <View style={styles.botoes}>
             <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(1)}>
@@ -292,7 +292,7 @@ export default function Cadastro({ navigation }) {
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
-        </View>
+       </View>
       )}
 
     {etapa === 3 && (
