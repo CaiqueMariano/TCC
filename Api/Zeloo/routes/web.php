@@ -31,7 +31,6 @@ Route::get('/dashboard-data', [ZelooController::class, 'DashboardData'])
     ->name('dashboard.data');
     // buscar denunciados pelo nome
 
-Route::get('/denuncias', [ZelooController::class, 'pesquisa']);
 
 Route::get('/responder-denuncia', [ZelooController::class, 'buscarDenuncia'])->name('buscarDenuncia');
 
