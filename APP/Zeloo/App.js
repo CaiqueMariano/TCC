@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from "@expo/vector-icons/Ionicons";
-import messaging from '@react-native-firebase/messaging';
+
 import { Dimensions, Platform } from 'react-native';
 
 const { height } = Dimensions.get('window');
@@ -36,29 +36,6 @@ import { AccessibilityProvider } from './src/screens/AccessibilityContext';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-
-  const [fcmToken, setFcmToken] = useState('');
-
-  useEffect(() => {
-    // Pede permissão e pega o token FCM
-    const requestPermission = async () => {
-      const authStatus = await messaging().requestPermission();
-      if (authStatus) {
-        const token = await messaging().getToken();
-        console.log('FCM Token:', token);
-        setFcmToken(token);
-        // Aqui você pode enviar para o backend
-      }
-    };
-    requestPermission();
-
-    // Listener para notificações quando o app estiver aberto
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      alert(`Nova notificação: ${remoteMessage.notification.body}`);
-    });
-
-    return unsubscribe; // limpa o listener ao desmontar
-  }, []);
   return (
 <UserProvider>
   <AccessibilityProvider>

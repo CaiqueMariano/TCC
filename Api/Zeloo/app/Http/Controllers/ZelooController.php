@@ -21,6 +21,9 @@ use App\Models\ExtratoModel;
 use App\Models\ContratoModel;
 use App\Models\FamiliarModel;
 use App\Models\ConversaModel;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Firebase\Factory;
 use App\Models\MensagensModel;
 use App\Models\IdosoModel;
 use App\Models\ProfissionalModel;
@@ -49,6 +52,44 @@ class ZelooController extends Controller
     public function dashboard(){
         return view('index');
     }
+
+
+    /*
+    public function enviarNotificacao($token, $titulo, $mensagem)
+{
+    $SERVER_API_KEY = env('FIREBASE_SERVER_KEY'); // sua chave do Firebase
+
+    $data = [
+        "to" => $token,
+        "notification" => [
+            "title" => $titulo,
+            "body" => $mensagem,
+            "sound" => "default"
+        ],
+        "data" => [
+            "extraData" => "Alguma informação adicional se quiser"
+        ]
+    ];
+
+    $dataString = json_encode($data);
+
+    $headers = [
+        'Authorization: key=' . $SERVER_API_KEY,
+        'Content-Type: application/json',
+    ];
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+    $response = curl_exec($ch);
+    curl_close($ch);
+
+    return $response;
+}*/
+
 // Deixando o grafico mais interativo com dados dinamicos 
 public function DashboardData()
 {
@@ -1298,7 +1339,19 @@ public function aceita(Request $request){
 
            $conversas->save();
 
-
+           /*
+        $idosoFamilia = IdosoFamiliaModel::where('idIdosoFamilia', $servico->idIdosoFamilia)->first();
+        if ($idosoFamilia) {
+            $usuario = UsuarioModel::find($idosoFamilia->idFamiliar); // usuário que vai receber a notificação
+            if ($usuario && $usuario->fcm_token) {
+                $this->enviarNotificacao(
+                    $usuario->fcm_token,
+                    'Novo contrato',
+                    'Você recebeu um novo contrato!'
+                );
+            }
+        }
+*/
 
     return response()->json([
         'success' => true,
