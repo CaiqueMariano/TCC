@@ -1,0 +1,419 @@
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  Keyboard,
+  StyleSheet,
+  Animated,
+  TouchableWithoutFeedback,
+  SafeAreaView,
+} from "react-native";
+import axios from "axios";
+import { API_URL } from "./link";
+import { Audio } from "expo-av";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useAccessibility } from "./AccessibilityContext";
+
+export default function Conversas({ navigation, route }) {
+  const { idUsuario, idProfissional, idConversa: conversaInicial } = route.params;
+  const { scale } = useAccessibility();
+
+  // Agora idConversa existe corretamente
+  const [idConversa, setIdConversa] = useState(conversaInicial || null);
+
+  const [gravando, setGravando] = useState(null);
+  const [gravacao, setGravacao] = useState(null);
+  const [mensagem, setMensagem] = useState("");
+  const [conversa, setConversa] = useState([]);
+
+  // ========== ESCOLHER IMAGEM ===========
+  const escolherImagem = async () => {
+    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (perm.status !== "granted") return alert("Permissão negada!");
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) enviarImagem(result.assets[0].uri);
+  };
+
+  const enviarImagem = async (uri) => {
+    try {
+      const form = new FormData();
+
+      form.append("idConversa", idConversa);
+      form.append("idRemetente", idProfissional);
+      form.append("tipoMensagens", "imagem");
+      form.append("arquivoMensagens", {
+        uri,
+        name: "foto.jpg",
+        type: "image/jpeg",
+      });
+
+      await axios.post(`${API_URL}/api/mandarMensagem`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      carregarMensagens(idConversa);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ========== ÁUDIO ===========
+  useEffect(() => {
+    Audio.requestPermissionsAsync();
+  }, []);
+
+  const iniciarGravacao = async () => {
+    try {
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
+      );
+
+      setGravando(recording);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const pararGravacao = async () => {
+    try {
+      await gravando.stopAndUnloadAsync();
+      const uri = gravando.getURI();
+      setGravando(null);
+      setGravacao(uri);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const enviarAudio = async () => {
+    if (!gravacao) return;
+
+    try {
+      const form = new FormData();
+
+      form.append("idConversa", idConversa);
+      form.append("idRemetente", idProfissional);
+      form.append("tipoMensagens", "audio");
+      form.append("arquivoMensagens", {
+        uri: gravacao,
+        name: "gravacao.m4a",
+        type: "audio/m4a",
+      });
+
+      await axios.post(`${API_URL}/api/mandarMensagem`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      setGravacao(null);
+      carregarMensagens(idConversa);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const tocarAudio = async (uri) => {
+    try {
+      const { sound } = await Audio.Sound.createAsync({ uri });
+      await sound.playAsync();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ========== TECLADO ===========
+  const keyboardHeight = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const show = Keyboard.addListener("keyboardDidShow", (e) => {
+      Animated.timing(keyboardHeight, {
+        toValue: e.endCoordinates.height,
+        duration: 250,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    const hide = Keyboard.addListener("keyboardDidHide", () => {
+      Animated.timing(keyboardHeight, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: false,
+      }).start();
+    });
+
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+
+  // ==================================
+  //     CARREGAR OU CRIAR CONVERSA
+  // ==================================
+  const criarNovaConversa = async () => {
+    try {
+      const resp = await axios.post(`${API_URL}/api/conversar`, {
+        idUsuario,
+        idProfissional,
+      });
+
+      const novoId = resp.data.data.idConversa;
+      setIdConversa(novoId);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    const carregarInicial = async () => {
+      if (conversaInicial) {
+        carregarMensagens(conversaInicial);
+        return;
+      }
+
+      try {
+        const resp = await axios.get(
+          `${API_URL}/api/verConversasFree/${idProfissional}`
+        );
+
+        const conv = resp.data.data.find((c) => c.idUsuario === idUsuario);
+
+        if (conv) {
+          setIdConversa(conv.idConversa);
+          carregarMensagens(conv.idConversa);
+        } else {
+          criarNovaConversa();
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    carregarInicial();
+  }, []);
+
+  // ========== CARREGAR MENSAGENS ===========
+  const carregarMensagens = async (idConversa) => {
+    try {
+      const resp = await axios.get(`${API_URL}/api/getMensagens/${idConversa}`);
+
+      const msgs = resp.data.mensagens.map((m) => ({
+        id: m.idMensagens.toString(),
+        tipo: m.tipoMensagens,
+        texto: m.tipoMensagens === "texto" ? m.conteudoMensagens : "",
+        imagemUri:
+          m.tipoMensagens === "imagem"
+            ? `${API_URL}/storage/${m.arquivoMensagens}`
+            : null,
+        audioUri:
+          m.tipoMensagens === "audio"
+            ? `${API_URL}/storage/${m.arquivoMensagens}`
+            : null,
+        remetente: m.idRemetente == idProfissional ? "cuidador" : "idoso",
+      }));
+
+      setConversa(msgs);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ========== ENVIAR TEXTO ===========
+  const enviarMensagem = async () => {
+    if (!mensagem.trim()) return;
+
+    try {
+      await axios.post(`${API_URL}/api/mandarMensagem`, {
+        idConversa,
+        idRemetente: idProfissional,
+        tipoMensagens: "texto",
+        conteudoMensagens: mensagem,
+      });
+
+      setMensagem("");
+      carregarMensagens(idConversa);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // ================= RENDER =================
+  return (
+    <SafeAreaView style={styles.container}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={{ flex: 1 }}>
+          {/* BARRA SUPERIOR */}
+          <View style={styles.nav}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={28 * scale} color="#202020" />
+            </TouchableOpacity>
+
+            <View style={styles.navInfo}>
+              <Image
+                source={require("../assets/perfilicon.png")}
+                style={styles.perfilFree}
+              />
+              <Text style={styles.freeNome}>Maria Silva</Text>
+            </View>
+            <Ionicons
+              name="ellipsis-vertical"
+              size={24 * scale}
+              color="#202020"
+            />
+          </View>
+
+          {/* LISTA DE MENSAGENS */}
+          <FlatList
+            data={conversa}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View
+                style={[
+                  styles.msgContainer,
+                  item.remetente === "idoso"
+                    ? styles.msgIdoso
+                    : styles.msgCuidador,
+                ]}
+              >
+                {item.tipo === "audio" ? (
+                  <TouchableOpacity onPress={() => tocarAudio(item.audioUri)}>
+                    <Ionicons name="play-circle" size={32} color="#fff" />
+                  </TouchableOpacity>
+                ) : item.tipo === "imagem" ? (
+                  <Image
+                    source={{ uri: item.imagemUri }}
+                    style={{ width: 180, height: 180, borderRadius: 12 }}
+                  />
+                ) : (
+                  <Text style={styles.msgTexto}>{item.texto}</Text>
+                )}
+              </View>
+            )}
+            contentContainerStyle={{ padding: 12 }}
+            showsVerticalScrollIndicator={false}
+          />
+
+          {/* PRÉVIA DO ÁUDIO */}
+          {gravacao && (
+            <View style={styles.previaContainer}>
+              <TouchableOpacity onPress={() => setGravacao(null)}>
+                <Ionicons name="trash-outline" size={32} color="red" />
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={enviarAudio}>
+                <Ionicons name="send" size={32} color="#b08cff" />
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* INPUT */}
+          <Animated.View style={[styles.inputContainer]}>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite uma mensagem..."
+              value={mensagem}
+              onChangeText={setMensagem}
+              multiline
+            />
+
+            <TouchableOpacity style={styles.iconButton} onPress={escolherImagem}>
+              <Ionicons name="image-outline" size={26} color="#202020" />
+            </TouchableOpacity>
+
+            {mensagem.trim() === "" ? (
+              <TouchableOpacity
+                style={styles.enviarButton}
+                onPress={gravando ? pararGravacao : iniciarGravacao}
+              >
+                <Ionicons
+                  name={gravando ? "stop-circle-outline" : "mic"}
+                  size={24}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.enviarButton} onPress={enviarMensagem}>
+                <Ionicons name="send" size={24} color="#fff" />
+              </TouchableOpacity>
+            )}
+          </Animated.View>
+        </View>
+      </TouchableWithoutFeedback>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#fff" },
+  nav: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    justifyContent: "space-between",
+  },
+  navInfo: { flexDirection: "row", alignItems: "center" },
+  perfilFree: { width: 38, height: 38, borderRadius: 20, marginRight: 10 },
+  freeNome: { fontSize: 16, color: "#202020", fontWeight: "600" },
+  msgContainer: {
+    marginVertical: 4,
+    padding: 10,
+    borderRadius: 12,
+    maxWidth: "80%",
+  },
+  msgIdoso: {
+    alignSelf: "flex-start",
+    backgroundColor: "#b08cff",
+  },
+  msgCuidador: {
+    alignSelf: "flex-end",
+    backgroundColor: "#6a4ce0",
+  },
+  msgTexto: { color: "#fff", fontSize: 15 },
+  previaContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: 12,
+    backgroundColor: "#eee",
+  },
+  inputContainer: {
+    marginBottom: 40,
+    flexDirection: "row",
+    padding: 10,
+    alignItems: "flex-end",
+    backgroundColor: "#fff",
+  },
+  input: {
+    flex: 1,
+    maxHeight: 120,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginRight: 10,
+  },
+  iconButton: {
+    marginRight: 10,
+    justifyContent: "center",
+  },
+  enviarButton: {
+    backgroundColor: "#b08cff",
+    padding: 12,
+    borderRadius: 50,
+  },
+});

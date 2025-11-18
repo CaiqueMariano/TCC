@@ -7,7 +7,7 @@ import CustomModal from './Modal';
 const ABAS = [
   { chave: 'ativos', titulo: 'Ativos' },
   { chave: 'pendentes', titulo: 'Pendentes' },
-  { chave: 'cancelados', titulo: 'Cancelados' },
+  { chave: 'cancelado', titulo: 'Cancelados' },
 ];
 
 export default function Contratos({navigation}) {
@@ -15,6 +15,7 @@ export default function Contratos({navigation}) {
   const [abaAtiva, definirAbaAtiva] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
   const [status, setStatus] = useState("");
+  const [precoModal, setPrecoModal] = useState(0);
   const [ativos, setAtivos] = useState([]);
   const [pendentes, setPendentes] = useState([]);
   const [cancelados, setCancelados] = useState([]);
@@ -80,7 +81,9 @@ export default function Contratos({navigation}) {
       });
 
       if (response.data.success) {
+        setPrecoModal(item.precoPersonalizado);
         setModalVisible(true);
+        
       }
 
       if(extrato.data.success){
@@ -106,6 +109,7 @@ export default function Contratos({navigation}) {
           setModalVisible(false);
           navigation.navigate('Dashboard');
         }}
+        preco={precoModal}
       />
      
 
@@ -251,9 +255,20 @@ export default function Contratos({navigation}) {
                     {item.horaInicioServico}
                   </Text>
   
-                  <TouchableOpacity style={styles.botaoM}> 
+                  <View style={styles.botoes}> 
+                   <TouchableOpacity style={styles.botaoM}> 
                     <Text style={styles.mais}>Ver Mais</Text>
                   </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.botaoM} onPress={() => navigation.navigate("Conversas", {
+   idUsuario: item.idUsuario, 
+   idProfissional: user.idProfissional,
+   idConversa: item.idConversa ?? null,
+  })}> 
+                    <Text style={styles.mais}>Conversar</Text>
+                  </TouchableOpacity>
+                  
+                </View>
                 </View>
               </View>
                );
@@ -304,9 +319,6 @@ export default function Contratos({navigation}) {
                   {item.horaInicioServico}
                 </Text>
 
-                <TouchableOpacity style={styles.botaoM}> 
-                  <Text style={styles.mais}>Ver Mais</Text>
-                </TouchableOpacity>
               </View>
             </View>
                );
@@ -324,7 +336,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffff',
   },
   botaoM: {
-    left: 260,  
+    marginRight:10,  
     borderColor: '#b08cff',
     borderWidth: 2,
     width: 90,
@@ -469,4 +481,8 @@ const styles = StyleSheet.create({
   rotuloPP: {
     color: '#b93a3aff',
   },
+
+  botoes:{
+    flexDirection:'row',
+  }
 });

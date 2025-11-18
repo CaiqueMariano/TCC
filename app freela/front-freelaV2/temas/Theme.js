@@ -1,9 +1,16 @@
 export const lightTheme = {
     background: "#fff",
-    card: "#e2d9ff",
-    text: "#333",
-    primary: "#1f6feb",
+    card: "#8b6bc7",
+    text: "#fff",
+    primary: "#b08cff",
     border: "#d2c6ff",
+    textSecondary: "#f0f0f0",
+    avatarBg: "#b08cff",
+    avatarText: "#fff",
+    balanceBg: "#b08cff",
+    balanceText: "#fff",
+    withdrawButton: "#b08cff",
+    withdrawText: "#fff",
   };
   
   export const darkTheme = {

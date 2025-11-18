@@ -88,7 +88,7 @@ export default function SettingsScreens() {
       </View>
 
       {/* Botão de Sair */}
-      <Pressable style={{ paddingVertical: 12, borderColor: "#ff4d4d", borderWidth: 1, borderRadius: 12, marginTop: 20, alignItems: "center" }} onPress={() => alert("Você saiu da conta.")}>
+      <Pressable style={{ paddingVertical: 12, borderColor: "#ff4d4d", borderWidth: 1, borderRadius: 12, marginTop: 20, alignItems: "center" }} onPress={() => navigation.navigate("BemVindo")}>
         <Text style={{ fontSize: 16, color: "#ff4d4d" }}>Sair da conta</Text>
       </Pressable>
     </ScrollView>

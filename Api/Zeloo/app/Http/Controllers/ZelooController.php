@@ -20,6 +20,8 @@ use App\Models\DenunciasFreeModel;
 use App\Models\ExtratoModel;
 use App\Models\ContratoModel;
 use App\Models\FamiliarModel;
+use App\Models\ConversaModel;
+use App\Models\MensagensModel;
 use App\Models\IdosoModel;
 use App\Models\ProfissionalModel;
 use App\Models\ProfissionalServicoModel;
@@ -327,7 +329,114 @@ public function buscarDenuncia(Request $request)
 
 
     /*Funcões da API*/ 
+    
 
+   public function conversar(Request $request){
+
+    $idUsuario = $request->idUsuario;
+    $familiar = IdosoModel::where('idUsuario', $idUsuario)->first();
+    $familia = IdosoFamiliaModel::where('idIdoso', $familiar->idIdoso)->first();
+
+        $conversas = new ConversaModel();
+        $conversas ->idProfissional = $request->idProfissional;
+        $conversas ->idIdosoFamilia = $familia->idIdosoFamilia;
+
+        $conversas->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversas encontrados',
+            'data'=> $conversas
+        ],200);
+   }
+
+   public function mandarMensagem(Request $request){
+    try{
+    $msg = new MensagensModel();
+    $msg->idConversa = $request->idConversa;
+    $msg->idRemetente = $request->idRemetente;
+    $msg->tipoMensagens = $request->tipoMensagens;
+
+    if($request->tipoMensagens === "texto"){
+        $msg->conteudoMensagens = $request->conteudoMensagens;
+    }
+
+    if($request->tipoMensagens !== "texto" && $request->arquivoMensagens){
+        $path = $request->arquivoMensagens->store('mensagens');
+        $msg->arquivoMensagens = $path;
+    }
+
+    $msg->save();
+
+    return response()->json($msg);
+   }catch (\Exception $e) {
+    return response()->json([
+        'error' => 'Erro ao buscar mensagens',
+        'details' => $e->getMessage()
+    ], 500);
+}
+   }
+
+
+
+   public function verConversasFree($id){
+    $conversa = DB::table('tb_conversa')
+         ->join('tb_idoso_familia', 'tb_conversa.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
+         ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
+         ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+         ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
+        ->where('tb_conversa.idProfissional',$id)
+        ->select('tb_conversa.*',  'tb_usuario.*')
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversas encontrados',
+            'data'=> $conversa
+        ],200);
+   }
+
+
+   public function verConversas($id){
+    $conversa = DB::table('tb_conversa')
+         ->join('tb_idoso_familia', 'tb_conversa.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
+         ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
+         ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+         ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
+        ->where('tb_usuario.idUsuario',$id)
+        ->select('tb_conversa.*',  'tb_profissional.*')
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversas encontrados',
+            'data'=> $conversa
+        ],200);
+   }
+   public function getMensagens($id)
+{
+    try {
+        $conversa = ConversaModel::find($id);
+
+
+        
+        $mensagens = MensagensModel::where('idConversa', $id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+
+        return response()->json([
+            'idConversa' => $id,
+            'mensagens' => $mensagens
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'Erro ao buscar mensagens',
+            'details' => $e->getMessage()
+        ], 500);
+    }
+}
 
     public function extrato(Request $request){
         $extrato = new ExtratoModel();
@@ -627,13 +736,6 @@ public function buscarDenuncia(Request $request)
             'nomeUsuario' => $request->nomeUsuario,
             'telefoneUsuario' => $request-> telefoneUsuario,
             'emailUsuario' => $request-> emailUsuario,
-            'dataNasc' => $request-> dataNasc,
-            'numLogradouroUsuario' => $request-> numLogradouroUsuario,
-            'ruaUsuario' => $request-> ruaUsuario,
-            'estadoUsuario' => $request-> estadoUsuario,
-            'bairroUsuario' => $request-> bairroUsuario,
-            'cepUsuario' => $request-> cepUsuario,
-            'cidadeUsuario' => $request-> cidadeUsuario,
 
         ]);
 
@@ -814,6 +916,21 @@ public function vizualizarContratos($idUsuario, $status){
 //CONTRATOS MAS COM PROFISSIONAL
 //ATIVO
 
+public function cancelarContrato($idContrato){
+
+    $cancelar = ContratoModel::find($idContrato);
+
+
+    ContratoModel::where('idContrato', '=', $idContrato)->update(['statusContrato' => 'cancelado']);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Contrato cancelado com sucesso'
+    ], 200);
+}
+        
+   
+
 
 //Cancelado
 public function vizualizarContratosFree($idProfissional, $status){
@@ -824,9 +941,10 @@ public function vizualizarContratosFree($idProfissional, $status){
     ->join('tb_idoso',  'tb_idoso_familia.idIdoso','=', 'tb_idoso.idIdoso')
     ->join('tb_usuario','tb_idoso.idUsuario','=','tb_usuario.idUsuario')
     ->join('tb_profissional', 'tb_profissional_servico.idProfissional', '=', 'tb_profissional.idProfissional')
+    ->join('tb_conversa', 'tb_conversa.idContrato', '=','tb_contrato.idContrato')
     ->where('tb_profissional_servico.idProfissional', $idProfissional)
     ->where('tb_contrato.statusContrato', $status)
-    ->select('tb_contrato.*', 'tb_servico.*', 'tb_usuario.*', 'tb_profissional_servico.*')
+    ->select('tb_contrato.*', 'tb_servico.*', 'tb_usuario.*', 'tb_profissional_servico.*'/*, 'tb_conversa.*'/*/)
     ->get();
 
 
@@ -1027,7 +1145,7 @@ public function vizualizarContratosFree($idProfissional, $status){
         $usuario->telefoneUsuario = $request->telefoneUsuario;
         $usuario->senhaUsuario = bcrypt($request->senhaUsuario);
         $usuario->dataNasc = $request->dataNasc;
-        $usuario->tipoUsuario = $request->tipoUsuario;
+        $usuario->tipoUsuario = 'idoso';
         $usuario->statusUsuario = 'ativo';
 
         $image = $request->file('fotoUsuario');
@@ -1173,6 +1291,14 @@ public function aceita(Request $request){
             $servico -> statusServico = "aceito";
             $servico-> save();
            }
+
+
+           $conversas = new ConversaModel();
+           $conversas->idContrato = $contrato->idContrato;
+
+           $conversas->save();
+
+
 
     return response()->json([
         'success' => true,

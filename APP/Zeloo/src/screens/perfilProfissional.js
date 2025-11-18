@@ -1,11 +1,14 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity,  } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { API_URL } from '../screens/link';
-import { useState, useEffect } from 'react';
-
+import axios from 'axios';
+import { useState, useEffect, useContext } from 'react';
+import { UserContext } from './userContext';
+import Icon from "react-native-vector-icons/Feather";
+import Icons from "react-native-vector-icons/Entypo";
 export default function perfilProfissional({route, navigation}) {
   const { servico } = route.params;
-
+  const {user} = useContext(UserContext);
   const anoNasc = new Date(servico.dataNascProfissional).getFullYear();
   const hoje = new Date();
   const ano = hoje.getFullYear();
@@ -18,6 +21,20 @@ export default function perfilProfissional({route, navigation}) {
   useEffect(() => {
     CalcularIdade();
   }, []);
+
+
+  const favoritar = async () =>{
+    axios.post (`${API_URL}/api/favoritar`,{
+      idUsuario:user.idUsuario,
+      idProfissional:servico.idProfissional
+    })
+    .then(
+      alert('Favoritado!')
+      
+    );
+    navigation.navigate("favoritos")
+    
+  }
   return (
     <View style={styles.container}>
       <View style={styles.topSection}>
@@ -103,9 +120,9 @@ export default function perfilProfissional({route, navigation}) {
       </ScrollView>
 
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity style={[styles.customButton, { backgroundColor: '#b3ecec' }]}>
-          <Ionicons name="document-attach-outline" size={22} color="#000" style={styles.buttonIcon} />
-          <Text style={[styles.buttonText, { color: '#000' }]}>Contratar</Text>
+        <TouchableOpacity style={[styles.customButton, { backgroundColor: '#b3ecec' }]} onPress={()=>favoritar()}>
+          <Icons name="heart" size={22} color="#000" style={styles.buttonIcon} />
+          <Text style={[styles.buttonText, { color: '#000' }]}>Favoritar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.customButton, { backgroundColor: '#d9534f' }]}>
@@ -236,6 +253,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   buttonsContainer: {
+    marginBottom:40,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -261,6 +279,6 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   buttonIcon: {
-    marginRight: 10,
-  },
+    marginRight: 10,
+},
 });

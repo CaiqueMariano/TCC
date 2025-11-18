@@ -87,7 +87,7 @@ export default function Ativos({ navigation }) {
               <EscalarCard style={styles.cardcontratro} maxScale={1.2}>
                 <View style={styles.contractInfo}>
                   <TouchableOpacity
-                    onPress={() => navigation.navigate("perfilProfissional", { servico })}
+                    onPress={() => navigation.navigate("Perfil Profissional", { servico })}
                   >
                     <Image
                       source={{ uri: `${API_URL}/storage/${servico.fotoProfissional}` }}

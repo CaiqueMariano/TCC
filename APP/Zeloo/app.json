@@ -1,6 +1,8 @@
 {
   "expo": {
     "name": "Zeloo",
+    "package": "com.zeloo.app",
+    "googleServicesFile": "./android/google-services.json",
     "slug": "Zeloo",
     "version": "1.0.0",
     "orientation": "portrait",

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,30 @@ import {
   Dimensions,
   StyleSheet,
   Image,
+  TextInput,
+  Keyboard,
   Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { API_URL } from './link';
+import { UserContext } from './userContext';
 import { useNavigation } from '@react-navigation/native';
 import Icon from "react-native-vector-icons/Feather";
 import * as Location from 'expo-location';
 
+const formatarPreco = (valor) => {
+ 
+  let numeros = valor.replace(/\D/g, "");
 
+
+  if (numeros.length === 0) return "";
+
+ 
+  let valorFormatado = (Number(numeros) / 100).toFixed(2);
+
+  return valorFormatado.replace(".", ",");
+};
 const ABAS = [
   { chave: 'Acompanhamento Médico', titulo: 'Médico' },
   { chave: 'Acompanhamento Domiciliar', titulo: 'Domiciliar' },
@@ -26,16 +40,78 @@ const ABAS = [
 ];
 
 export default function Pedidos() {
+  const {user} = useContext(UserContext);
   const [localizacao, setLocalizacao] = useState(null);
   const [erro, setErro] = useState(null);
   const navigation = useNavigation();
   const [abaAtiva, setAbaAtiva] = useState(0);
   const [modalVisivel, setModalVisivel] = useState(false);
+  const [modalAceitar, setModalAceitar] = useState(false);
+  const [modalConfirmar, setModalConfirmar] = useState(false);
   const [itemSelecionado, setItemSelecionado] = useState(null);
   const [servicos, setServicos] = useState([]);
+  const [precoPersonalizado, setPrecoPersonalizado] = useState("");
   const indicador = useRef(new Animated.Value(0)).current;
   const { width } = Dimensions.get('window');
   const larguraAba = width / ABAS.length;
+
+
+  const [tecladoVisivel, setTecladoVisivel] = useState(false);
+
+
+  const precoParaBackend = (valor) => {
+    if (!valor) return 0;
+  
+    // Remove tudo que não é número
+    let numeros = valor.replace(/\D/g, "");
+  
+    // Converte para decimal
+    let convertido = (Number(numeros) / 100).toFixed(2);
+  
+    return convertido; // "12.50"
+  };
+useEffect(() => {
+  const showSub = Keyboard.addListener("keyboardDidShow", () => {
+    setTecladoVisivel(true);
+  });
+
+  const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+    setTecladoVisivel(false);
+  });
+
+  return () => {
+    showSub.remove();
+    hideSub.remove();
+  };
+}, []);
+
+
+
+const aceitar = async () => {
+  try {
+
+    const precoFinal = precoParaBackend(precoPersonalizado);
+    const response = await axios.post(`${API_URL}/api/aceita`, {
+      idServico: itemSelecionado.idServico,
+      idProfissional: user.idProfissional,
+      precoPersonalizado:precoFinal
+    });
+
+    if (response.data.success) {
+     console.log(response.data.message);
+     setModalConfirmar(true);
+     setModalAceitar(false)
+    } else {
+      console.log(response.data.message)
+     setModalAceitar(false);
+    }
+
+  } catch (error) {
+      console.log(error)
+  }
+};
+
+
 
   useEffect(() => {
     (async () => {
@@ -175,6 +251,9 @@ export default function Pedidos() {
     
       calc();
     }, [localizacao, item]);
+
+
+    
   
     return (
       <View style={styles.card}>
@@ -231,7 +310,7 @@ export default function Pedidos() {
 
       <>
       <Text style={styles.rotuloFortaoKm}>Distância:</Text>
-      <Text style={styles.rotuloFortaoKmN}>15 KM</Text>
+      <Text style={styles.rotuloFortaoKmN}>{itemSelecionado.distancia}</Text>
         <Image 
           source={{uri: `${API_URL}/storage/${itemSelecionado.fotoUsuario}` }}
           style={styles.modalImagem}
@@ -265,10 +344,15 @@ export default function Pedidos() {
           Descrição: </Text> {itemSelecionado.descServico}
         </Text>
           <View style={styles.botoes}>
-              <TouchableOpacity style={styles.botaoAcao} onPress={() => navigation.navigate(PerfilIdoso)}> 
+              <TouchableOpacity style={styles.botaoAcao} onPress={() => navigation.navigate("Perfil Idoso", {
+itemSelecionado
+  })}> 
                 <Text style={styles.textoBotao}>Perfil do Idoso</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.botaoAcao} onPress={() => navigation.navigate(PerfilIdoso)}> 
+              <TouchableOpacity style={styles.botaoAcao} onPress={() => {
+    setModalAceitar(true);
+    setModalVisivel(false);
+  }}> 
                 <Text style={styles.textoBotao}>Aceitar</Text>
               </TouchableOpacity>
               </View>
@@ -277,6 +361,96 @@ export default function Pedidos() {
   )};
   </View>
 </Modal>
+
+{/**MODAL VALOR */}
+
+<Modal
+  visible={modalAceitar}
+  transparent={true}
+  animationType="slide"
+  onRequestClose={() => setModalAceitar(false)}
+>
+  <View style={styles.modalAceitar}>
+  {itemSelecionado && (
+    <View style={styles.modalConteudoAceitar}>
+
+      <TouchableOpacity 
+        style={styles.modalFechar}
+        onPress={() => setModalAceitar(false)}
+      >
+        <Ionicons name="close" size={28} color="#333" />
+      </TouchableOpacity>
+
+      <>
+
+      <Text style={styles.valorText}>Digite a proposta de valor:</Text>
+
+      <View style={styles.valorInput} >
+            <Text style={styles.valorPreco}>R$</Text>
+            <TextInput
+                      cursorColor="#b08cff"
+                      style={styles.input}
+                      placeholder=''
+                      autoFocus
+                      placeholderTextColor="#444"
+                      keyboardType="numeric"
+                      maxLength={6} 
+                      value={precoPersonalizado}
+                      onChangeText={(texto) => {
+                        setPrecoPersonalizado(formatarPreco(texto));
+                      }}
+                    />
+        </View>
+{!tecladoVisivel && (
+        <TouchableOpacity style={styles.botaoPreco} onPress={aceitar}> 
+                <Text style={styles.textoBotaoPreco}>Enviar</Text>
+              </TouchableOpacity>
+)}
+         
+      </>
+    </View>
+  )};
+  </View>
+</Modal>
+
+
+{/**Modal confirmação */}
+<Modal
+      animationType="fade"
+      transparent={true}
+      visible={modalConfirmar}
+      onRequestClose={() => setModalConfirmar(false)}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>Serviço Aceito!</Text>
+
+          <Image 
+            source={require('../assets/correct.png')} 
+            style={styles.profileImage} 
+          />
+
+          <Text style={styles.modalMensagem}>
+          Aguarde o pagamento do usuário  
+          </Text>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: '#7C4DFF' }]}
+            onPress={() => navigation.navigate('Contratos')}
+          >
+            <Text style={styles.buttonText}>Ir para contratos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+            onPress={()=> setModalConfirmar(false)}
+          >
+            <Text style={styles.buttonText}>Fechar</Text>
+          </TouchableOpacity>
+
+        </View>
+      </View>
+    </Modal>
 
       {/* Abas */}
       <View style={styles.headerTabs}>
@@ -321,7 +495,7 @@ export default function Pedidos() {
       pegarCoordenadasPorCEP={pegarCoordenadasPorCEP}
       calcularDistancia={calcularDistancia}
       abrirModal={() => {
-        setItemSelecionado(item);
+        setItemSelecionado({ ...item, distancia });
         setModalVisivel(true);
       }}
     />
@@ -335,11 +509,38 @@ const styles = StyleSheet.create({
    safeArea: { 
     flex: 1
    },
+   valorInput:{
+      flexDirection:"row",
+   },
+
    barraAbas: {
     paddingTop: 60,
     backgroundColor: 'white',
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
+  },
+  
+  valorText:{
+    marginLeft:15,
+    fontSize:25,
+    textAlign:'center',
+    marginTop:30,
+  },
+  
+  input:{
+    
+    color: '#b08cff',
+    height:90,
+    marginTop:30,
+    width:'65%',
+    fontSize:50,
+    
+  },
+  valorPreco:{
+    marginLeft: 40,
+    top:41,
+    fontSize:50,
+    color:'#b08cff',
   },
   botaoAba: {
     flex: 1,
@@ -347,6 +548,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
   },
+
+  botaoPreco: {
+   marginTop:25,
+    borderRadius: 16,
+      width:120,
+      paddingBottom:8,
+      paddingTop:8,
+      borderWidth: 2,
+      marginLeft:100,
+      borderColor: '#b08cff' ,
+  },
+
+  textoBotaoPreco: {
+    color: '#b08cff',
+    fontSize: 25,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
   botoes:{
     flexDirection:'row',
   },
@@ -405,6 +625,25 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
    
   },
+
+  modalAceitar: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
+  modalConteudoAceitar: {
+    width: '90%',
+    height: '40%',
+    
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 20,
+    position: 'relative',
+    alignItems: 'flex-start',
+   
+  },
   
   modalFechar: {
     position: 'absolute',
@@ -412,7 +651,7 @@ const styles = StyleSheet.create({
     right: 10,
     padding: 5,
   },
-  
+
   modalImagem: {
     width: 120,
     height: 120,
@@ -655,91 +894,102 @@ pedidoText: {
     fontWeight: '600',
   },
 // === MODAL ===
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.55)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
 
-  modalContainer: {
-    width: '80%',
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    padding: 20,
-    alignItems: 'center',
-  },
-
-
-  modalFoto: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginBottom: 12,
-  },
-
-  modalInfo: { marginBottom: 12 },
+modalContainer: {
+  width: '80%',
+  backgroundColor: '#fff',
+  borderRadius: 14,
+  padding: 20,
+  alignItems: 'center',
+},
 
 
-  actionButton: {
-    width: '100%',
-    paddingVertical: 12,
-    borderRadius: 10,
-    marginTop: 10,
-    alignItems: 'center',
-  },
+modalFoto: {
+  width: 100,
+  height: 100,
+  borderRadius: 10,
+  marginBottom: 12,
+},
 
-  openButton: {
-    padding: 12,
-    backgroundColor: '#ddd',
-    borderRadius: 10,
-    marginBottom: 20,
-    alignItems: 'center',
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    padding: 25,
-    borderRadius: 12,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalText: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  modalReceivedText: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    fontWeight: '600',
-  },
+modalInfo: { marginBottom: 12 },
 
-  modalFoto: {
-    width: 120,            
-    height: 120,           
-    borderRadius: 60,      
-    marginBottom: 15,
-    resizeMode: 'cover',
-  },
-  modalReceivedText:{
-    fontSize: 18,
-    fontWeight: '600',
-    marginLeft: 12,         
-    color: '#83DBC2',
-  },
-  modalInfo:{
-    flexDirection: 'row',      
-    alignItems: 'center',    
-    marginBottom: 20,       
-    justifyContent: 'flex-start',
-  }
-  
+
+actionButton: {
+  width: '100%',
+  paddingVertical: 12,
+  borderRadius: 10,
+  marginTop: 10,
+  alignItems: 'center',
+},
+
+openButton: {
+  padding: 12,
+  backgroundColor: '#ddd',
+  borderRadius: 10,
+  marginBottom: 20,
+  alignItems: 'center',
+},
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  backgroundColor: 'white',
+  padding: 25,
+  borderRadius: 12,
+  width: '80%',
+  alignItems: 'center',
+},
+modalText: {
+  fontSize: 20,
+  fontWeight: '600',
+  marginBottom: 10,
+},
+
+modalMensagem: {
+  fontSize: 15,
+  fontWeight: '400',
+  marginBottom: 10,
+},
+modalReceivedText: {
+  fontSize: 22,
+  fontWeight: 'bold',
+  fontWeight: '600',
+},
+
+modalFoto: {
+  width: 80,            
+  height: 80,           
+  borderRadius: 60,      
+  marginBottom: 15,
+  resizeMode: 'cover',
+},
+profileImage: {
+  width: 54,
+  height: 54,
+  borderRadius: 10,
+  marginRight: 10,
+},
+modalReceivedText:{
+  fontSize: 18,
+  fontWeight: '600',
+  marginLeft: 12,         
+  color: '#83DBC2',
+},
+modalInfo:{
+  flexDirection: 'row',      
+  alignItems: 'center',    
+  marginBottom: 20,       
+  justifyContent: 'flex-start',
+},
   
 });
   

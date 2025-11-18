@@ -20,6 +20,13 @@ export default function Contrato({ navigation }) {
     .catch(error => console.log(error));
   },[])
 
+  const cancelar = async (servico) =>{
+    axios.delete(`${API_URL}/api/cancelarContrato/${servico.idContrato}`)
+    .then(response=>{
+      console.log("Contrato apagado");
+      navigation.replace("Apagar");
+    })
+  }
 
 
       
@@ -58,15 +65,17 @@ export default function Contrato({ navigation }) {
         paddingHorizontal: 10,
         alignItems: 'center',
       }} style={styles.content}>
+         <Text style={styles.subtitle}>
+        Você tem até 2 dias para pagar ou cancelar um serviço
+      </Text>
         
         {servicos.length === 0 ? (
   <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
 ) : (
   servicos.map((servico, index) => (
+    
     <>
-      <Text style={styles.subtitle}>
-        Você tem até 2 dias para pagar ou cancelar um serviço
-      </Text>
+     
 
       <View key={index} style={styles.cardcontratro}>
         <TouchableOpacity
@@ -81,7 +90,7 @@ export default function Contrato({ navigation }) {
 
      
         <View style={styles.contractInfo}>
-        <TouchableOpacity onPress={()=> navigation.navigate("perfilProfissional", {servico})}>
+        <TouchableOpacity onPress={()=> navigation.navigate("Perfil Profissional", {servico})}>
           <Image
             source={ {uri: `${API_URL}/storage/${servico.fotoProfissional}` }}
             style={styles.foto}
@@ -104,11 +113,11 @@ export default function Contrato({ navigation }) {
 
         <View style={{ width: '100%', paddingLeft: 20 }}>
           <Text style={styles.detalhes}>Dia: {servico.dataServico}</Text>
-          <Text style={styles.detalhes}>Horário: {servico.horaInicioServico}</Text>
+          <Text style={styles.detalhes}>Preço: {servico.precoPersonalizado}</Text>
           <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.button2} >
+            <TouchableOpacity style={styles.button2} onPress={()=> cancelar(servico)} >
               <Text style={styles.buttonText2}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate("telaPagamento", {servico})}>
@@ -117,19 +126,13 @@ export default function Contrato({ navigation }) {
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.soundButton}
-          onPress={() => alert('Auxiliar auditivo')}
-        >
-          <Image
-            source={require('../../assets/images/audio.png')}
-            style={styles.soundIcon}
-          />
-        </TouchableOpacity>
+        
       </View>
     </>
   ))
 )}
+
+
       </ScrollView>
     </View>
   );
