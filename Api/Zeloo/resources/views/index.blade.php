@@ -10,10 +10,10 @@
     
     <style>
         :root {
-            --primary-green: #4CAF50;
-            --light-green: #81C784;
-            --lighter-green: #A5D6A7;
-            --very-light-green: #C8E6C9;
+            --primary-blue: #206bb6;
+            --light-blue: #1876d4c7;
+            --lighter-blue: #5b97d3ff;
+            --very-light-blue: #78abdfff;
             --white: #ffffff;
             --light-gray: #f8f9fa;
             --text-dark: #2c3e50;
@@ -24,62 +24,86 @@
             background-color: var(--white);
             color: var(--text-dark);
         }
-        
-        .navbar-nav .nav-link {
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .navbar-nav .nav-link:hover {
-            color: var(--primary-green) !important;
-        }
-                 .navbar-nav .nav-link.active {
-             color: var(--primary-green) !important;
-         }
-         
-         .navbar {
-             background-color: rgba(255, 255, 255, 0.95) !important;
-             backdrop-filter: blur(10px);
-             transition: all 0.3s ease;
-         }
-         
-         .navbar.scrolled {
-             background-color: rgba(255, 255, 255, 0.98) !important;
-             box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-         }
-         
-         .navbar-nav {
-             margin: 0 auto;
-         }
+        /* SIDEBAR */
+    .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 230px;
+    height: 100%;
+    background: 'white';
+    padding: 20px 0;
+    border-right: 1px solid #eee;
+    box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    }
 
-         .navbar-brand {
-             padding: 0;
-             margin-right: 2rem;
-         }
+   .sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
 
-         .navbar-brand img {
-             transition: opacity 0.3s ease;
-         }
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
 
-         .navbar-brand:hover img {
-             opacity: 0.8;
-         }
-        
+  .sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 15px;
+    transition: .3s;
+}
+
+.sidebar-menu a:hover {
+    background: #f1f8f2;
+    color: #206bb6;
+}
+
+.sidebar-menu a.active {
+    background: #e8f5e9;
+    color: #206bb6;
+    font-weight: 700;
+    }
+
+        .sidebar-menu i {
+    font-size: 1.2rem;
+     }
+
+      .sidebar .logout a {
+    color: red !important;
+    }
+
+/* Empurrar todo o conteúdo da página para o lado: */
+body {
+    margin-left: 230px !important;
+      }
         .btn-primary {
-            background-color: var(--primary-green);
-            border-color: var(--primary-green);
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
         }
         .btn-primary:hover {
-            background-color: var(--light-green);
-            border-color: var(--light-green);
+            background-color: var(--light-blue);
+            border-color: var(--light-blue);
         }
         
         .btn-outline-primary {
-            color: var(--primary-green);
-            border-color: var(--primary-green);
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
         }
         .btn-outline-primary:hover {
-            background-color: var(--primary-green);
-            border-color: var(--primary-green);
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue);
         }
         
         .stats-card {
@@ -113,85 +137,86 @@
         }
         
         .bg-primary {
-            background-color: var(--primary-green) !important;
+            background-color: var(--primary-blue) !important;
         }
         
         .bg-success {
-            background-color: var(--light-green) !important;
+            background-color: var(--light-blue) !important;
         }
         
         .text-success {
-            color: var(--primary-green) !important;
+            color: var(--primary-blue) !important;
         }
         
         .table-light {
-            background-color: var(--very-light-green) !important;
+            background-color: var(--very-light-blue) !important;
         }
         
         .badge.bg-primary {
-            background-color: var(--primary-green) !important;
+            background-color: var(--primary-blue) !important;
         }
         
         .badge.bg-success {
-            background-color: var(--light-green) !important;
+            background-color: var(--light-blue) !important;
         }
+        .text-primary {
+        color: var(--primary-green) !important;
+}
+
         .logout{
             color:red;
         }
     </style>
 </head>
 <body>
-         <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light sticky-top" id="mainNavbar">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <img src="{{url('images/zeloo-light.png')}}" alt="Zeloo" height="40">
+        <!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="{{url('images/zeloo-light.png')}}" alt="Zeloo" height="60">
+        
+    </div>
+
+    <ul class="sidebar-menu">
+        <li>
+            <a href="{{url('/dashboard')}}" class="active">
+                <i class="bi bi-speedometer2"></i> Dashboard
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        </li>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{{url('/dashboard')}}">
-                            <i class="bi bi-speedometer2 me-1"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('denuncias')}}">
-                            <i class="bi bi-shield-exclamation me-1"></i>
-                            Analisar Denúncias
-                        </a>
-                    </li>
+        <li>
+            <a href="{{url('denuncias')}}">
+                <i class="bi bi-shield-exclamation"></i> Analisar Denúncias
+            </a>
+        </li>
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('denunciados')}}">
-                            <i class="bi bi-shield-exclamation me-1"></i>
-                            Analisar Respostas
-                        </a>
-                    </li>
-                   
-                    
-                </ul>
-                <a class="nav-link" href="{{url('/logoutUser')}}">
-                           <t class="logout"> LOGOUT</t>
-                </a>
-            </div>
-        </div>
-    </nav>
+        <li>
+            <a href="{{url('denunciados')}}">
+                <i class="bi bi-clipboard-check"></i> Analisar Respostas
+            </a>
+        </li>
 
-         <!-- Header da Seção -->
-     <div class="container-fluid bg-light py-3">
+        <li class="logout">
+            <a href="{{url('/logoutUser')}}">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </li>
+    </ul>
+</div>
+
+       <!-- Header da Seção -->
+<div class="container-fluid py-3" style="background-color: #206bb6;">
+
     <div class="container">
-             <h2 class="h4 mb-0 text-primary">
-                 <i class="bi bi-speedometer2 me-2"></i>
-                 Dashboard
-             </h2>
-             <p class="text-muted mb-0 mt-1">Visão geral do sistema de cuidado aos idosos</p>
-         </div>
-     </div>
+        <h2 class="h4 mb-0 text-white">
+            <i class="bi bi-speedometer2 me-2"></i>
+            Dashboard
+        </h2>
+
+        <p class="mb-0 mt-1" style="color: #e6e6e6;">
+            Visão geral do sistema de cuidado aos idosos
+        </p>
+    </div>
+</div>
 
      <!-- Cards de Estatísticas Rápidas -->
      <div class="container my-4">
@@ -200,11 +225,6 @@
                  <div class="card stats-card border-0 shadow-sm h-100">
                      <div class="card-body">
                          <div class="d-flex align-items-center">
-                             <div class="flex-shrink-0">
-                                 <div class="bg-danger bg-opacity-10 rounded-circle p-3">
-                                     <i class="bi bi-exclamation-triangle text-danger" style="font-size: 1.5rem;"></i>
-                                 </div>
-                             </div>
                              <div class="flex-grow-1 ms-3">
                                                                   <h6 class="card-title text-muted mb-1">Total de Reclamações</h6>
                                   <h3 class="mb-0 fw-bold text-danger">847</h3>
@@ -222,9 +242,6 @@
                      <div class="card-body">
                          <div class="d-flex align-items-center">
                              <div class="flex-shrink-0">
-                                 <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                     <i class="bi bi-currency-dollar text-success" style="font-size: 1.5rem;"></i>
-                                 </div>
                              </div>
                              <div class="flex-grow-1 ms-3">
                                                                   <h6 class="card-title text-muted mb-1">Cuidadores Ativos</h6>
@@ -245,15 +262,33 @@
       <div style="text-align: center; margin-top: 20px;">
     <a href="{{ route('download.dashboard.pdf') }}" 
        class="btn btn-primary" 
-       style="display:inline-block; background-color:#4DEB6F; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; transition:0.3s;">
+       style="display:inline-block; background-color:#206bb6; color:#fff; padding:10px 20px; border-radius:8px; text-decoration:none; font-weight:bold; transition:0.3s;">
        📄 Baixar Relatório PDF
     </a>
 </div>
 
 
-    <!-- Gráficos -->
-    <div class="container mb-5">
-        <div class="row">
+<div class="container my-4">
+    <div class="row">
+        <!-- Gráfico de Idosos Ativos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-heart-pulse text-primary me-2"></i>
+                        Idosos Ativos
+                    </h5>
+                    <p class="text-muted mb-0 mt-1">Situação atual do sistema</p>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="idososAtivosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+   
             <!-- Gráfico de Reclamações -->
             <div class="col-lg-6 mb-4">
                 <div class="card border-0 shadow-sm h-100">
@@ -351,139 +386,132 @@
      
 <script>
 document.addEventListener('DOMContentLoaded', async function() {
-     const response = await fetch("{{ url('/dashboard-data') }}");
+    try {
+        const response = await fetch("{{ url('/dashboard-data') }}");
+        const data = await response.json();
 
-    const data = await response.json();
-        
-    document.addEventListener("DOMContentLoaded", async () => {
-        try {
-            const response = await fetch("/dashboard-data"); // rota do Laravel
-            const data = await response.json();
+        if (data.semDados) {
+            const aviso = document.createElement("div");
+            aviso.innerText = "Sem dados disponíveis no momento.";
+            aviso.style.textAlign = "center";
+            aviso.style.fontWeight = "bold";
+            aviso.style.color = "gray";
+            document.body.prepend(aviso);
+            return;
+        }
 
-            if (data.semDados) {
-                // 🚨 Exibe aviso se não houver dados
-                const aviso = document.createElement("div");
-                aviso.innerText = "Sem dados disponíveis no momento.";
-                aviso.style.textAlign = "center";
-                aviso.style.fontWeight = "bold";
-                aviso.style.color = "gray";
-                document.getElementById("graficoContainer")?.appendChild(aviso);
-                return;
+       
+        const idososAtivosCtx = document.getElementById('idososAtivosChart');
+        new Chart(idososAtivosCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ativos', 'Inativos'],
+                datasets: [{
+                    data: [data.idososAtivos, data.idososInativos],
+                    backgroundColor: ['#206bb6', '#C8E6C9'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
             }
+        });
 
-            const ctx = document.getElementById("graficoDenuncias")?.getContext("2d");
-            if (!ctx) return;
+    
 
-            new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: Object.keys(data.tiposReclamacoes),
-                    datasets: [{
-                        label: "Total de Denúncias",
-                        data: Object.values(data.tiposReclamacoes),
-                        borderWidth: 1,
-                        backgroundColor: "rgba(54, 162, 235, 0.6)"
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
+    
+        const reclamacoesCtx = document.getElementById('reclamacoesChart');
+        new Chart(reclamacoesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                datasets: [{
+                    label: 'Reclamações',
+                    data: data.reclamacoesPorMes,
+                    borderColor: '#206bb6',
+                    backgroundColor: 'rgba(76,175,80,0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-        } catch (error) {
-            console.error("Erro ao carregar dados do dashboard:", error);
-            alert("Ocorreu um erro ao carregar o gráfico.");
-        }
-    });
-    // === Reclamações ===
-    const reclamacoesCtx = document.getElementById('reclamacoesChart');
-    new Chart(reclamacoesCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            datasets: [{
-                label: 'Reclamações',
-                data: data.reclamacoesPorMes,
-                borderColor: '#4CAF50',
-                backgroundColor: 'rgba(76,175,80,0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+        // === Cuidadores ===
+        const cuidadoresCtx = document.getElementById('cuidadoresChart');
+        new Chart(cuidadoresCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                datasets: [{
+                    label: 'Cuidadores Ativos',
+                    data: data.cuidadoresAtivos,
+                    backgroundColor: '#206bb6'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-    // === Cuidadores ===
-    const cuidadoresCtx = document.getElementById('cuidadoresChart');
-    new Chart(cuidadoresCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            datasets: [{
-                label: 'Cuidadores Ativos',
-                data: data.cuidadoresAtivos,
-                backgroundColor: '#4CAF50'
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
+        // === Tipos de Reclamações ===
+        const tiposCtx = document.getElementById('tiposReclamacoesChart');
+        new Chart(tiposCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(data.tiposReclamacoes),
+                datasets: [{
+                    data: Object.values(data.tiposReclamacoes),
+                    backgroundColor: ['#206bb6','#5b97d3ff','#78abdfff','#C8E6C9','#E8F5E9']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
 
-    // === Tipos de Reclamações ===
-    const tiposCtx = document.getElementById('tiposReclamacoesChart');
-    new Chart(tiposCtx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(data.tiposReclamacoes),
-            datasets: [{
-                data: Object.values(data.tiposReclamacoes),
-                backgroundColor: ['#4CAF50','#81C784','#A5D6A7','#C8E6C9','#E8F5E9']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
-    // === Receita Mensal ===
-const receitaCtx = document.getElementById('receitaChart');
-new Chart(receitaCtx, {
-    type: 'bar',
-    data: {
-        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-        datasets: [{
-            label: 'Receita (R$)',
-            data: data.receitaMensal,
-            backgroundColor: '#81C784'
-        }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-});
+        // === Receita Mensal ===
+        const receitaCtx = document.getElementById('receitaChart');
+        new Chart(receitaCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
+                datasets: [{
+                    label: 'Receita (R$)',
+                    data: data.receitaMensal,
+                    backgroundColor: '#206bb6'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-// === Rentabilidade Anual ===
-const rentabilidadeCtx = document.getElementById('rentabilidadeChart');
-new Chart(rentabilidadeCtx, {
-    type: 'line',
-    data: {
-        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-        datasets: [{
-            label: 'Rentabilidade (%)',
-            data: data.rentabilidadeAnual,
-            borderColor: '#4CAF50',
-            backgroundColor: 'rgba(76,175,80,0.1)',
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4
-        }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-});
+        // === Rentabilidade Anual ===
+        const rentabilidadeCtx = document.getElementById('rentabilidadeChart');
+        new Chart(rentabilidadeCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+                datasets: [{
+                    label: 'Rentabilidade (%)',
+                    data: data.rentabilidadeAnual,
+                    borderColor: '#206bb6',
+                    backgroundColor: 'rgba(76,175,80,0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar dados do dashboard:", error);
+        alert("Ocorreu um erro ao carregar o gráfico.");
+    }
 });
 </script>
-
 </body>
 </html>
