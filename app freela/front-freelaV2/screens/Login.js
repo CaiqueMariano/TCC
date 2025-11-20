@@ -1,11 +1,20 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Alert, TouchableOpacity, Image, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
 
 export default function Login() {
   const navigation = useNavigation();
+  const [emailProfissional, setEmailProfissional] = useState('');
+  const [senhaProfissional, setSenhaProfissional] = useState('');
+
+  //EMAIL
+const validarEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
   return (
     <Background>
       <View style={styles.logoWrapper}>
@@ -20,12 +29,16 @@ export default function Login() {
             placeholderTextColor="#444"
             keyboardType="email-address"
             autoCapitalize="none"
+            value={emailProfissional}
+            onChangeText={setEmailProfissional}
           />
           <TextInput
             style={styles.input}
             placeholder="Senha"
             placeholderTextColor="#444"
             secureTextEntry
+            value={senhaProfissional}
+            onChangeText={setSenhaProfissional}
           />
           <View style={styles.buttonRow}>
             <TouchableOpacity
@@ -34,12 +47,25 @@ export default function Login() {
             >
               <Text style={[styles.buttonText, styles.buttonTextSecondary]}>Cadastro</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.buttonPrimary]}
-              onPress={() => navigation.navigate('Home')}
-            >
-              <Text style={styles.buttonText}>Logar</Text>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.button, styles.buttonPrimary]}
+                onPress={() => {
+                  if (!validarEmail(emailProfissional)) {
+                    Alert.alert("E-mail inválido", "Digite um e-mail válido.");
+                    return;
+                  }
+
+                  if (!senhaProfissional.trim()) {
+                    Alert.alert("Senha inválida", "Digite sua senha.");
+                    return;
+                  }
+
+                  navigation.navigate('Home');
+                }}
+              >
+                <Text style={styles.buttonText}>Entrar</Text>
+              </TouchableOpacity>
+
           </View>
         </View>
         <StatusBar style="light" />

@@ -6,6 +6,8 @@ import { useTheme } from '../temas/ThemeContext';
 import Background from '../components/Background';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
+import DropDownPicker from 'react-native-dropdown-picker';
+
 
 const { width } = Dimensions.get("window");
 
@@ -26,18 +28,90 @@ export default function Cadastro() {
   const [mostrarDropdownArea, setMostrarDropdownArea] = useState(false);
   const [servicosOferecidos, setServicosOferecidos] = useState('');
   const [imagem, setImagem] = useState(null);
+  const [cpf, setCpf] = useState('');
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState('');
+  const [dataNasc, setDataNasc] = useState('');
+  const [formatarData, setFormatarData] = useState('');
+
+  //cpf
+  const validarCPF = (cpf) => {
+  const apenasNumeros = cpf.replace(/\D/g, '');
+
+  if (apenasNumeros.length !== 11) return false;
+
+  if (/^(\d)\1{10}$/.test(apenasNumeros)) return false;
+
+  let soma = 0;
+  for (let i = 0; i < 9; i++) {
+    soma += parseInt(apenasNumeros.charAt(i)) * (10 - i);
+  }
+
+  let digito1 = 11 - (soma % 11);
+  if (digito1 >= 10) digito1 = 0;
+
+  soma = 0;
+  for (let i = 0; i < 10; i++) {
+    soma += parseInt(apenasNumeros.charAt(i)) * (11 - i);
+  }
+
+  let digito2 = 11 - (soma % 11);
+  if (digito2 >= 10) digito2 = 0;
+
+  return digito1 === parseInt(apenasNumeros.charAt(9)) &&
+         digito2 === parseInt(apenasNumeros.charAt(10));
+};
+
+const formatarCpf = (texto) => {
+  let cpf = texto.replace(/\D/g, '');
+
+  if (cpf.length > 11) cpf = cpf.slice(0, 11);
+
+  if (cpf.length > 9) {
+    cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+  } else if (cpf.length > 6) {
+    cpf = cpf.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+  } else if (cpf.length > 3) {
+    cpf = cpf.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+  }
+
+  setCpf(cpf);
+};
+
+//EMAIL
+const validarEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
 
   // Formatações simples
-  const formatarTelefone = (texto) => {
-    let numeros = texto.replace(/\D/g, '');
-    if (numeros.length > 11) numeros = numeros.slice(0, 11);
-    if (numeros.length > 6) {
-      numeros = numeros.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
-    } else if (numeros.length > 2) {
-      numeros = numeros.replace(/(\d{2})(\d{1,4})/, '($1) $2');
-    }
-    setTelefoneProfissional(numeros);
-  };
+const formatarTelefone = (texto) => {
+  let numeros = texto.replace(/\D/g, '');
+  if (numeros.length > 11) numeros = numeros.slice(0, 11);
+
+  if (numeros.length > 6) {
+    numeros = numeros.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
+  } else if (numeros.length > 2) {
+    numeros = numeros.replace(/(\d{2})(\d{1,4})/, '($1) $2');
+  }
+
+  setTelefoneProfissional(numeros);
+};
+
+const validarTelefone = (telefone) => {
+  const apenasNumeros = telefone.replace(/\D/g, '');
+
+  // fixo: 10 dígitos
+  if (apenasNumeros.length === 10) return true;
+
+  // celular: 11 dígitos e começando com 9
+  if (apenasNumeros.length === 11 && apenasNumeros[2] === '9') return true;
+
+  return false;
+};
+
 
   const formatarValor = (texto) => {
     let numeros = texto.replace(/[^\d]/g, '');
@@ -109,6 +183,59 @@ export default function Cadastro() {
       ))}
     </View>
   );
+
+  const avancarEtapa = () => {
+  if (etapa === 1) {
+
+    if (!nomeProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu nome completo.");
+      return;
+    }
+
+    if (!cpf.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu CPF.");
+      return;
+    }
+
+    if (!validarCPF(cpf)) {
+      Alert.alert("CPF inválido", "Digite um CPF válido.");
+      return;
+    }
+
+    if (!emailProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu e-mail.");
+      return;
+    }
+
+    if (!validarEmail(emailProfissional)) {
+      Alert.alert("E-mail inválido", "Digite um e-mail válido.");
+      return;
+    }
+
+    if (!telefoneProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu telefone.");
+      return;
+    }
+
+    if (!validarTelefone(telefoneProfissional)) {
+      Alert.alert("Telefone inválido", "Digite um telefone válido.");
+      return;
+    }
+
+    if (!senhaProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite sua senha.");
+      return;
+    }
+  }
+
+  if (etapa < 3) {
+    setEtapa(etapa + 1);
+  } else {
+    Alert.alert('Sucesso', 'Cadastro concluído!');
+    navigation.goBack();
+  }
+};
+
   return (
     <Background>
       <View style={styles.logoWrapper}>
@@ -123,32 +250,39 @@ export default function Cadastro() {
             <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
               <TextInput
                 style={styles.input}
-                placeholder="Nome profissional"
+                placeholder="Nome Completo"
                 placeholderTextColor="#444"
                 value={nomeProfissional}
                 onChangeText={setNomeProfissional}
               />
               <TextInput
                 style={styles.input}
-                placeholder="E-mail profissional"
+                placeholder="CPF"
+                placeholderTextColor="#444"
+                keyboardType="numeric"
+                value={cpf}
+                onChangeText={formatarCpf}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="E-mail"
                 placeholderTextColor="#444"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={emailProfissional}
                 onChangeText={setEmailProfissional}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Telefone profissional"
-                placeholderTextColor="#444"
-                keyboardType="phone-pad"
-                value={telefoneProfissional}
-                onChangeText={formatarTelefone}
-              />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Telefone"
+                  keyboardType="numeric"
+                  value={telefoneProfissional}
+                  onChangeText={formatarTelefone}
+                />
               <View style={styles.senhaContainer}>
                 <TextInput
                   style={styles.senhaInput}
-                  placeholder="Senha profissional"
+                  placeholder="Senha"
                   placeholderTextColor="#444"
                   secureTextEntry={!mostrarSenha}
                   value={senhaProfissional}
@@ -165,60 +299,31 @@ export default function Cadastro() {
             </ScrollView>
           )}
 
-          {etapa === 2 && (
-            <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
-              <TextInput
-                style={[styles.input, styles.textarea]}
-                placeholder="Biografia"
-                placeholderTextColor="#444"
-                value={biografia}
-                onChangeText={setBiografia}
-                multiline
-                textAlignVertical="top"
+        {etapa === 2 && (
+            <View style={styles.scrollArea} contentContainerStyle={styles.scrollContent} >
+              <View style={styles.dropdowncontainerV} >
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                placeholder="Gênero"
+                setItems={setItems}
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropDownContainer}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Valor mínimo (ex: R$ 50,00)"
-                placeholderTextColor="#444"
+            </View>
+           
+               <TextInput 
+                style={styles.input} 
+                placeholder="Data de nascimento" 
                 keyboardType="numeric"
-                value={valorMinimo}
-                onChangeText={formatarValor}
+                value={dataNasc}
+                onChangeText={formatarData}
               />
-              <View style={styles.dropdownContainer}>
-                <TouchableOpacity style={styles.dropdownHeader} onPress={() => setMostrarDropdownArea(!mostrarDropdownArea)}>
-                  <Text style={styles.dropdownHeaderText}>{areaAtuacao || 'Área de atuação'}</Text>
-                  <Ionicons name={mostrarDropdownArea ? 'chevron-up' : 'chevron-down'} size={20} color="#444" />
-                </TouchableOpacity>
-                {mostrarDropdownArea && (
-                  <View style={styles.dropdownList}>
-                    {[
-                      'Cuidador de idosos',
-                      'Serviço de compras',
-                      'Transporte',
-                      'Acompanhante médico',
-                      'Enfermagem',
-                    ].map((opcao) => (
-                      <TouchableOpacity
-                        key={opcao}
-                        style={styles.dropdownItem}
-                        onPress={() => { setAreaAtuacao(opcao); setMostrarDropdownArea(false); }}
-                      >
-                        <Text style={styles.dropdownItemText}>{opcao}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                )}
-              </View>
-              <TextInput
-                style={[styles.input, styles.textarea]}
-                placeholder="Serviços oferecidos (descreva)"
-                placeholderTextColor="#444"
-                value={servicosOferecidos}
-                onChangeText={setServicosOferecidos}
-                multiline
-                textAlignVertical="top"
-              />
-            </ScrollView>
+              
+            </View>
           )}
 
           {etapa === 3 && (
@@ -248,24 +353,16 @@ export default function Cadastro() {
                 {etapa === 1 ? 'Cancelar' : 'Voltar'}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.button, styles.buttonPrimary]}
-              onPress={() => {
-                if (etapa < 3) {
-                  setEtapa(etapa + 1);
-                } else {
-                  // Finalizar cadastro - aqui você pode integrar com sua API
-                  Alert.alert('Sucesso', 'Cadastro concluído!');
-                  navigation.goBack();
-                }
-              }}
-            >
-              <Text style={styles.buttonText}>
-                {etapa < 3 ? 'Seguinte' : 'Finalizar'}
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.button, styles.buttonPrimary]}
+                onPress={avancarEtapa}
+              >
+                <Text style={styles.buttonText}>
+                  {etapa < 3 ? 'Seguinte' : 'Finalizar'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
         <StatusBar style="light" />
       </View>
     </Background>
