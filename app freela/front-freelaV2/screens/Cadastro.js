@@ -7,7 +7,7 @@ import Background from '../components/Background';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import DropDownPicker from 'react-native-dropdown-picker';
-
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const { width } = Dimensions.get("window");
 
@@ -36,8 +36,8 @@ export default function Cadastro() {
   { label: "Feminino", value: "feminino" },
   { label: "Outro", value: "outro" },
 ]);
-  const [dataNasc, setDataNasc] = useState('');
-  const [formatarData, setFormatarData] = useState('');
+  const [dataNasc, setDataNascUsuario] = useState(null);
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
   //cpf
   const validarCPF = (cpf) => {
@@ -66,6 +66,43 @@ export default function Cadastro() {
   return digito1 === parseInt(apenasNumeros.charAt(9)) &&
          digito2 === parseInt(apenasNumeros.charAt(10));
 };
+
+  const formatarData = (texto) => {
+  // Remove tudo que não é número
+  let numeros = texto.replace(/\D/g, '');
+
+  // Limita a 8 dígitos
+  if (numeros.length > 8) numeros = numeros.slice(0, 8);
+
+  // Formata DD/MM/AAAA
+  if (numeros.length >= 5) {
+    numeros = numeros.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
+  } else if (numeros.length >= 3) {
+    numeros = numeros.replace(/(\d{2})(\d{1,2})/, '$1/$2');
+  }
+
+  setDataNascUsuario(numeros);
+};
+
+  const validarData = (data) => {
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data)) return false;
+
+    const [dia, mes, ano] = data.split('/').map(Number);
+
+    if (ano < 1900 || ano > new Date().getFullYear()) return false;
+    if (mes < 1 || mes > 12) return false;
+    if (dia < 1 || dia > 31) return false;
+
+    const dataObj = new Date(ano, mes - 1, dia);
+
+    return (
+      dataObj.getFullYear() === ano &&
+      dataObj.getMonth() + 1 === mes &&
+      dataObj.getDate() === dia
+    );
+  };
+
+
 
 const formatarCpf = (texto) => {
   let cpf = texto.replace(/\D/g, '');
@@ -188,7 +225,43 @@ const validarTelefone = (telefone) => {
     </View>
   );
 
-  const avancarEtapa = () => {
+  const validarEtapa2 = () => {
+
+  if (!value) {
+    Alert.alert("Campo obrigatório", "Selecione seu gênero.");
+    return false;
+  }
+
+  if (!dataNasc) {
+    Alert.alert("Campo obrigatório", "Selecione sua data de nascimento.");
+    return false;
+  }
+
+  if (typeof dataNasc === "string" && !validarData(dataNasc)) {
+    Alert.alert("Data inválida", "Escolha uma data de nascimento válida.");
+    return false;
+  }
+
+  if (dataNasc instanceof Date) {
+    const hoje = new Date();
+    const idade = hoje.getFullYear() - dataNasc.getFullYear();
+    const mes = hoje.getMonth() - dataNasc.getMonth();
+    const dia = hoje.getDate() - dataNasc.getDate();
+
+    const idadeFinal = mes < 0 || (mes === 0 && dia < 0) ? idade - 1 : idade;
+
+    if (idadeFinal < 18) {
+      Alert.alert("Idade inválida", "Você deve ter pelo menos 18 anos.");
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const avancarEtapa = () => {
+
+
   if (etapa === 1) {
 
     if (!nomeProfissional.trim()) {
@@ -232,13 +305,24 @@ const validarTelefone = (telefone) => {
     }
   }
 
+ if (etapa === 2) {
+  if (!validarEtapa2()) return;
+}
+
+if (etapa === 3) {
+  if (!imagem) {
+    Alert.alert("Campo obrigatório", "Adicione uma foto para continuar.");
+    return;
+  }
+}
+
   if (etapa < 3) {
     setEtapa(etapa + 1);
   } else {
     Alert.alert('Sucesso', 'Cadastro concluído!');
     navigation.goBack();
   }
-};
+}
 
   return (
     <Background>
@@ -319,13 +403,29 @@ const validarTelefone = (telefone) => {
               />
             </View>
            
-               <TextInput 
-          style={styles.input} 
-          placeholder="Data de nascimento" 
-          keyboardType="numeric"
-          value={dataNasc}
-          onChangeText={formatarData}
-          />
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setMostrarCalendario(true)}
+          >
+            <Text style={{ color: dataNasc ? '#202020' : '#444', marginTop: 10, fontSize: 16}}>
+              {dataNasc ? dataNasc.toLocaleDateString() : "data de nascimento"}
+            </Text>
+          </TouchableOpacity>
+
+
+          {mostrarCalendario && (
+            <DateTimePicker
+              value={dataNasc || new Date()} 
+              mode="date"
+              display="spinner"
+              onChange={(event, selectedDate) => {
+                setMostrarCalendario(false);
+                if (event.type === 'set' && selectedDate) {
+                  setDataNascUsuario(selectedDate);
+                }
+              }}
+            />
+          )}
               
             </View>
           )}
@@ -505,6 +605,14 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 16,
   },
+  dropDownContainer: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "black",
+    borderRadius: 10,
+    width: width * 0.6,
+    zIndex: 2,
+  },
   dropdownHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -535,6 +643,16 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     color: '#111',
   },
+  scrollArea: {
+    maxHeight: 360,
+    width: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 8,
+  },
+  dropdowncontainerV:{
+     marginBottom:10,
+  }, 
   photoTitle: {
     fontSize: 18,
     fontWeight: '600',
