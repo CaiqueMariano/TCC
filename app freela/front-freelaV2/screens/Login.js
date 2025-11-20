@@ -1,13 +1,15 @@
-import React,{useState, useContext} from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import axios from 'axios';
+import React,{useContext, useState} from 'react';
 import { UserContext } from './userContext';
 import { API_URL } from './link';
-
+import axios from 'axios';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
 
+
 export default function Login({navigation}) {
+
   const { setUser } = useContext(UserContext);
   const [mensagem, setMensagem] = useState('');
   const  [emailProfissional, setEmail] = useState('');
@@ -40,9 +42,6 @@ const enviarLogin = async () => {
       <View style={styles.container}>
         <View style={styles.loginBox}>
           <Text style={styles.loginTitle}>Login</Text>
-          <View style={styles.mensagem}>
-            <Text style={styles.mensagemText}>{mensagem}</Text>
-          </View>
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -69,7 +68,7 @@ const enviarLogin = async () => {
               style={[styles.button, styles.buttonPrimary]}
               onPress={enviarLogin}
             >
-              <Text style={styles.buttonText}>Login</Text>
+              <Text style={styles.buttonText}>Logar</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -83,12 +82,6 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  mensagem:{
-    marginBottom:10,
-},
-mensagemText:{
-    color:'red',
-},  
   container: {
     flex: 1,
     alignItems: 'center',
@@ -107,7 +100,7 @@ mensagemText:{
   },
   loginBox: {
     width: '70%',
-    backgroundColor: '#e2d9ff',
+    backgroundColor:  '#b08cff',
     padding: 20,
     paddingVertical: 28,
     minHeight: 320,
@@ -126,7 +119,7 @@ mensagemText:{
   loginTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111',
+    color: '#ffffffff',
     textAlign: 'center',
     marginBottom: 16,
   },
@@ -157,21 +150,19 @@ mensagemText:{
   buttonSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#0a84ff',
+    borderColor: '#ffffffff',
     marginRight: 8,
   },
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#ffffffff',
     marginLeft: 8,
   },
   buttonText: {
-    color: '#fff',
+    color:  '#b08cff',
     fontWeight: '600',
     fontSize: 16,
   },
   buttonTextSecondary: {
-    color: '#0a84ff',
+    color: '#fff',
   },
 });
-
-

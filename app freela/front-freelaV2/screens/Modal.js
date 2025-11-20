@@ -3,6 +3,7 @@ import { Modal, View, Text, Image, TouchableOpacity } from 'react-native';
 
 export default function CustomModal({
   visible,
+  preco,
   onClose,
   onNavigateDashboard
 }) {
@@ -24,7 +25,7 @@ export default function CustomModal({
 
           <Text style={styles.modalText}>
             Recebeu 
-            <Text style={styles.modalReceivedText}> R$1120</Text>
+            <Text style={styles.modalReceivedText}> R${preco}</Text>
           </Text>
 
           <TouchableOpacity

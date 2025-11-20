@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions,Alert, Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions,Alert, Image, ScrollView } from "react-native";
 import colors from "./colors";
 import { TextInput } from "react-native";
 import axios from "axios";
@@ -48,16 +48,27 @@ export default function PerguntasC ({ navigation }) {
   const [checked2E5, setChecked2E5] = useState(false);
   const [checked3E5, setChecked3E5] = useState(false);
 
+  //etapa 6
+ const [cog1, setCog1] = useState(false);
+const [cog2, setCog2] = useState(false);
+const [cog3, setCog3] = useState(false);
+const [cog4, setCog4] = useState(false);
+const [cog5, setCog5] = useState(false);
+
   //etapa 7
-   const [checked1E8, setChecked1E8] = useState(false);
-  const [checked2E8, setChecked2E8] = useState(false);
-  const [checked3E8, setChecked3E8] = useState(false);
-  const [checked4E8, setChecked4E8] = useState(false);
-  const [checked5E8, setChecked5E8] = useState(false);
+const [emo1, setEmo1] = useState(false);
+const [emo2, setEmo2] = useState(false);
+const [emo3, setEmo3] = useState(false);
+const [emo4, setEmo4] = useState(false);
+const [emo5, setEmo5] = useState(false);
+
+
   //etapa 8
   const [ComportamentoTexto, setComportamentoTexto] = useState("");
   const [Comportamento, setComportamento] = useState([]);
-
+const [checked1E8, setChecked1E8] = useState(false);
+const [checked2E8, setChecked2E8] = useState(false);
+const [checked3E8, setChecked3E8] = useState(false);
 
   const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
 
@@ -529,152 +540,106 @@ export default function PerguntasC ({ navigation }) {
             </View>
         </View>
       )}
-    {etapa === 6 && (
+  {etapa === 6 && (
   <View style={styles.form}>
-    <EscalarText style={styles.title}>
-      Como se encontra seu{"\n"}Estado cognitivo:
-    </EscalarText>
+    <EscalarText style={styles.title}>Como se encontra seu estado cognitivo?</EscalarText>
 
-    <View style={styles.cognitivoContainer}>
+    <View style={styles.checkboxContainer}>
       {[
-        { label: "Lúcido", checked: checked1, setChecked: setChecked1 },
-        { label: "Confuso", checked: checked2, setChecked: setChecked2 },
-        { label: "Demência leve", checked: checked3, setChecked: setChecked3 },
-        { label: "Demência moderada", checked: checked4, setChecked: setChecked4 },
-        { label: "Demência severa", checked: checked5E2, setChecked: setChecked5E2 },
+        { label: "Lúcido", checked: cog1, setChecked: setCog1,},
+        { label: "Confuso", checked: cog2, setChecked: setCog2,},
+        { label: "Demência leve", checked: cog3, setChecked: setCog3,},
+        { label: "Demência moderada", checked: cog4, setChecked: setCog4,},
+        { label: "Demência severa", checked: cog5, setChecked: setCog5,},
       ].map((item, i) => (
         <EscalarTouchable
           key={i}
           style={[
-            styles.cognitivoBox,
-            item.checked && styles.cognitivoBoxSelecionado,
+            styles.checkboxBox,
+            item.checked && styles.checkboxBoxSelecionado,
           ]}
           onPress={() => {
-            // garante que apenas uma opção possa ser selecionada por vez
-            setChecked1(false);
-            setChecked2(false);
-            setChecked3(false);
-            setChecked4(false);
-            setChecked5E2(false);
+            setCog1(false); setCog2(false); setCog3(false); setCog4(false); setCog5(false);
             item.setChecked(true);
           }}
           activeOpacity={0.8}
         >
-          <View style={styles.cognitivoOpcoes}>
+          <View style={styles.checkboxes}>
             <Checkbox
               status={item.checked ? "checked" : "unchecked"}
               color={colors.azul}
-              onPress={() => {
-                setChecked1(false);
-                setChecked2(false);
-                setChecked3(false);
-                setChecked4(false);
-                setChecked5E2(false);
-                item.setChecked(true);
-              }}
             />
-            <EscalarText style={styles.cognitivoTexto}>{item.label}</EscalarText>
-            
 
+            <View style={styles.imageContainer}>
+              <EscalarImage source={item.image} style={styles.optionImage} resizeMode="contain" />
+            </View>
+
+            <EscalarText style={styles.checkOpicoes}>{item.label}</EscalarText>
           </View>
         </EscalarTouchable>
-        
       ))}
     </View>
 
     <View style={styles.botoes}>
       <EscalarTouchable
-        style={[
-          styles.bFoto,
-          !(
-            checked1 ||
-            checked2 ||
-            checked3 ||
-            checked4 ||
-            checked5E2
-          ) && { opacity: 0.5 },
-        ]}
+        style={[styles.bFoto, !(cog1 || cog2 || cog3 || cog4 || cog5) && { opacity: 0.5 }]}
         onPress={() => {
-          if (checked1 || checked2 || checked3 || checked4 || checked5E2) {
-            setEtapa(7);
-          } else {
-            alert("Por favor, selecione uma opção antes de continuar.");
-          }
+          if (cog1 || cog2 || cog3 || cog4 || cog5) setEtapa(7);
+          else alert("Por favor, selecione uma opção antes de continuar.");
         }}
-        activeOpacity={0.8}
       >
         <EscalarText style={styles.buttonText}>Próximo</EscalarText>
       </EscalarTouchable>
     </View>
   </View>
-  
 )}
 {etapa === 7 && (
   <View style={styles.form}>
-    <EscalarText style={styles.title}>
-      Como se encontra seu{"\n"}Estado Emocional:
-    </EscalarText>
+    <EscalarText style={styles.title}>Como se encontra seu estado emocional?</EscalarText>
 
-    <View style={styles.emocionalContainer}>
+    <View style={styles.checkboxContainer}>
       {[
-        { label: "Deprimido", checked: checked1, setChecked: setChecked1 },
-        { label: "Ansioso", checked: checked2, setChecked: setChecked2 },
-        { label: "Tranquilo", checked: checked3, setChecked: setChecked3 },
-        { label: "Comunicativo", checked: checked4, setChecked: setChecked4 },
-        { label: "Agressivo", checked: checked5E2, setChecked: setChecked5E2 },
+        { label: "Deprimido", checked: emo1, setChecked: setEmo1, },
+        { label: "Ansioso", checked: emo2, setChecked: setEmo2, },
+        { label: "Tranquilo", checked: emo3, setChecked: setEmo3,},
+        { label: "Comunicativo", checked: emo4, setChecked: setEmo4, },
+        { label: "Agressivo", checked: emo5, setChecked: setEmo5,},
       ].map((item, i) => (
         <EscalarTouchable
           key={i}
           style={[
-            styles.emocionalBox,
-            item.checked && styles.emocionalBoxSelecionado,
+            styles.checkboxBox,
+            item.checked && styles.checkboxBoxSelecionado,
           ]}
           onPress={() => {
-            // Permite apenas uma opção marcada
-            setChecked1(false);
-            setChecked2(false);
-            setChecked3(false);
-            setChecked4(false);
-            setChecked5E2(false);
+            setEmo1(false); setEmo2(false); setEmo3(false); setEmo4(false); setEmo5(false);
             item.setChecked(true);
           }}
           activeOpacity={0.8}
         >
-          <View style={styles.emocionalOpcoes}>
+          <View style={styles.checkboxes}>
             <Checkbox
               status={item.checked ? "checked" : "unchecked"}
               color={colors.azul}
-              onPress={() => {
-                setChecked1(false);
-                setChecked2(false);
-                setChecked3(false);
-                setChecked4(false);
-                setChecked5E2(false);
-                item.setChecked(true);
-              }}
             />
-            <EscalarText style={styles.emocionalTexto}>{item.label}</EscalarText>
+
+            <View style={styles.imageContainer}>
+              <EscalarImage source={item.image} style={styles.optionImage} resizeMode="contain" />
+            </View>
+
+            <EscalarText style={styles.checkOpicoes}>{item.label}</EscalarText>
           </View>
         </EscalarTouchable>
       ))}
     </View>
 
-
-    {/* Botão Próximo */}
     <View style={styles.botoes}>
       <EscalarTouchable
-        style={[
-          styles.bFoto,
-          !(checked1 || checked2 || checked3 || checked4 || checked5E2) && { opacity: 0.5 },
-        ]}
+        style={[styles.bFoto, !(emo1 || emo2 || emo3 || emo4 || emo5) && { opacity: 0.5 }]}
         onPress={() => {
-          if (checked1 || checked2 || checked3 || checked4 || checked5E2) {
-            setEtapa(8);
-          } else {
-            alert("Por favor, selecione uma opção antes de continuar.");
-          }
+          if (emo1 || emo2 || emo3 || emo4 || emo5) setEtapa(8);
+          else alert("Por favor, selecione uma opção antes de continuar.");
         }}
-        activeOpacity={0.8}
       >
         <EscalarText style={styles.buttonText}>Próximo</EscalarText>
       </EscalarTouchable>
@@ -840,17 +805,11 @@ export default function PerguntasC ({ navigation }) {
   
 )}
 {etapa === 9 && (
-  <View style={styles.form}>
-    {/* Cabeçalho */}
-    <View style={styles.headerContainer}>
-    </View>
-
-    {/* Conteúdo principal */}
-    <View style={styles.contentContainer}>
+  <ScrollView contentContainerStyle={{alignItems:"center", justifyContent:"center", paddingBottom:40}}>
+    <View style={styles.form}>
       <EscalarImage
         source={require("../../assets/images/final.png")}
         style={styles.finalImage}
-        resizeMode="contain"
       />
 
       <EscalarText style={styles.finalText}>
@@ -859,24 +818,15 @@ export default function PerguntasC ({ navigation }) {
 
       <EscalarTouchable
         style={styles.finalButton}
-        onPress={() => {navigation.navigate("Home"),
-          Alert.alert(
-            "Concluído!",
-            "Suas respostas foram salvas com sucesso!",
-            [
-              {
-                text: "OK",
-                onPress: () => navigation.navigate("Home"), // Troque se quiser outra tela
-              },
-            ]
-          );
+        onPress={() => {
+          Alert.alert("Concluído!", "Suas respostas foram salvas!");
+          navigation.navigate("Home");
         }}
-        activeOpacity={0.8}
       >
         <EscalarText style={styles.finalButtonText}>Finalizar</EscalarText>
       </EscalarTouchable>
     </View>
-  </View>
+  </ScrollView>
 )}
    
       

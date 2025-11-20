@@ -1,341 +1,245 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, ScrollView, Platform } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { LineChart } from 'react-native-chart-kit';
-import Background from '../components/Background';
-
+import axios from 'axios';
+import { API_URL } from './link';
+import { UserContext } from './userContext';
 export default function Home() {
+  const { user } = useContext(UserContext);
+  const [ultimoContrato, setUltimoContrato] = useState(null);
   const navigation = useNavigation();
-  const screenWidth = Dimensions.get('window').width;
+  const [abaAtiva, setAbaAtiva] = useState(0);
+ 
+  useEffect(() => {
+    if (!user) return;
 
-  const chartData = {
-    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-    datasets: [
-      {
-        data: [2, 4, 6, 8, 10, 12],
-        strokeWidth: 2,
-        color: () => '#0a84ff',
-      },
-    ],
-  };
+    const fetchUltimoContrato = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/api/vizualizarContratosFree/${user.idProfissional}/ativo`);
+        if (response.data.data && response.data.data.length > 0) {
+          // Pega o último contrato da lista
+          setUltimoContrato(response.data.data[0]);
+        }
+      } catch (error) {
+        console.log('Erro ao buscar último contrato:', error);
+      }
+    };
 
-  const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientTo: '#fff',
-    color: () => '#0a84ff',
-    labelColor: () => '#333',
-    strokeWidth: 2,
-    propsForDots: {
-      r: '4',
-      strokeWidth: '2',
-      stroke: '#0a84ff',
-    },
-  };
+    fetchUltimoContrato();
+  }, [user]);
+  const abas = [
+    { titulo: 'Home', icone: 'home-outline', rota: 'Home' },
+    { titulo: 'Contratos', icone: 'document-text-outline', rota: 'Contratos' },
+    { titulo: 'Perfil', icone: 'person-outline', rota: 'Perfil' },
+  ];
 
   return (
-    <Background>
-      {/* Top bar removida para mais espaço útil */}
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
 
-      <ScrollView contentContainerStyle={styles.container}>
-        {/* CARD 1 - Proposta recomendada */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Proposta recomendada</Text>
+  
+      <ScrollView
+  contentContainerStyle={styles.scrollContainer}
+  showsVerticalScrollIndicator={false}
+>
 
-          <View style={styles.cardContent}>
-            <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=12' }}
-              style={styles.profileImage}
-            />
-            <View style={styles.infoSection}>
-              <Text style={styles.personName}>Maria Oliveira</Text>
-              <Text style={styles.locationText}>São Paulo - SP</Text>
-              <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star-half" size={14} color="#b08cff" />
-                <Ionicons name="star-outline" size={14} color="#b08cff" />
-              </View>
-            </View>
-            <View style={styles.valueContainer}>
-              <Text style={styles.valueText}>R$ 180,00</Text>
-            </View>
-          </View>
-
-          <View style={styles.requestContainer}>
-            <Text style={styles.requestText}>
-              Pedido: Mercado e supervisão
-            </Text>
-          </View>
-        </View>
-
-        {/* CARD 2 - Últimas avaliações */}
-       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Contratos')}>
-          <Text style={styles.cardTitle}>Últimas avaliações</Text>
-          <View style={styles.feedbackRow}>
-            {[
-              { name: 'Carlos Souza', rating: 5 },
-              { name: 'Ana Lima', rating: 4 },
-              { name: 'Pedro Martins', rating: 3 },
-            ].map((item, index) => (
-              <View key={index} style={styles.feedbackItem}>
-                <Text style={styles.feedbackName}>{item.name}:</Text>
-                <View style={styles.starsContainer}>
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Ionicons
-                      key={i}
-                      name={i < item.rating ? 'star' : 'star-outline'}
-                      size={16}
-                      color="#b08cff"
-                    />
-                  ))}
-                </View>
-              </View>
-            ))}
-          </View>
-        </TouchableOpacity>
-
-        {/* CARD 3 - Seu perfil */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Meu perfil</Text>
-          <View style={styles.profileSection}>
-            <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=8' }}
-              style={styles.profileImageLarge}
-            />
-            <View style={styles.profileInfo}>
-              <Text style={styles.personName}>João Cuidador</Text>
-              <Text style={styles.locationText}>Bairro Vila Nova - Curitiba/PR</Text>
-              <View style={styles.ratingRow}>
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star" size={14} color="#b08cff" />
-                <Ionicons name="star-outline" size={14} color="#b08cff" />
-              </View>
-              <Text style={styles.profileDetail}>Média de avaliação: 4.0</Text>
-              <Text style={styles.profileDetail}>Tempo no app: 1 ano e 3 meses</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* CARD 4 - Dashboard */}
-        
-        <View style={styles.card}>
-        <TouchableOpacity onPress={()=> navigation.navigate('Dashboard')}>
-          <Text style={styles.cardTitle}>Dashboard</Text>
-          <View style={styles.dashboardRow}>
-            <View style={styles.kpiBox}>
-              <Text style={styles.kpiValue}>12</Text>
-              <Text style={styles.kpiLabel}>Pedidos mês</Text>
-            </View>
-            <View style={styles.kpiBox}>
-              <Text style={styles.kpiValue}>R$ 2.450</Text>
-              <Text style={styles.kpiLabel}>Ganhos</Text>
-            </View>
-            <View style={styles.kpiBox}>
-              <Text style={styles.kpiValue}>4.2</Text>
-              <Text style={styles.kpiLabel}>Média</Text>
-            </View>
-          </View>
-          </TouchableOpacity>
-
-          {/* Gráfico de linha */}
-          <View style={{ marginTop: 16 }}>
-            {Platform.OS !== 'web' ? (
-              <LineChart
-                data={chartData}
-                width={screenWidth - 48}
-                height={180}
-                chartConfig={chartConfig}
-                bezier
-                style={{ borderRadius: 12 }}
+{ultimoContrato && (
+          <View style={styles.cartao}>
+            <Text style={styles.tituloSecao}>Contrato ativo mais recente</Text>
+            
+            <View style={styles.cabecalhoIdoso}>
+              <Image
+                source={{ uri: `${API_URL}/storage/${ultimoContrato.fotoUsuario}` }}
+                style={styles.fotoIdoso}
               />
-            ) : (
-              <View style={styles.chartPlaceholder}>
-                <Text style={styles.chartPlaceholderText}>Gráfico indisponível no web</Text>
+              <View>
+                <Text style={styles.nomeIdoso}>{ultimoContrato.nomeUsuario}</Text>
+                <Text style={styles.subInfoIdoso}>Preço: R${ultimoContrato.precoPersonalizado}</Text>
+                <Text style={styles.subInfoIdoso}>Dia: {ultimoContrato.dataServico}</Text>
+                <Text style={styles.subInfoIdoso}>Horário: {ultimoContrato.horaInicioServico}</Text>
               </View>
-            )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.botaoOutline}
+              onPress={() => navigation.navigate('Contratos')}
+            >
+              <Text style={styles.textoBotaoOutline}>Ver contratos</Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        )}
 
-        <StatusBar style="light" />
-      </ScrollView>
+  <TouchableOpacity
+    style={styles.botaoDashboard}
+    onPress={() => navigation.navigate('Pedidos')}
+  >
+    <Ionicons name="analytics-outline" size={32} color="#fff" style={{ marginBottom: 6 }} />
+    <Text style={styles.textoBotaoDashboard}>Buscar Pedidos</Text>
+  </TouchableOpacity>
+  <TouchableOpacity
+    style={styles.botaoDashboard}
+    onPress={() => navigation.navigate('Dashboard')}
+  >
+    <Ionicons name="analytics-outline" size={32} color="#fff" style={{ marginBottom: 6 }} />
+    <Text style={styles.textoBotaoDashboard}>Ir para Dashboard</Text>
+  </TouchableOpacity>
 
-    </Background>
+    <TouchableOpacity
+    style={styles.botaoDashboard}
+    onPress={() => navigation.navigate('Mensagens')}
+  >
+    <Ionicons name="chatbubbles-outline" size={32} color="#fff" style={{ marginBottom: 6 }} />
+    <Text style={styles.textoBotaoDashboard}>Ir para Conversas</Text>
+  </TouchableOpacity>
+
+</ScrollView>
+
+
+      <StatusBar style="dark" />
+
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
-  topBar: {
-    width: '100%',
-    backgroundColor: '#000',
+  navBar: {
+    backgroundColor: '#b08cff',
+    paddingTop: 40,
     paddingVertical: 16,
-    paddingHorizontal: 16,
+    alignItems: 'center',
   },
-  topBarText: {
+  tituloNav: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '700',
-  },
-  container: {
-    padding: 12,
-    paddingBottom: 96,
-    flexGrow: 1,
-  },
-  card: {
-    backgroundColor: '#e2d9ff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-  },
-  dashboardRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  kpiBox: {
-    flex: 1,
-    backgroundColor: '#e2d9ff',
-    borderRadius: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    marginHorizontal: 4,
-    alignItems: 'center',
-  },
-  kpiValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0a84ff',
-  },
-  kpiLabel: {
-    fontSize: 12,
-    color: '#555',
-    marginTop: 4,
-  },
-  chartPlaceholder: {
-    height: 180,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chartPlaceholderText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 8,
-    color: '#333',
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  profileImage: {
-    width: 54,
-    height: 54,
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  infoSection: {
-    flex: 1,
-  },
-  personName: {
-    fontSize: 15,
     fontWeight: '600',
-    color: '#111',
   },
-  locationText: {
-    fontSize: 13,
-    color: '#555',
-    marginVertical: 2,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-  },
-  valueContainer: {
-    alignItems: 'flex-end',
-  },
-  valueText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0a84ff',
-  },
-  requestContainer: {
-    marginTop: 4,
-  },
-  requestText: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '500',
-  },
-  feedbackRow: {
-    flexDirection: 'column',
-  },
-  feedbackItem: {
-    flexDirection: 'row',
-    marginBottom: 6,
-  },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  profileImageLarge: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
-    marginRight: 12,
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  profileDetail: {
-    fontSize: 13,
-    color: '#444',
-    marginTop: 2,
-  },
-  bottomBar: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: 'rgba(0,0,0,0.85)',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderRadius: 14,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  navLabel: {
-    marginTop: 2,
-    fontSize: 12,
-    color: '#fff',
-  },
-  navLabelActive: {
-    color: '#0a84ff',
-    fontWeight: '700',
-  },
-  feedbackName: {
-  fontSize: 14,
-  fontWeight: '500',
-  marginRight: 6,
-  color: '#333',
-},
-starsContainer: {
-  flexDirection: 'row',
+
+  botaoDashboard: {
+  backgroundColor: '#b08cff',
+  borderRadius: 12,
+  paddingVertical: 16,
+  alignItems: 'center',
+  marginTop: 20,
 },
 
+textoBotaoDashboard: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '700',
+},
+
+
+  scrollContainer: {
+    padding: 20,
+  },
+
+  cartao: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+
+  cabecalhoIdoso: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+
+  fotoIdoso: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 12,
+  },
+
+  nomeIdoso: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+
+  subInfoIdoso: {
+    color: '#555',
+  },
+
+  botaoOutline: {
+    borderColor: '#b08cff',
+    borderWidth: 2,
+    borderRadius: 12,
+    paddingVertical: 10,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+
+  textoBotaoOutline: {
+    color: '#b08cff',
+    fontWeight: '700',
+  },
+
+  containerPesquisa: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2f2f2',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    marginBottom: 20,
+    marginTop: 20,
+  },
+
+  campoPesquisa: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+  },
+
+  tituloSecao: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    marginTop: 10,
+  },
+
+  cardServico: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 16,
+  },
+
+  cardServicoConteudo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  fotoServico: {
+    width: 54,
+    height: 54,
+    borderRadius: 8,
+    marginRight: 14,
+  },
+
+  infoServico: {
+    flex: 1,
+  },
+
+  nomeServico: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+
+  cidadeServico: {
+    fontSize: 14,
+    color: '#777',
+  },
+
+  tipoServico: {
+    fontSize: 14,
+    marginTop: 4,
+    fontWeight: '500',
+  },
 });

@@ -25,6 +25,7 @@ export default function Cadastro({ navigation }) {
   const [checked2, setChecked2] = useState(false);
   const [checked3, setChecked3] = useState(false);
   const [checked4, setChecked4] = useState(false);
+  const [servicoSelecionado, setServicoSelecionado] = useState(null);
   const [abrirOutro, setAbrirOutro] = useState(false);
   const [textoOutro, setTextoOutro] = useState("");
 
@@ -63,7 +64,7 @@ const [nomeNovoEndereco, setNomeNovoEndereco] = useState("");
   ]);
   
 const validarEtapa1 = () => data && horarioIn;
-const validarEtapa2 = () => checked1 || checked2 || checked3 || checked4;
+const validarEtapa2 = () => servicoSelecionado !== null;
 const validarEtapa3 = () => textoOutro.trim() !== "";
 const validarEtapa4 = () => {
   // um so
@@ -137,11 +138,12 @@ const validarEtapa5 = () => genero !== null;
   );
 
   const nomeServicosSelecionados = [];
-  if (checked1) nomeServicosSelecionados.push('Acompanhamento Médico');
-  if (checked2) nomeServicosSelecionados.push('Acompanhamento Domiciliar');
-  if (checked3) nomeServicosSelecionados.push('Locomoção');
-  if (checked4) nomeServicosSelecionados.push('Outro');
-  if (abrirOutro && textoOutro.trim() !== '') nomeServicosSelecionados.push(textoOutro.trim());
+
+  if (servicoSelecionado === "medico") nomeServicosSelecionados.push("Acompanhamento Médico");
+  else if (servicoSelecionado === "domiciliar") nomeServicosSelecionados.push("Acompanhamento Domiciliar");
+  else if (servicoSelecionado === "locomocao") nomeServicosSelecionados.push("Locomoção");
+  else if (servicoSelecionado === "outro" && textoOutro.trim() !== "") nomeServicosSelecionados.push(textoOutro.trim());
+  
   const [idEnderecoSelecionado, setIdEnderecoSelecionado] = useState(null);
 
   //AXIOS
@@ -186,6 +188,7 @@ const validarEtapa5 = () => genero !== null;
 
 const enviarEndereco = async () =>{
   try{
+
     const response = await axios.post(`${API_URL}/api/storeEnderecoUsuario`,
       {
         nomeEndereco: nomeNovoEndereco,
@@ -220,13 +223,13 @@ const nomeServicoString = nomeServicosSelecionados.join("");
   const enviarDados = async () => {
 
     try {
-
+      const nomeServicoString = nomeServicosSelecionados.join("");
       const response = await axios.post(
         `${API_URL}/api/storeServicos`,
         {
-          nomeServico:nomeServicosSelecionados.join(", "),
+          nomeServico:nomeServicoString,
           idUsuario:user.idUsuario,
-          tipoServico:nomeServicosSelecionados.join(", "),
+          tipoServico:nomeServicoString,
           descServico:textoOutro,
           dataServico:data,
           generoServico:genero,
@@ -316,21 +319,23 @@ const nomeServicoString = nomeServicosSelecionados.join("");
           <Image source={require('../../assets/images/cuidador.png')} style={styles.image} />
 
           <View style={styles.checkboxContainer}>
-            {[ 
-              { label: "Acompanhamento Médico", checked: checked1, setChecked: setChecked1 },
-              { label: "Acompanhamento Domiciliar", checked: checked2, setChecked: setChecked2 },
-              { label: "Locomoção", checked: checked3, setChecked: setChecked3 },
-              { label: "Outro", checked: checked4, setChecked: setChecked4 },
-            ].map((item, i) => (
-              <View key={i} style={styles.checkboxes}>
-                <Checkbox
-                  status={item.checked ? 'checked' : 'unchecked'}
-                  onPress={() => item.setChecked(!item.checked)}
-                  color={colors.azul}
-                />
-                <Text style={styles.checkOpicoes}>{item.label}</Text>
-              </View>
-            ))}
+          {[
+    { label: "Acompanhamento Médico", value: "medico" },
+    { label: "Acompanhamento Domiciliar", value: "domiciliar" },
+    { label: "Locomoção", value: "locomocao" },
+    { label: "Outro", value: "outro" },
+  ].map((item, i) => (
+    <TouchableOpacity
+      key={i}
+      style={styles.radioContainer}
+      onPress={() => setServicoSelecionado(item.value)}
+    >
+      <View style={styles.radioCircle}>
+        {servicoSelecionado === item.value && <View style={styles.selectedRb} />}
+      </View>
+      <Text style={styles.radioText}>{item.label}</Text>
+    </TouchableOpacity>
+  ))}
           </View>
 
 
@@ -664,6 +669,33 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: colors.branco, 
     alignItems: "center" 
+  },
+  radioContainer: {
+    flexDirection: 'row',
+
+    marginBottom: 12,
+  },
+  
+  radioText: {
+    fontSize: 20,
+    color: colors.preto,
+    marginLeft: 10,
+  },
+  
+  radioCircle: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.azul,
+   
+  },
+  
+  selectedRb: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.azul,
   },
 
   teste:{

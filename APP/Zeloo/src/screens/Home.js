@@ -101,7 +101,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
   }, [user]);
 //CONTRATOS ATIVOS
   useEffect(() => {
-    axios.get(`${API_URL}/api/vizualizarContratoAtivo/${user.idUsuario}`)
+    axios.get(`${API_URL}/api/vizualizarContratos/${user.idUsuario}/Ativo`)
       .then(response => {
         const contratos = response.data.data;
         if (contratos.length > 0) {
@@ -115,7 +115,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
 
   //A PAGAR
   useEffect(() => {
-    axios.get(`${API_URL}/api/vizualizarContratoAPagar/${user.idUsuario}`)
+    axios.get(`${API_URL}/api/vizualizarContratos/${user.idUsuario}/Aguardando Pagamento`)
       .then(response => {
         const contratos = response.data.data;
         
@@ -128,19 +128,6 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
       .catch(error => console.log(error));
   }, []);
 
-  //Esperando aceitar
-  useEffect(() => {
-    axios.get(`${API_URL}/api/buscarServicosN/${user.idUsuario}`)
-      .then(response => {
-        const contratos = response.data.data;
-        if (contratos.length > 0) {
-          setServicosNAceitos(contratos[contratos.length - 1]);
-        } else {
-          setServicosNAceitos(null);
-        }
-      })
-      .catch(error => console.log(error));
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -163,7 +150,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.grid}>
-{/*
+
        
       {contratoAtivo && (
   <View style={styles.cardcontratro}>
@@ -223,72 +210,6 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
 )}
 
 
-{servicosNAceitos && (
-  <View style={styles.cardcontratro}>
-    <Text style={styles.viewMoreText}>Aguardando profissional</Text>
-
-    <View style={styles.contractInfo}>
-      <Image 
-        source={require('../../assets/images/perfilicon.png')}
-        style={styles.contractIcon}
-      />
-      <View>
-        <Text style={styles.contractStatus}>
-          Status: <Text style={styles.contractPaid}>Aguardando cuidador</Text>
-        </Text>
-      </View>
-    </View>
-
-    <View style={styles.separator}></View>
-
-    <TouchableOpacity 
-      style={styles.viewMoreButton}
-      onPress={() => navigation.navigate('Pendente')}
-    >
-      <Text style={styles.viewMoreText}>Ver Outros Contratos</Text>
-    </TouchableOpacity>
-  </View>
-)}/*}
-        {/* BOTÃO CONTRATO ATIVO MAIS RECENTE */}
-        <EscalarCard style={styles.cardcontratro} maxScale={1.2}>
-          
-            <EscalarText style={styles.viewMoreText}>Contrato ativo mais recente</EscalarText>
-              
-              <View style={[styles.contractInfo]}>
-              <EscalarImage 
-                source={require('../../assets/images/perfilicon.png')}
-                style={{
-                  width: 120 * Math.min(scale, 0.7), // cresce até 1.4x
-                  height: 90 * Math.min(scale, 0.7),
-                  resizeMode: 'contain',
-                  marginLeft: (scale - 1) * -100,
-                  marginBottom: (scale - 1) * 10,
-                }}
-              />
-
-                <View 
-                  style={{
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    marginLeft: (scale - 1) * -40 // desloca para a esquerda quando aumenta
-                  }}
-                >
-                  <EscalarText style={styles.contractName}>Ana Maria braga</EscalarText>
-                  <EscalarText style={styles.contractStatus}>
-                    Status: <EscalarText style={styles.contractPaid}>Pago</EscalarText>
-                  </EscalarText>
-                </View>
-              </View>
-
-          <EscalarSeparator style={styles.separator} maxScale={1.1}></EscalarSeparator>
-
-          <EscalarTouchable
-            style={styles.viewMoreButton}
-            onPress={() => navigation.navigate('Ativos')}
-          >
-            <EscalarText style={styles.viewMoreText}>Ver Outros Contratos</EscalarText>
-          </EscalarTouchable>
-        </EscalarCard>
 
         {/* BOTÕES PRINCIPAIS */}
         <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Servico')}>
@@ -312,12 +233,12 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
           <EscalarText style={styles.cardText}>Seu Perfil</EscalarText>
         </EscalarTouchable>
 
-        <EscalarTouchable style={styles.card}>
+        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Apagar')}>
           <EscalarImage source={require('../../assets/images/linkagem.png')} style={styles.icon} />
-          <EscalarText style={styles.cardText}>Linkagem</EscalarText>
+          <EscalarText style={styles.cardText}>Contratos</EscalarText>
         </EscalarTouchable>
 
-        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Conversas')}>
+        <EscalarTouchable style={styles.card} onPress={() => navigation.navigate('Mensagens')}>
           <EscalarImage source={require('../../assets/images/conversas.png')}  style={styles.icon} /> 
           <EscalarText style={styles.cardText}>Conversas</EscalarText>
         </EscalarTouchable>

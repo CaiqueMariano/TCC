@@ -1,22 +1,28 @@
-import React from "react";
-import { StyleSheet } from 'react-native';
+import React, { useContext } from "react";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '../temas/ThemeContext';
+import { UserProvider, UserContext } from "../screens/userContext";
+import { AccessibilityProvider } from "../screens/AccessibilityContext";
 import Cadastro from '../screens/Cadastro';
 import Home from '../screens/Home';
 import Pedidos from '../screens/Pedidos';
 import Perfil from '../screens/Perfil';
+import Historico from "../screens/Historico";
 import Login from '../screens/Login';
+import BemVindo from "../screens/BemVindo";
 import SobreNos from '../screens/SobreNos';
-import { UserProvider } from "../screens/userContext";
+import ListaConversas from "../screens/ListaConversas";
 import Configuracoes from '../screens/Configuracoes';
+import Contratos from "../screens/Contratos";
+import Dashboard from "../screens/Dashboard";
+import PerfilIdoso from "../screens/PerfilIdoso";
+import Conversas from "../screens/Conversas";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from "react-native-vector-icons/Feather";
 import Icons from "react-native-vector-icons/AntDesign";
-import Ativos from '../screens/Contratos';
-import Dashboard from "../screens/Dashboard";
-import Contratos from "../screens/Contratos";
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -34,16 +40,29 @@ function AppTabs() {
       tabBarInactiveTintColor: "#888",
     }}>
       
-      <Tab.Screen name="Home" component={Home} options={{
-          tabBarLabel: "Início",
-          tabBarIcon: ({ color }) => (
-            <Icon name="home" size={24} color={color} />
-          )
-        }} />
+      <Tab.Screen
+  name="Home"
+  component={Home}
+  options={{
+    headerShown: true, 
+    title: "Home", 
+    tabBarLabel: "Início",
+    tabBarIcon: ({ color }) => (
+      <Icon name="home" size={24} color={color} />
+    ),
+  }}
+/>
       <Tab.Screen name="Pedidos" component={Pedidos} options={{
           tabBarLabel: "Pedidos",
           tabBarIcon: ({ color }) => (
             <Icons name="ordered-list" size={24} color={color} />
+          )
+        }} />
+
+<Tab.Screen name="Mensagens" component={ListaConversas} options={{
+          tabBarLabel: "Conversas",
+          tabBarIcon: ({ color }) => (
+            <Icons name="message" size={24} color={color} />
           )
         }} />
       <Tab.Screen name="Contratos" component={Contratos} options={{
@@ -52,24 +71,47 @@ function AppTabs() {
             <Icons name="solution" size={24} color={color} />
           )
         }} />
-      <Tab.Screen name="Perfil" component={Perfil} options={{
-          tabBarLabel: "Perfil",
-          tabBarIcon: ({ color }) => (
-            <Icon name="user" size={24} color={color} />
-          )
-        }} />
+    <Tab.Screen
+  name="Perfil"
+  component={Perfil}
+  options={({ navigation }) => ({
+    headerShown: true,
+    title: "Perfil",
+    tabBarLabel: "Perfil",
+    tabBarIcon: ({ color }) => (
+      <Icon name="user" size={24} color={color} />
+    ),
+    headerRight: () => (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Configuracoes')}
+        style={{ marginRight: 16 }}
+      >
+        <Icon name="settings" size={24} color="#202020" />
+      </TouchableOpacity>
+    ),
+    headerStyle: {
+      backgroundColor: '#fff',
+    },
+    headerTintColor: '#202020',
+  })}
+/>
       
     </Tab.Navigator>
   );
 }
+
 export default function App() {
+  const { user } = useContext(UserContext);
   return (
     
+    <AccessibilityProvider userId={user?.idProfissional || 0}>
 <UserProvider>
     <ThemeProvider> 
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator initialRouteName="BemVindo">
+      <Stack.Screen name="BemVindo" component={BemVindo} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+        <Stack.Screen name="Historico" component={Historico} />
         <Stack.Screen name="Cadastro" component={Cadastro} options={{ headerShown: false }} />
         <Stack.Screen 
         name="Tabs" 
@@ -80,10 +122,13 @@ export default function App() {
         <Stack.Screen name="SobreNos" component={SobreNos} options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard" component={Dashboard} />
         <Stack.Screen name="Configuracoes" component={Configuracoes} />
+        <Stack.Screen name="Conversas" component={Conversas} options={{ headerShown: false }} />
+        <Stack.Screen name="Perfil Idoso" component={PerfilIdoso} />
       </Stack.Navigator>
     </NavigationContainer>
     </ThemeProvider>
     </UserProvider>
+    </AccessibilityProvider>
   );
 }
 

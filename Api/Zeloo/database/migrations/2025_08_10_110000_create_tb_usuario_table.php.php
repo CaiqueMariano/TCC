@@ -25,6 +25,7 @@ return new class extends Migration
             $table->date('dataNasc');
             $table->string('tipoUsuario');
             $table->string('fotoUsuario')->nullable();
+            $table->string('fcm_token')->nullable();
  
 
 
