@@ -31,7 +31,11 @@ export default function Cadastro() {
   const [cpf, setCpf] = useState('');
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState(null);
-  const [items, setItems] = useState('');
+  const [items, setItems] = useState([
+  { label: "Masculino", value: "masculino" },
+  { label: "Feminino", value: "feminino" },
+  { label: "Outro", value: "outro" },
+]);
   const [dataNasc, setDataNasc] = useState('');
   const [formatarData, setFormatarData] = useState('');
 
@@ -299,7 +303,7 @@ const validarTelefone = (telefone) => {
             </ScrollView>
           )}
 
-        {etapa === 2 && (
+          {etapa === 2 && (
             <View style={styles.scrollArea} contentContainerStyle={styles.scrollContent} >
               <View style={styles.dropdowncontainerV} >
               <DropDownPicker
@@ -316,12 +320,12 @@ const validarTelefone = (telefone) => {
             </View>
            
                <TextInput 
-                style={styles.input} 
-                placeholder="Data de nascimento" 
-                keyboardType="numeric"
-                value={dataNasc}
-                onChangeText={formatarData}
-              />
+          style={styles.input} 
+          placeholder="Data de nascimento" 
+          keyboardType="numeric"
+          value={dataNasc}
+          onChangeText={formatarData}
+          />
               
             </View>
           )}
