@@ -5,11 +5,17 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import colors from './colors';
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
+import { useAccessibility } from "./AccessibilityContext";
+import * as Speech from 'expo-speech';
 
 const { width, height } = Dimensions.get("window");
 
+
 export default function Login({navigation}) {
   const { setUser } = useContext(UserContext);
+
+const { audioAtivo, setAudioAtivo } = useAccessibility();
+const { narrar } = useAccessibility();
 
   const [abrir, setAbrir] = useState(false);
   const [valor, setValor] = useState(null);
@@ -70,9 +76,22 @@ export default function Login({navigation}) {
       <View style={styles.Form1}></View>
       <View style={styles.Form2}></View>
 
-       <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
-         <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
-      </TouchableOpacity>
+<TouchableOpacity
+  style={styles.soundButton}
+  onPress={() => {
+    const novoEstado = !audioAtivo;
+    setAudioAtivo(novoEstado);
+
+    // Força a fala independente do estado
+    Speech.speak(novoEstado ? "Narrador Ativado" : "Narrador Desativado", {
+    });
+  }}
+>
+  <Image
+    source={require('../../assets/images/audio.png')}
+    style={styles.soundIcon}
+  />
+</TouchableOpacity>
 
       <Image 
         source={require('../../assets/images/Zeloo.png')}
@@ -84,9 +103,10 @@ export default function Login({navigation}) {
 
       <TextInput
         style={styles.input}
-        placeholder="Telefone celular"
+        placeholder="Número de telefone"
         keyboardType="numeric"
         value={telefoneUsuario}
+        onFocus={() => narrar("Digite seu número de telefone")}
         onChangeText={(text) =>
           setTelefoneUsuario(formatarTelefone(text, telefoneUsuario))
         }
@@ -100,6 +120,7 @@ export default function Login({navigation}) {
         placeholder="Senha"
         onChangeText={setSenhaUsuario}
         secureTextEntry={!mostrarSenha}
+        onFocus={() => narrar("Digite sua senha")}
       />
       <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
         <Text style={styles.senhaToggle}>{mostrarSenha ? <Ionicons size={25} name="eye-outline"></Ionicons>
@@ -109,10 +130,20 @@ export default function Login({navigation}) {
 
         <View style={styles.botoes}>
                   <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText} onPress={() => navigation.navigate('Home')}>Entrar</Text>
+            <Text style={styles.buttonText} 
+            onPress={() =>{
+             navigation.navigate('Home')
+            narrar("Entrar");
+            }}
+            >Entrar</Text>
           </TouchableOpacity>
                   <TouchableOpacity style={styles.button2}>
-            <Text style={styles.buttonText} onPress={() => navigation.navigate('Cadastro')}>Cadastrar</Text>
+            <Text style={styles.buttonText} 
+            onPress={() => {
+              navigation.navigate('Cadastro')
+              narrar("Cadastro");
+            }}
+            >Cadastrar</Text>
           </TouchableOpacity>
         </View>
       </View>

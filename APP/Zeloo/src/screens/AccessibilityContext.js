@@ -2,6 +2,9 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
 import axios from 'axios';
+import * as Speech from 'expo-speech';
+
+
 
 const AccessibilityContext = createContext();
 
@@ -9,6 +12,14 @@ export const AccessibilityProvider = ({  style,userId, children, minScale = 1, m
   const [scale, setScale] = useState(1);
   const limitedScale = Math.min(Math.max(scale, minScale), maxScale);
 
+  const [audioAtivo, setAudioAtivo] = useState(false);
+
+function narrar(texto) {
+  if (audioAtivo) {
+    Speech.stop();   // para evitar que sobreponha falas
+    Speech.speak(texto, { language: "pt-BR" });
+  }
+}
   // Função para salvar no backend
   const salvarScaleNoBackend = async (novoScale) => {
     try {
@@ -55,9 +66,23 @@ export const AccessibilityProvider = ({  style,userId, children, minScale = 1, m
   }, [userId]);
 
   return (
-    <AccessibilityContext.Provider value={{ scale, increaseScale, decreaseScale, resetScale, setScale }}>
-      {children}
-    </AccessibilityContext.Provider>
+<AccessibilityContext.Provider
+  value={{
+    // seus estados antigos (zoom, scale etc.)
+    scale,
+    increaseScale,
+    decreaseScale,
+    resetScale,
+
+    // narrador
+    audioAtivo,
+    setAudioAtivo,
+    narrar,
+  }}
+>
+  {children}
+</AccessibilityContext.Provider>
+
   );
 };
 
