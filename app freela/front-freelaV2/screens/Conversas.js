@@ -1,55 +1,88 @@
-import React, { useState, useEffect, useRef } from "react";
-import {View,Text,TextInput,TouchableOpacity,FlatList,Image,Platform,StyleSheet,Animated,Keyboard,TouchableWithoutFeedback,SafeAreaView,} from "react-native";
-
+import React, { useState, useEffect, useRef, useContext } from "react";
+import {View,Text,TextInput,TouchableOpacity,FlatList,Image,Platform,StyleSheet,Animated,Keyboard,TouchableWithoutFeedback,SafeAreaView, ScrollView} from "react-native";
+import axios from "axios";
+import { API_URL } from "./link";
+import { UserContext } from "./userContext";
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from "expo-image-picker";
 import { useAccessibility } from "./AccessibilityContext";
 
-export default function Conversas({ navigation }) {
-  
+export default function Conversas({ navigation, route }) {
+  const{converSelecionada} = route.params;
+  const {user} = useContext(UserContext);
   const { scale } = useAccessibility();
-  const [gravando, setGravando] = useState(null);
-  const [gravacao, setGravacao] = useState(null);
+  const [gravando, setGravando] = useState(null);  // objeto recording
+const [gravacaoURI, setGravacaoURI] = useState(null); // uri do audio
   const [somPrevia, setSomPrevia] = useState(null);
-  const [ouvindoPrevia, setOuvindoPrevia] = useState(false);
+  const [audioTocandoId, setAudioTocandoId] = useState(null);
 
+  const [somAtual, setSomAtual] = useState(null);
+  const [ouvindoPrevia, setOuvindoPrevia] = useState(false);
+  const [imagem, setImagem] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [conversa, setConversa] = useState([
-    { id: "1", texto: "Oi ! Tudo bem hoje?", remetente: "cuidador" },
-    { id: "2", texto: "Oi, sim. Obrigado!", remetente: "idoso" },
+
   ]);
 
+  const pegarMensagens = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/getMensagens/${converSelecionada.idConversa}`);
+      setConversa(response.data.mensagens);
+    } catch (error) {
+      console.log("Erro ao buscar msgs:", error);
+    }
+  };
+  useEffect(() => {
+    console.log(converSelecionada);
+    pegarMensagens();
+
+    const interval = setInterval(() => {
+      pegarMensagens();
+    }, 2000); 
+  
+    return () => clearInterval(interval);
+  }, []);
   //IMAGEEEM
-  const escolherImagem = async () => {
 
-  // Pede permissão
-  const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (status !== "granted") {
-    alert("Permissão para acessar a galeria negada!");
-    return;
-  }
 
-  // Abre a galeria
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [8, 8],
-    quality: 1,
-  });
 
-  // Se o veio não cancelou
-  if (!result.canceled) {
-    const uri = result.assets[0].uri;
-    const novaMsg = {
-      id: Date.now().toString(),
-      tipo: "imagem",
-      imagemUri: uri,
-      remetente: "idoso",
-    };
-    setConversa((prev) => [...prev, novaMsg]);
-  }
-};
+  const cancelarGravacao = () => {
+    setGravacaoURI(null);
+  };
+  const escolherDaGaleria = async () => {
+
+    const resultado = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+  
+    if (resultado.canceled) return;
+  
+    const uri = resultado.assets[0].uri; // ← Pegue direto daqui
+  
+    const formData = new FormData();
+    formData.append("idConversa", converSelecionada.idConversa);
+    formData.append("remententeConversa", "profissional");
+    formData.append("tipoMensagens", "imagem");
+  
+    const filename = uri.split('/').pop();
+    const extension = filename.split('.').pop();
+    const type = `image/${extension}`;
+  
+    formData.append("arquivoMensagens", {
+      uri,
+      name: filename,
+      type,
+    });
+  
+    await axios.post(`${API_URL}/api/mandarMensagem`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  
+    pegarMensagens(); // Atualiza a tela
+  };
 
     //AUDIOO
   useEffect(() => {
@@ -60,29 +93,39 @@ export default function Conversas({ navigation }) {
     pedirPermissao();
   }, []);
 
-  const enviarMensagem = () => {
+  const enviarMensagem = async () => {
     if (mensagem.trim() === "") return;
-    const novaMsg = {
-      id: Date.now().toString(),
-      texto: mensagem,
-      tipo: "texto",
-      remetente: "idoso",
-    };
-    setConversa((prev) => [...prev, novaMsg]);
+ 
+    
+    await axios.post(`${API_URL}/api/mandarMensagem`, {
+          idConversa: converSelecionada.idConversa,
+          remententeConversa: "cuidador",
+          tipoMensagens: "texto",
+          conteudoMensagens: mensagem
+        });
+    
+
+    
+   
+    
     setMensagem("");
+    pegarMensagens();
+
   };
 
   const iniciarGravacao = async () => {
     try {
-      console.log("Iniciando gravação");
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
+  
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
+  
       setGravando(recording);
+  
     } catch (error) {
       console.log("Erro ao iniciar gravação:", error);
     }
@@ -90,28 +133,53 @@ export default function Conversas({ navigation }) {
 
   const pararGravacao = async () => {
     try {
-      console.log("Parando gravação...");
+      if (!gravando) return;
+  
       await gravando.stopAndUnloadAsync();
-      const uri = gravando.getURI();
+      const uri = gravando.getURI();  // ← pega o áudio gravado
+      setGravacaoURI(uri);
       setGravando(null);
-      setGravacao(uri);
-
-      const novaMsg = {
-        id: Date.now().toString(),
-        tipo: "audio",
-        audioUri: uri,
-        remetente: "idoso",
-      };
-      setConversa((prev) => [...prev, novaMsg]);
+  
+      console.log("Áudio gravado em:", uri);
+  
     } catch (error) {
       console.log("Erro ao parar gravação:", error);
     }
   };
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      playsInSilentModeIOS: true,
+      staysActiveInBackground: true,
+    });
+  }, []);
 
-  const tocarAudio = async (uri) => {
+  const tocarAudio = async (uri, id) => {
     try {
-      const { sound } = await Audio.Sound.createAsync({ uri });
-      await sound.playAsync();
+      console.log("Tocando:", uri);
+  
+      // Se já existe um áudio tocando, parar ele antes
+      if (somAtual) {
+        await somAtual.stopAsync();
+        await somAtual.unloadAsync();
+        setSomAtual(null);
+      }
+  
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: uri },
+        { shouldPlay: true }
+      );
+  
+      setSomAtual(sound);
+      setAudioTocandoId(id); // <-- salva qual áudio está tocando agora
+  
+      // Reseta quando terminar
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (status.didJustFinish) {
+          setAudioTocandoId(null);
+          setSomAtual(null);
+        }
+      });
+  
     } catch (error) {
       console.log("Erro ao tocar áudio:", error);
     }
@@ -149,21 +217,27 @@ export default function Conversas({ navigation }) {
     await sound.playAsync();
   };
 
-const enviarGravacao = () => {
-  if (!gravacao) return;
-  const novaMsg = {
-    id: Date.now().toString(),
-    tipo: "audio",
-    audioUri: gravacao,
-    remetente: "idoso",
+  const enviarGravacao = async () => {
+    if (!gravacaoURI) return;
+  
+    const formData = new FormData();
+    formData.append("idConversa", converSelecionada.idConversa);
+    formData.append("remententeConversa", "cuidador");
+    formData.append("tipoMensagens", "audio");
+  
+    formData.append("arquivoMensagens", {
+      uri: gravacaoURI,
+      name: "audio.m4a",
+      type: "audio/m4a",
+    });
+  
+    await axios.post(`${API_URL}/api/mandarMensagem`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  
+    setGravacaoURI(null);
+    pegarMensagens();
   };
-  setConversa((prev) => [...prev, novaMsg]);
-  setGravacao(null);
-};
-
-const cancelarGravacao = () => {
-  setGravacao(null);
-};
 
 //se o TECLADOO abre ou fecha e animacao dele
 
@@ -215,8 +289,8 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
   }, []);
 
     return (
-      <SafeAreaView style={styles.container}>
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+           
               <View style={{ flex: 1 }}>
 
                 <View style={styles.nav}>
@@ -225,10 +299,10 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                   </TouchableOpacity>
                   <View style={styles.navInfo}>
                     <Image
-                      source={require("../assets/perfilicon.png")}
+                      source={{uri: `${API_URL}/storage/${converSelecionada.fotoUsuario}`}}
                       style={styles.perfilFree}
                     />
-                    <Text style={styles.freeNome}>Maria Silva</Text>
+                    <Text style={styles.freeNome}>{converSelecionada.nomeUsuario}</Text>
                   </View>
                   <Ionicons
                     name="ellipsis-vertical"
@@ -237,35 +311,40 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                   />
                 </View>
                 
-                <FlatList
-                  data={conversa}
-                  keyExtractor={(item) => item.id}
-                  renderItem={({ item }) => (
-                    <View
-                      style={[
-                        styles.msgContainer,
-                        item.remetente === "idoso" ? styles.msgIdoso : styles.msgCuidador,
-                      ]}
-                    >
-                      {item.tipo === "audio" ? (
-                        <TouchableOpacity onPress={() => tocarAudio(item.audioUri)}>
-                          <Ionicons name="play-circle" size={32 * scale} color="#fff" />
-                        </TouchableOpacity>
-                      ) : item.tipo === "imagem" ? (
-                        <Image
-                          source={{ uri: item.imagemUri }}
-                          style={{ width: 180, height: 180, borderRadius: 12 }}
-                        />
-                      ) : (
-                        <Text style={styles.msgTexto}>{item.texto}</Text>
-                      )}
-                    </View>
-                  )}
-                  contentContainerStyle={{ padding: 12 }}
-                  showsVerticalScrollIndicator={false}
-                />
+                <View style={{ flex: 1 }}>
+  <FlatList
+    data={conversa}
+    keyExtractor={(item) => item.idMensagens.toString()}
+    renderItem={({ item }) => (
+      <View
+        style={[
+          styles.msgContainer,
+          item.remententeConversa === "idoso" ? styles.msgIdoso : styles.msgCuidador,,
+          audioTocandoId === item.idMensagens && styles.audioTocando
+        ]}
+      >
+        {item.tipoMensagens === "audio" ? (
+          <TouchableOpacity 
+          onPress={() => tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)}
+        >
+            <Ionicons name="play-circle" size={32 * scale} color="#fff" />
+          </TouchableOpacity>
+        ) : item.tipoMensagens === "imagem" ? (
+          <Image
+            source={{ uri: `${API_URL}/storage/${item.arquivoMensagens}` }}
+            style={{ width: 180, height: 180, borderRadius: 12 }}
+          />
+        ) : (
+          <Text style={styles.msgTexto}>{item.conteudoMensagens}</Text>
+        )}
+      </View>
+    )}
+    contentContainerStyle={{ padding: 12 }}
+    showsVerticalScrollIndicator={false}
+  />
+</View>
 
-                {gravacao && (
+                {gravacaoURI && (
                   <View style={styles.previaContainer}>
                     <TouchableOpacity onPress={cancelarGravacao}>
                       <Ionicons name="trash-outline" size={32 * scale} color="red" />
@@ -284,7 +363,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     </TouchableOpacity>
                   </View>
                 )}
-
+ <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <Animated.View style={[styles.inputContainer, { marginBottom: keyboardHeight }]}>
                   <TextInput
                     style={styles.input}
@@ -295,7 +374,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     multiline
                   />
 
-                  <TouchableOpacity style={styles.iconButton}  onPress={escolherImagem}>
+                  <TouchableOpacity style={styles.iconButton}  onPress={escolherDaGaleria}>
                     <Ionicons name="image-outline" size={26 * scale} color="#202020" />
                   </TouchableOpacity>
 
@@ -316,9 +395,10 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     </TouchableOpacity>
                   )}
                 </Animated.View>
+                </TouchableWithoutFeedback>
               </View>
-            </TouchableWithoutFeedback>
-          </SafeAreaView>
+            
+          </View>
 
     );
 };
@@ -338,6 +418,12 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     paddingVertical: 5,
     paddingHorizontal: 20,
+  },
+
+  audioTocando: {
+    borderWidth: 2,
+    borderColor: "#6a4cff",
+    backgroundColor: "#dcd2ff",
   },
 
   nav: {
@@ -371,12 +457,15 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   msgIdoso: {
-    backgroundColor: "#b08cff",
-    alignSelf: "flex-end",
-  },
-  msgCuidador: {
     backgroundColor: "#E5E5EA",
     alignSelf: "flex-start",
+  },
+  msgCuidador: {
+
+
+
+    backgroundColor: "#b08cff",
+    alignSelf: "flex-end",
   },
   msgTexto: {
     fontSize: 18,

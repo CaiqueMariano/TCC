@@ -13,6 +13,7 @@ import Historico from "../screens/Historico";
 import Login from '../screens/Login';
 import BemVindo from "../screens/BemVindo";
 import SobreNos from '../screens/SobreNos';
+import ListaConversas from "../screens/ListaConversas";
 import Configuracoes from '../screens/Configuracoes';
 import Contratos from "../screens/Contratos";
 import Dashboard from "../screens/Dashboard";
@@ -55,6 +56,13 @@ function AppTabs() {
           tabBarLabel: "Pedidos",
           tabBarIcon: ({ color }) => (
             <Icons name="ordered-list" size={24} color={color} />
+          )
+        }} />
+
+<Tab.Screen name="Mensagens" component={ListaConversas} options={{
+          tabBarLabel: "Conversas",
+          tabBarIcon: ({ color }) => (
+            <Icons name="message" size={24} color={color} />
           )
         }} />
       <Tab.Screen name="Contratos" component={Contratos} options={{

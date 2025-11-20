@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('tb_mensagens', function (Blueprint $table) {
             $table->id('idMensagens');
             $table->unsignedBigInteger('idConversa');
-            $table->integer('idRemetente');
+            $table->string('remententeConversa');
             $table->string('tipoMensagens');
-            $table->string('conteudoMensagens');
+            $table->string('conteudoMensagens')->nullable();
             $table->string('arquivoMensagens')->nullable();
             $table->timestamps();
 

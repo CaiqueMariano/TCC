@@ -28,10 +28,11 @@ import Adicionar from './src/screens/Adicionar';
 import { UserProvider } from "./src/screens/userContext";
 import perfilProfissional from './src/screens/perfilProfissional';
 import Contrato from './src/screens/Contrato';
-import Servico from './src/screens/Servico'
-import PerguntasC from './src/screens/PerguntasC'
-import pagamento from './src/screens/pagamento'
-import Conversas from './src/screens/Conversas'
+import ListaConversas from './src/screens/ListaConversas';
+import Servico from './src/screens/Servico';
+import PerguntasC from './src/screens/PerguntasC';
+import pagamento from './src/screens/pagamento';
+import Conversas from './src/screens/Conversas';
 import { AccessibilityProvider } from './src/screens/AccessibilityContext';
 const Stack = createNativeStackNavigator();
 
@@ -55,6 +56,7 @@ export default function App() {
         <Stack.Screen name="Ativos" component={Ativos} />
         <Stack.Screen name="Contrato" component={Contrato} />
         <Stack.Screen name="favoritos" component={favoritos} />
+        <Stack.Screen name="Mensagens" component={ListaConversas} />
         <Stack.Screen name="configuracoes" component={configuracoes} />
         <Stack.Screen name="Perfil" component={Perfil} />
         <Stack.Screen name="Login" component={Login} />

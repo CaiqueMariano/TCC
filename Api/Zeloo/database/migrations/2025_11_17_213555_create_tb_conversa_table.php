@@ -15,14 +15,21 @@ return new class extends Migration
     {
         Schema::create('tb_conversa', function (Blueprint $table) {
             $table->id('idConversa');
-            $table->unsignedBigInteger('idContrato');
+            $table->unsignedBigInteger('idProfissional');
+            $table->unsignedBigInteger('idIdosoFamilia');
             $table->timestamps();
 
 
 
-            $table->foreign('idContrato') 
-            ->references('idContrato') 
-            ->on('tb_contrato') 
+            $table->foreign('idProfissional') 
+            ->references('idProfissional') 
+            ->on('tb_profissional') 
+            ->onDelete('cascade');
+
+            
+            $table->foreign('idIdosoFamilia') 
+            ->references('idIdosoFamilia') 
+            ->on('tb_idoso_familia') 
             ->onDelete('cascade');
 
 

@@ -386,7 +386,7 @@ public function buscarDenuncia(Request $request)
 
         return response()->json([
             'success' => true,
-            'message' => 'Conversas encontrados',
+            'message' => 'Conversa criada',
             'data'=> $conversas
         ],200);
    }
@@ -395,16 +395,17 @@ public function buscarDenuncia(Request $request)
     try{
     $msg = new MensagensModel();
     $msg->idConversa = $request->idConversa;
-    $msg->idRemetente = $request->idRemetente;
+    $msg->remententeConversa = $request->remententeConversa;
     $msg->tipoMensagens = $request->tipoMensagens;
 
     if($request->tipoMensagens === "texto"){
         $msg->conteudoMensagens = $request->conteudoMensagens;
     }
 
-    if($request->tipoMensagens !== "texto" && $request->arquivoMensagens){
-        $path = $request->arquivoMensagens->store('mensagens');
+    if ($request->tipoMensagens !== "texto" && $request->hasFile('arquivoMensagens')) {
+        $path = $request->file('arquivoMensagens')->store('mensagens', 'public');
         $msg->arquivoMensagens = $path;
+        
     }
 
     $msg->save();
@@ -425,9 +426,10 @@ public function buscarDenuncia(Request $request)
          ->join('tb_idoso_familia', 'tb_conversa.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
          ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
          ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+         ->leftJoin('tb_mensagens', 'tb_mensagens.idMensagens', '=', DB::raw('(SELECT idMensagens FROM tb_mensagens WHERE idConversa = tb_conversa.idConversa ORDER BY idMensagens DESC LIMIT 1)'))
          ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
         ->where('tb_conversa.idProfissional',$id)
-        ->select('tb_conversa.*',  'tb_usuario.*')
+        ->select('tb_conversa.*',  'tb_usuario.*', 'tb_mensagens.*')
         ->get();
 
         return response()->json([
@@ -443,9 +445,10 @@ public function buscarDenuncia(Request $request)
          ->join('tb_idoso_familia', 'tb_conversa.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
          ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
          ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+         ->leftJoin('tb_mensagens', 'tb_mensagens.idMensagens', '=', DB::raw('(SELECT idMensagens FROM tb_mensagens WHERE idConversa = tb_conversa.idConversa ORDER BY idMensagens DESC LIMIT 1)'))
          ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
         ->where('tb_usuario.idUsuario',$id)
-        ->select('tb_conversa.*',  'tb_profissional.*')
+        ->select('tb_conversa.*',  'tb_profissional.*', 'tb_mensagens.*')
         ->get();
 
         return response()->json([
