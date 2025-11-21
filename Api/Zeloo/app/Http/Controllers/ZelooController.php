@@ -26,6 +26,7 @@ use Kreait\Firebase\Messaging\Notification;
 use Kreait\Firebase\Factory;
 use App\Models\MensagensModel;
 use App\Models\IdosoModel;
+use App\Models\ServicoMensagemModel;
 use App\Models\ProfissionalModel;
 use App\Models\ProfissionalServicoModel;
 use App\Models\TelefoneModel;
@@ -372,23 +373,71 @@ public function buscarDenuncia(Request $request)
     /*Funcões da API*/ 
     
 
+//COMBINAR SERVICO
    public function conversar(Request $request){
 
     $idUsuario = $request->idUsuario;
     $familiar = IdosoModel::where('idUsuario', $idUsuario)->first();
     $familia = IdosoFamiliaModel::where('idIdoso', $familiar->idIdoso)->first();
 
+    $conversaE = ConversaModel::where('idProfissional', $request->idProfissional)
+    ->where('idIdosoFamilia', $familia->idIdosoFamilia)
+    ->first();
+    
+
+    if($conversaE){
+        $conversas = $conversaE;
+    }else{
         $conversas = new ConversaModel();
         $conversas ->idProfissional = $request->idProfissional;
         $conversas ->idIdosoFamilia = $familia->idIdosoFamilia;
 
         $conversas->save();
 
+    }
+
+        $servicoMensagem = new ServicoMensagemModel();
+
+        $servicoMensagem->idConversa = $conversas->idConversa;
+        $servicoMensagem->idServico = $request->idServico;
+
+        $servicoMensagem->save();
+
+        $conversa = DB::table('tb_conversa')
+         ->join('tb_idoso_familia', 'tb_conversa.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
+         ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
+         ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+         ->leftJoin('tb_mensagens', 'tb_mensagens.idMensagens', '=', DB::raw('(SELECT idMensagens FROM tb_mensagens WHERE idConversa = tb_conversa.idConversa ORDER BY idMensagens DESC LIMIT 1)'))
+         ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
+        ->where('tb_conversa.idProfissional',$request->idProfissional)
+        ->where('tb_conversa.idConversa', $conversas->idConversa)
+        ->select('tb_conversa.*',  'tb_usuario.*', 'tb_mensagens.idMensagens','tb_mensagens.created_at as horaConversa','tb_mensagens.remententeConversa','tb_mensagens.tipoMensagens','tb_mensagens.conteudoMensagens','tb_mensagens.arquivoMensagens')
+        ->get();
+
         return response()->json([
             'success' => true,
-            'message' => 'Conversa criada',
-            'data'=> $conversas
+            'message' => 'Conversas encontrados',
+            'data'=> $conversa
         ],200);
+
+   }
+
+
+   public function verServico($id){
+    $servicos= DB::table('tb_servico_mensagem')
+    ->join('tb_servico', 'tb_servico_mensagem.idServico', '=', 'tb_servico.idServico')
+    ->where('tb_servico_mensagem.idConversa', $id)
+    ->where('tb_servico.statusServico', 'nAceito')
+    ->select('tb_servico_mensagem.*', 'tb_servico.*')
+    ->get();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Conversas encontrados',
+        'data'=> $servicos
+    ],200);
+
+
    }
 
    public function mandarMensagem(Request $request){
@@ -400,9 +449,11 @@ public function buscarDenuncia(Request $request)
 
     if($request->tipoMensagens === "texto"){
         $msg->conteudoMensagens = $request->conteudoMensagens;
-    }
 
-    if ($request->tipoMensagens !== "texto" && $request->hasFile('arquivoMensagens')) {
+    }else if($request->tipoMensagens === "agendamento"){
+        $msg->idServico = $request->idServico;
+
+    }else if ($request->tipoMensagens !== "texto" && $request->hasFile('arquivoMensagens')) {
         $path = $request->file('arquivoMensagens')->store('mensagens', 'public');
         $msg->arquivoMensagens = $path;
         
@@ -419,6 +470,21 @@ public function buscarDenuncia(Request $request)
 }
    }
 
+   public function infoAgendamento($id){
+        $servico = DB::table('tb_mensagens')
+        ->join('tb_servico', 'tb_mensagens.idServico', '=', 'tb_servico.idServico')
+        ->where('tb_servico.idServico', $id)
+        ->select('tb_servico.*', 'tb_mensagens.*')
+        ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Conversas encontrados',
+            'data'=> $servico
+        ],200);
+   }
+
+
 
 
    public function verConversasFree($id){
@@ -429,7 +495,7 @@ public function buscarDenuncia(Request $request)
          ->leftJoin('tb_mensagens', 'tb_mensagens.idMensagens', '=', DB::raw('(SELECT idMensagens FROM tb_mensagens WHERE idConversa = tb_conversa.idConversa ORDER BY idMensagens DESC LIMIT 1)'))
          ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
         ->where('tb_conversa.idProfissional',$id)
-        ->select('tb_conversa.*',  'tb_usuario.*', 'tb_mensagens.*')
+        ->select('tb_conversa.*',  'tb_usuario.*', 'tb_mensagens.idMensagens','tb_mensagens.created_at as horaConversa','tb_mensagens.remententeConversa','tb_mensagens.tipoMensagens','tb_mensagens.conteudoMensagens','tb_mensagens.arquivoMensagens')
         ->get();
 
         return response()->json([
@@ -439,7 +505,40 @@ public function buscarDenuncia(Request $request)
         ],200);
    }
 
+   public function enviarproposta(Request $request){
+    try{
+     $proposta = new ProfissionalServicoModel();
 
+     $proposta->idProfissional = $request->idProfissional;
+     $proposta->idServico = $request->idServico;
+     $proposta->precoPersonalizado = $request->precoPersonalizado;
+     
+     $proposta->save();
+
+     $msg = new MensagensModel();
+     $msg->idConversa = $request->idConversa;
+     $msg->remententeConversa = $request->remententeConversa;
+     $msg->tipoMensagens = "proposta";
+     $msg->idProfissionalServico = $proposta->idProfissionalServico;
+    $msg->idServico= $proposta->idServico;
+     $msg->save();
+
+     return response()->json([
+        'success' => true,
+        'message' => 'feito',
+        'proposta' => $proposta,
+        'msg' => $msg
+    ],200);
+   }catch (\Exception $e) {
+   
+    return response()->json([
+        'error' => 'Erro ao buscar mensagens',
+        'details' => $e->getMessage()
+    ], 500);
+
+}
+
+   }
    public function verConversas($id){
     $conversa = DB::table('tb_conversa')
          ->join('tb_idoso_familia', 'tb_conversa.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
@@ -448,7 +547,7 @@ public function buscarDenuncia(Request $request)
          ->leftJoin('tb_mensagens', 'tb_mensagens.idMensagens', '=', DB::raw('(SELECT idMensagens FROM tb_mensagens WHERE idConversa = tb_conversa.idConversa ORDER BY idMensagens DESC LIMIT 1)'))
          ->join('tb_profissional', 'tb_conversa.idProfissional', '=', 'tb_profissional.idProfissional')
         ->where('tb_usuario.idUsuario',$id)
-        ->select('tb_conversa.*',  'tb_profissional.*', 'tb_mensagens.*')
+        ->select('tb_conversa.*',  'tb_profissional.*', 'tb_mensagens.idMensagens', 'tb_mensagens.created_at as horaConversa','tb_mensagens.remententeConversa','tb_mensagens.tipoMensagens','tb_mensagens.conteudoMensagens','tb_mensagens.arquivoMensagens')
         ->get();
 
         return response()->json([
@@ -458,29 +557,57 @@ public function buscarDenuncia(Request $request)
         ],200);
    }
    public function getMensagens($id)
-{
-    try {
-        $conversa = ConversaModel::find($id);
+   {
+       try {
+           $conversa = ConversaModel::find($id);
+
+           /* $mensagens = MensagensModel::where('idConversa', $id) 
+           ->orderBy('created_at', 'asc') 
+           ->get();*/
+   
+           $mensagens = MensagensModel::where('idConversa', $id)
+               ->leftJoin('tb_servico', 'tb_mensagens.idServico', '=', 'tb_servico.idServico')
+               ->leftJoin('tb_profissional_servico', 'tb_servico.idServico', '=', 'tb_profissional_servico.idServico')
+               ->leftJoin('tb_endereco', 'tb_servico.idEndereco', '=', 'tb_endereco.idEndereco')
+               ->orderBy('idMensagens', 'asc')
+               ->select(
+                'tb_servico.idServico',
+                'tb_servico.nomeServico',
+                'tb_servico.idIdosoFamilia',
+                'tb_servico.tipoServico',
+                'tb_servico.descServico',
+                'tb_servico.generoServico',
+                'tb_servico.dataServico',
+                'tb_servico.horaInicioServico',
+                'tb_servico.horaTerminoServico',
+                'tb_servico.idEndereco',
+                'tb_servico.statusServico',
+                'tb_servico.created_at',
+                'tb_servico.updated_at',
+                'tb_profissional_servico.idProfissionalServico',
+                'tb_profissional_servico.precoPersonalizado',
+                'tb_profissional_servico.idServico as IDDOSERVICO',
+                'tb_mensagens.*',
+                'tb_endereco.*'
+            )
+               ->get();
+   
+           return response()->json([
+               'idConversa' => $id,
+               'mensagens' => $mensagens
+           ], 200);
+   
+       } catch (\Exception $e) {
+   
+           return response()->json([
+               'error' => 'Erro ao buscar mensagens',
+               'details' => $e->getMessage()
+           ], 500);
+   
+       }
+   }
 
 
-        
-        $mensagens = MensagensModel::where('idConversa', $id)
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-
-        return response()->json([
-            'idConversa' => $id,
-            'mensagens' => $mensagens
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Erro ao buscar mensagens',
-            'details' => $e->getMessage()
-        ], 500);
-    }
-}
 
     public function extrato(Request $request){
         $extrato = new ExtratoModel();

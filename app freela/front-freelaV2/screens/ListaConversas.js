@@ -31,16 +31,24 @@ export default function ListaConversas({navigation}) {
         navigation.navigate("Conversas",{ converSelecionada: item });
     }
     const [conversas, setConversas] = useState([]);
+
+
+    const atualizarConversas = async () => {
+        axios
+        .get(`${API_URL}/api/verConversasFree/${user.idProfissional}`)
+        .then(
+            response =>{
+                setConversas(response.data.data)
+            }
+        ).catch(error => console.log("erro:", error));
+    }
     useEffect(() => {
-
-            axios
-            .get(`${API_URL}/api/verConversasFree/${user.idProfissional}`)
-            .then(
-                response =>{
-                    setConversas(response.data.data)
-                }
-            ).catch(error => console.log("erro:", error));
-
+        atualizarConversas()
+        const interval = setInterval(() => {
+            atualizarConversas();
+          }, 2000); 
+        
+          return () => clearInterval(interval);
     }, []);
    
     return (
@@ -48,10 +56,10 @@ export default function ListaConversas({navigation}) {
 
             <View style={styles.cardsGanhos}>
             {conversas
-            .sort((a, b) => new Date(`${b.updated_at}T${b.updated_at}`) - new Date(`${a.updated_at}T${a.updated_at}`))
+            .sort((a, b) => new Date(`${b.horaConversa}T${b.horaConversa}`) - new Date(`${a.horaConversa}T${a.horaConversa}`))
             .map((item, index) => {
 
-                const data = new Date(item.updated_at);
+                const data = new Date(item.horaConversa);
                 const h= data.getHours();
                 const m = data.getMinutes();
 

@@ -17,6 +17,15 @@ use App\Http\Controllers\AuthController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+//Ver informações do servico da mensagem infoAgendamento
+Route::get('/infoAgendamento/{id}','App\Http\Controllers\ZelooController@infoAgendamento');
+//ENVIAR PROPOSTA
+Route::post('/enviarproposta','App\Http\Controllers\ZelooController@enviarproposta');
+
+//Ver os servicos daquela conversa 
+Route::get('/verServico/{id}','App\Http\Controllers\ZelooController@verServico');
 //Pegar mensagens
 Route::get('/getMensagens/{id}','App\Http\Controllers\ZelooController@getMensagens');
 //CRIAR CONVERSA

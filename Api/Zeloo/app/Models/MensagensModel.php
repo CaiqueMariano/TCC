@@ -18,5 +18,7 @@ class MensagensModel extends Model
         'tipoMensagens',
         'conteudoMensagens',
         'arquivoMensagens',
+        'idServico',
+        'idProfissionalServico'
     ];
 }

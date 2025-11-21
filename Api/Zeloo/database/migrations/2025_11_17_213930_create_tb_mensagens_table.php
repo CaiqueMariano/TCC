@@ -18,9 +18,22 @@ return new class extends Migration
             $table->unsignedBigInteger('idConversa');
             $table->string('remententeConversa');
             $table->string('tipoMensagens');
+            $table->unsignedBigInteger('idServico')->nullable();
+            $table->unsignedBigInteger('idProfissionalServico')->nullable();
             $table->string('conteudoMensagens')->nullable();
             $table->string('arquivoMensagens')->nullable();
             $table->timestamps();
+
+            $table->foreign('idServico') 
+            ->references('idServico') 
+            ->on('tb_servico') 
+            ->onDelete('cascade');
+
+
+            $table->foreign('idProfissionalServico') 
+            ->references('idProfissionalServico') 
+            ->on('tb_profissional_servico') 
+            ->onDelete('cascade');
 
             $table->foreign('idConversa') 
             ->references('idConversa') 

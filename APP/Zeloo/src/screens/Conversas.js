@@ -300,10 +300,10 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                   </TouchableOpacity>
                   <View style={styles.navInfo}>
                     <Image
-                      source={{uri: `${API_URL}/storage/${converSelecionada.fotoUsuario}`}}
+                      source={{uri: `${API_URL}/storage/${converSelecionada.fotoProfissional}`}}
                       style={styles.perfilFree}
                     />
-                    <Text style={styles.freeNome}>{converSelecionada.nomeUsuario}</Text>
+                    <Text style={styles.freeNome}>{converSelecionada.nomeProfissional}</Text>
                   </View>
                   <Ionicons
                     name="ellipsis-vertical"
@@ -311,19 +311,29 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     color="#202020"
                   />
                 </View>
+
+                <View>
+
+                </View>
                 
                 <View style={{ flex: 1 }}>
   <FlatList
     data={conversa}
-    keyExtractor={(item) => item.idMensagens.toString()}
+   keyExtractor={(item, index) => `${item.idMensagens}_${index}`}
     renderItem={({ item }) => (
       <View
-        style={[
-          styles.msgContainer,
-          item.remententeConversa === "idoso" ? styles.msgIdoso : styles.msgCuidador,,
-          audioTocandoId === item.idMensagens && styles.audioTocando
-        ]}
-      >
+  style={[
+    styles.msgContainer,
+    item.remententeConversa === "idoso"
+      ? styles.msgIdoso
+      : styles.msgCuidador,
+
+    item.tipoMensagens === "agendamento" && styles.cardAgendamentoContainer,
+    item.tipoMensagens === "proposta" && styles.cardAgendamentoContainer,
+
+    audioTocandoId === item.idMensagens && styles.audioTocando
+  ]}
+>
         {item.tipoMensagens === "audio" ? (
           <TouchableOpacity 
           onPress={() => tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)}
@@ -335,6 +345,50 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             source={{ uri: `${API_URL}/storage/${item.arquivoMensagens}` }}
             style={{ width: 180, height: 180, borderRadius: 12 }}
           />
+        ): item.tipoMensagens === "proposta" ? (
+
+          <View  style={styles.cardAgendamento}>
+
+          <Text style={styles.textoContrato}>Informações da Proposta</Text>
+          <TouchableOpacity>
+          </TouchableOpacity>
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Tipo:</Text>
+            <Text style={styles.infoText}>{item.nomeServico}</Text>
+          </View>
+          
+
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Data: </Text>
+            <Text style={styles.infoText}>{item.dataServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Horário: </Text>
+            <Text style={styles.infoText}>{item.horaInicioServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Rua: </Text>
+            <Text style={styles.infoText}>{item.ruaUsuario}, {item.numLogradouroUsuario}</Text>
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Cidade: </Text>
+            <Text style={styles.infoText}>{item.cidadeUsuario}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelText}>CEP: </Text>
+            <Text style={styles.infoText}>{item.cepUsuario}</Text>
+          </View>
+
+
+          <View style={styles.labelValor}>
+            <Text style={styles.labelTextValor}>Valor: R$</Text>
+            <Text style={styles.labelTextValor}>{item.precoPersonalizado}</Text>
+          </View>
+          <TouchableOpacity style={styles.botaoContrato}><Text style={styles.textoBotao}>CONFIRMAR</Text></TouchableOpacity>
+          </View>
         ) : (
           <Text style={styles.msgTexto}>{item.conteudoMensagens}</Text>
         )}
@@ -409,6 +463,89 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F8F8F8",
   },
+
+  cardAgendamento:{
+   
+    borderRadius:30,
+
+  },
+
+  labelValor:{
+    marginTop:20,
+    marginBottom:10,
+    flexDirection:"row",
+  },
+
+  labelTextValor:{
+    marginTop:10,
+   
+    fontSize:20,
+    marginBottom:10,
+  },
+
+  inputValor:{
+    
+    fontSize:20,
+  },
+
+  labelText:{
+    
+    
+  },
+
+  infoText:{
+    
+    textDecorationLine:"underline",
+  },
+
+  cardAgendamentoContainer: {
+    width:250,
+    backgroundColor: "#E5E5EA",
+    padding: 12,
+    borderRadius: 12,
+    
+  },
+
+  label:{
+    marginBottom:10,
+    flexDirection:"row"
+  },
+  botaoContrato:{
+    backgroundColor:"#fff",
+    borderRadius: 16,
+    width:150,
+    paddingBottom:8,
+    paddingTop:8,
+    borderWidth: 2,
+   marginBottom:20,
+    borderColor: '#fff' ,
+  },
+
+  textoBotao: {
+    color: colors.azul,
+    fontSize: 15,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+
+  textoContrato:{
+   
+    color: "#fff",
+    fontSize:15,
+    fontWeight:"600",
+  },
+
+  textoContrato2:{
+    color: "#fff",
+    fontSize:15,
+    marginBottom:10,
+    fontWeight:"400",
+  },
+
+
+
+
   audioTocando: {
     borderWidth: 2,
     borderColor: "#6a4cff",

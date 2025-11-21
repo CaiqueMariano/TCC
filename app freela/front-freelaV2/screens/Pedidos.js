@@ -16,7 +16,6 @@ import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 import { API_URL } from './link';
 import { UserContext } from './userContext';
-import { useNavigation } from '@react-navigation/native';
 import Icon from "react-native-vector-icons/Feather";
 import * as Location from 'expo-location';
 
@@ -39,11 +38,10 @@ const ABAS = [
   { chave: 'Outro', titulo: 'Outros' },
 ];
 
-export default function Pedidos() {
+export default function Pedidos({navigation}) {
   const {user} = useContext(UserContext);
   const [localizacao, setLocalizacao] = useState(null);
   const [erro, setErro] = useState(null);
-  const navigation = useNavigation();
   const [abaAtiva, setAbaAtiva] = useState(0);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalAceitar, setModalAceitar] = useState(false);
@@ -91,19 +89,20 @@ const aceitar = async () => {
   try {
 
     const precoFinal = precoParaBackend(precoPersonalizado);
-    const response = await axios.post(`${API_URL}/api/aceita`, {
+    const response = await axios.post(`${API_URL}/api/conversar`, {
       idServico: itemSelecionado.idServico,
       idProfissional: user.idProfissional,
-      precoPersonalizado:precoFinal
+      idUsuario:itemSelecionado.idUsuario
     });
 
     if (response.data.success) {
-     console.log(response.data.message);
-     setModalConfirmar(true);
-     setModalAceitar(false)
+      const conversa = response.data.data[0];
+      navigation.navigate("Conversas", { converSelecionada: conversa });
+
+     
     } else {
       console.log(response.data.message)
-     setModalAceitar(false);
+     
     }
 
   } catch (error) {
@@ -129,7 +128,7 @@ const aceitar = async () => {
   async function pegarCoordenadasPorCEP(item) {
     const enderecoCompleto = `${item.ruaUsuario} ${item.numLogradouroUsuario}, ${item.bairroUsuario}, ${item.cidadeUsuario} - ${item.estadoUsuario}`;
   
-    console.log("Endereço usado para geocode:", enderecoCompleto);
+
   
     const resultados = await Location.geocodeAsync(enderecoCompleto);
   
@@ -171,35 +170,24 @@ const aceitar = async () => {
     }).start();
   }, [abaAtiva]);
 
-  const pedidos = [
-    {
-      id: 1,
-      nome: 'Sebastião Melo',
-      cidade: 'Vila olimpia - SP',
-      nota: 3.5,
-      avaliacoes: 47,
-      pedido: 'senhor de idade, precisa de (acompanhamento doméstico)',
-      imagem: 'https://i.pravatar.cc/150?img=70',
-    },
-    {
-      id: 2,
-      nome: 'José Ricardo',
-      cidade: 'Guarulhos - SP',
-      nota: 3,
-      avaliacoes: 23,
-      pedido: 'senhor de idade, precisa de (acompanhamento doméstico)',
-      imagem: 'https://i.pravatar.cc/150?img=63',
-    },
-  ];
+const pegarServicos = async () =>{
+  axios
+  .get(`${API_URL}/api/buscarServicos`)
+  .then(response =>{
+    setServicos(response.data.data);
+  })
+  .catch(error => console.log("ERRO: ", error));
+}
 
 
   useEffect(()=>{
-    axios
-      .get(`${API_URL}/api/buscarServicos`)
-      .then(response =>{
-        setServicos(response.data.data);
-      })
-      .catch(error => console.log("ERRO: ", error));
+    pegarServicos();
+
+    const interval = setInterval(() => {
+      pegarServicos();
+    }, 2000); 
+  
+    return () => clearInterval(interval);
   },[])
 
   const renderStars = (rating) => {
@@ -231,7 +219,7 @@ const aceitar = async () => {
       if (!localizacao) return;
     
       async function calc() {
-        console.log("Chamando pegarCoordenadasPorCEP com:", item);
+
         const coords = await pegarCoordenadasPorCEP(item);
         
         if (coords) {
@@ -242,7 +230,7 @@ const aceitar = async () => {
             coords.lon
           );
     
-          console.log("Distância calculada:", km);
+      
           setDistancia(km.toFixed(1));
         } else {
           console.log("Coordenadas não encontradas para:");
@@ -349,11 +337,8 @@ itemSelecionado
   })}> 
                 <Text style={styles.textoBotao}>Perfil do Idoso</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.botaoAcao} onPress={() => {
-    setModalAceitar(true);
-    setModalVisivel(false);
-  }}> 
-                <Text style={styles.textoBotao}>Aceitar</Text>
+              <TouchableOpacity style={styles.botaoAcao} onPress={() => aceitar()}> 
+                <Text style={styles.textoBotao}>Combinar</Text>
               </TouchableOpacity>
               </View>
       </>

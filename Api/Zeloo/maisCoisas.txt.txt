@@ -2,9 +2,16 @@
 php artisan serve --host=0.0.0.0 --port=8000
 npx expo start --host lan
 
+scrcpy -s RQ8N2098ZZW
+scrcpy -s a3a366b6
+
+
+
+
+
 
 Criar migration
-php artisan make:migration create_tbMensagens_table
+php artisan make:migration create_tbServicoMensagem_table
 
 php artisan make:mail MensagemMail
 
