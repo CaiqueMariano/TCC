@@ -129,6 +129,9 @@ Route::get('/usuario','App\Http\Controllers\ZelooController@indexApi');
 //CADASTRO USUARIO
 Route::post('/usuario','App\Http\Controllers\ZelooController@storeUsuarioApi');
 
+//BANIR USUARIO (API)
+Route::post('/banir-usuario','App\Http\Controllers\ZelooController@banirUsuario');
+
 /*
 Route::post('/familiar','App\Http\Controllers\ZelooController@storeFamiliarApi');
 Route::post('/idoso','App\Http\Controllers\ZelooController@storeIdosoApi');*/

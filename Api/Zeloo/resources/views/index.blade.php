@@ -208,8 +208,8 @@ body {
 
     <div class="container">
         <h2 class="h4 mb-0 text-white">
-            <i class="bi bi-speedometer2 me-2"></i>
-            Dashboard
+            <i class="bi bi-shield-check me-2"></i>
+            Sistema de Administração SPLIT
         </h2>
 
         <p class="mb-0 mt-1" style="color: #e6e6e6;">
