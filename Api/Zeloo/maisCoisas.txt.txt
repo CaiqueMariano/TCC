@@ -7,18 +7,13 @@ scrcpy -s a3a366b6
 
 
 
-
-
-
 Criar migration
 php artisan make:migration create_tbServicoMensagem_table
 
 php artisan make:mail MensagemMail
 
 Criar Model
-php artisan make:model MensagemModel​
-php artisan make:model MensagensModel​
-
+php artisan make:model ServicoMensagemModel​
 
 
 {

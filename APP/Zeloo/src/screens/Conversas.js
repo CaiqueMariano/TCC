@@ -46,7 +46,12 @@ const [gravacaoURI, setGravacaoURI] = useState(null); // uri do audio
   }, []);
   //IMAGEEEM
 
-
+const confirmarContrato = async (item) =>{
+  axios.post(`${API_URL}/api/aceita`,{
+    idServico:item.idServico,
+    idProfissionalServico:item.idProfissionalServico,
+  })
+}
 
   const cancelarGravacao = () => {
     setGravacaoURI(null);
@@ -387,7 +392,15 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             <Text style={styles.labelTextValor}>Valor: R$</Text>
             <Text style={styles.labelTextValor}>{item.precoPersonalizado}</Text>
           </View>
-          <TouchableOpacity style={styles.botaoContrato}><Text style={styles.textoBotao}>CONFIRMAR</Text></TouchableOpacity>
+          {item.statusServico === "nAceito" ?
+          (
+          <TouchableOpacity style={styles.botaoContrato} onPress={()=> confirmarContrato(item)}>
+            <Text style={styles.textoBotao}>CONFIRMAR</Text>
+            </TouchableOpacity>
+            ):( <TouchableOpacity style={styles.botaoContrato}>
+            <Text style={styles.textoBotao}>CONFIRMADO</Text>
+            </TouchableOpacity>)
+            }
           </View>
         ) : (
           <Text style={styles.msgTexto}>{item.conteudoMensagens}</Text>

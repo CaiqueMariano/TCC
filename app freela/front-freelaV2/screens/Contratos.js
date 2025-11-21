@@ -4,6 +4,7 @@ import { API_URL } from './link';
 import { UserContext } from './userContext';
 import {View,Text,ScrollView,Platform,TouchableOpacity,Animated,Dimensions,StyleSheet, Image,} from 'react-native';
 import CustomModal from './Modal';
+import ModalFinalizacao from './ModalFinalizacao';
 const ABAS = [
   { chave: 'ativos', titulo: 'Ativos' },
   { chave: 'pendentes', titulo: 'Pendentes' },
@@ -71,14 +72,14 @@ export default function Contratos({navigation}) {
       const response = await axios.post(`${API_URL}/api/finalizar`, {
         idContrato: item.idContrato
       });
-
+/*
       const extrato = await axios.post(`${API_URL}/api/extrato`,{
         idProfissional: user.idProfissional,
         idContrato:item.idContrato,
         valor: item.precoPersonalizado,
         dataExtrato: dataFormatada,
         horarioExtrato: horario,
-      });
+      });*/
 
       if (response.data.success) {
         setPrecoModal(item.precoPersonalizado);
@@ -86,11 +87,7 @@ export default function Contratos({navigation}) {
         
       }
 
-      if(extrato.data.success){
-        console.log("sucesso");
-      }else{
-        console.log("erro")
-      }
+      
     } catch (error) {
       console.log(error);
     }
@@ -102,14 +99,9 @@ export default function Contratos({navigation}) {
 
   return (
     <View style={styles.container}>
-       <CustomModal
+       <ModalFinalizacao
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
-        onNavigateDashboard={() => {
-          setModalVisible(false);
-          navigation.navigate('Dashboard');
-        }}
-        preco={precoModal}
       />
      
 

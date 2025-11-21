@@ -164,7 +164,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
       <View>
       <Text style={styles.contractName}>{contratoAtivo.nomeProfissional}</Text>
         <Text style={styles.contractStatus}>
-          Status: <Text style={styles.contractPaid}>Pago</Text>
+          Status: <Text style={styles.contractPaid}>Ativo</Text>
         </Text>
       </View>
     </View>

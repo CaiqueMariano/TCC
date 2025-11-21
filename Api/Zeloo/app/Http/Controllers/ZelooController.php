@@ -1015,6 +1015,7 @@ public function desbanirFree($idProfissional)
         ->join('tb_idoso_familia', 'tb_servico.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
         ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
         ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+        ->where('tb_servico.statusServico', "nAceito")
         ->select('tb_servico.*','tb_usuario.*', 'tb_endereco.*')
         ->get();
 
@@ -1164,6 +1165,8 @@ public function cancelarContrato($idContrato){
 
 //Cancelado
 public function vizualizarContratosFree($idProfissional, $status){
+
+    try{
     $contratos = DB::table('tb_contrato')
     ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
     ->join('tb_servico', 'tb_profissional_servico.idServico', '=' ,'tb_servico.idServico')
@@ -1171,7 +1174,6 @@ public function vizualizarContratosFree($idProfissional, $status){
     ->join('tb_idoso',  'tb_idoso_familia.idIdoso','=', 'tb_idoso.idIdoso')
     ->join('tb_usuario','tb_idoso.idUsuario','=','tb_usuario.idUsuario')
     ->join('tb_profissional', 'tb_profissional_servico.idProfissional', '=', 'tb_profissional.idProfissional')
-    ->join('tb_conversa', 'tb_conversa.idContrato', '=','tb_contrato.idContrato')
     ->where('tb_profissional_servico.idProfissional', $idProfissional)
     ->where('tb_contrato.statusContrato', $status)
     ->select('tb_contrato.*', 'tb_servico.*', 'tb_usuario.*', 'tb_profissional_servico.*'/*, 'tb_conversa.*'/*/)
@@ -1183,6 +1185,13 @@ public function vizualizarContratosFree($idProfissional, $status){
         'message' => 'Contratos sem pagar encontrados',
         'data'=> $contratos
     ],200);
+}catch (\Exception $e) {
+    return response()->json([
+        'success' => false,
+        'message' => 'Erro ao listar usuários',
+        'error' => $e->getMessage()
+    ], 500);
+}
 }
 
 //
@@ -1192,7 +1201,7 @@ public function vizualizarContratosFree($idProfissional, $status){
     public function pagar(Request $request){
         $contrato = ContratoModel::find($request->idContrato);
            if($contrato){
-            $contrato -> statusContrato = "Ativo";
+            $contrato -> statusContrato = "finalizado";
             $contrato-> save();
            }
 
@@ -1208,7 +1217,7 @@ public function vizualizarContratosFree($idProfissional, $status){
     public function finalizar(Request $request){
         $contrato = ContratoModel::find($request->idContrato);
            if($contrato){
-            $contrato -> statusContrato = "finalizado";
+            $contrato -> statusContrato = "Aguardando Pagamento";
             $contrato-> save();
            }
 
@@ -1499,6 +1508,7 @@ public function criarContrato(Request $request)
 public function aceita(Request $request){
    try{
    
+    /*
     $aceita =  new ProfissionalServicoModel();
 
     $aceita -> idProfissional = $request->idProfissional;
@@ -1506,13 +1516,13 @@ public function aceita(Request $request){
     $aceita -> precoPersonalizado = $request->precoPersonalizado;
 
 
-    $aceita->save();
+    $aceita->save();*/
 
 
            $contrato = new ContratoModel();
-           $contrato->idProfissionalServico = $aceita->idProfissionalServico; 
+           $contrato->idProfissionalServico = $request->idProfissionalServico; 
            $contrato->dataInicioContrato = date('Y-m-d');
-           $contrato->statusContrato = 'Aguardando Pagamento';
+           $contrato->statusContrato = 'ativo';
            $contrato->obsContrato = '-';
            $contrato->save();
 
@@ -1523,10 +1533,7 @@ public function aceita(Request $request){
            }
 
 
-           $conversas = new ConversaModel();
-           $conversas->idContrato = $contrato->idContrato;
-
-           $conversas->save();
+          
 
            /*
         $idosoFamilia = IdosoFamiliaModel::where('idIdosoFamilia', $servico->idIdosoFamilia)->first();

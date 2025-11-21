@@ -10,12 +10,46 @@ import colors from "./colors";
 export default function telaPagamento({ route, navigation }) {
   const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
   const { servico } = route.params;
-
+  const dataAtual = new Date();
   const pagar = async () => {
     try {
+
+
+      const hoje = new Date();
+      const horas = String(hoje.getHours()).padStart(2, '0');
+      const minutos = String(hoje.getMinutes()).padStart(2, '0');
+      const segundos = String(hoje.getSeconds()).padStart(2, '0');
+
+
+
+      const horario = `${horas}:${minutos}:${segundos}`;
+
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0'); // 0–11 → soma 1
+      const dia = String(hoje.getDate()).padStart(2, '0');
+
+      const dataFormatada = `${ano}-${mes}-${dia}`;
+
+
       const response = await axios.post(`${API_URL}/api/pagar`, {
         idContrato: servico.idContrato
       });
+
+      
+      const extrato = await axios.post(`${API_URL}/api/extrato`,{
+        idProfissional: servico.idProfissional,
+        idContrato: servico.idContrato,
+        valor: servico.precoPersonalizado,
+        dataExtrato: dataFormatada,
+        horarioExtrato: horario,
+      })
+
+      if(extrato.data.success){
+        console.log("sucesso");
+      }else{
+        console.log("erro")
+      }
+
 
       if (response.data.success) {
         alert('Pagamento Feito!');

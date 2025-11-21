@@ -79,7 +79,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
   
     if (resultado.canceled) return;
   
-    const uri = resultado.assets[0].uri; // ← Pegue direto daqui
+    const uri = resultado.assets[0].uri; 
   
     const formData = new FormData();
     formData.append("idConversa", converSelecionada.idConversa);
@@ -100,7 +100,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
       headers: { "Content-Type": "multipart/form-data" },
     });
   
-    pegarMensagens(); // Atualiza a tela
+    pegarMensagens();
   };
 
     //AUDIOO
@@ -143,7 +143,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
           idConversa: converSelecionada.idConversa,
           remententeConversa: "cuidador",
         }).catch(error =>{
-          console.log("Erro:", error.response?.data?.details);
+          //console.log("Erro:", error.response?.data?.details);
         })
     pegarMensagens();
     setMostrarEdicao(false);
@@ -187,7 +187,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
       if (!gravando) return;
   
       await gravando.stopAndUnloadAsync();
-      const uri = gravando.getURI();  // ← pega o áudio gravado
+      const uri = gravando.getURI();  
       setGravacaoURI(uri);
       setGravando(null);
   
@@ -208,7 +208,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
     try {
       console.log("Tocando:", uri);
   
-      // Se já existe um áudio tocando, parar ele antes
+      
       if (somAtual) {
         await somAtual.stopAsync();
         await somAtual.unloadAsync();
@@ -221,9 +221,9 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
       );
   
       setSomAtual(sound);
-      setAudioTocandoId(id); // <-- salva qual áudio está tocando agora
+      setAudioTocandoId(id);
   
-      // Reseta quando terminar
+      
       sound.setOnPlaybackStatusUpdate((status) => {
         if (status.didJustFinish) {
           setAudioTocandoId(null);
@@ -549,7 +549,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             <Text style={styles.labelTextValor}>Valor: R$</Text>
             <Text style={styles.labelTextValor}>{item.precoPersonalizado}</Text>
           </View>
-          <TouchableOpacity style={styles.botaoContrato}><Text style={styles.textoBotao}>Aguardando Confirmação</Text></TouchableOpacity>
+          <TouchableOpacity style={styles.botaoContrato}><Text style={styles.textoBotao}>{item.statusServico === "nAceito" ? ("Aguardando Confirmação"):("Proposta Aceita")}</Text></TouchableOpacity>
           </View>
         ) : (
           <Text style={styles.msgTexto}>{item.conteudoMensagens}</Text>

@@ -98,7 +98,7 @@ export default function Ativos({ navigation }) {
                   <View>
                     <EscalarText style={styles.contractName}>{servico.nomeProfissional}</EscalarText>
                     <EscalarText style={styles.contractStatus}>
-                      Status: <Text style={styles.contractPaid}>Pago</Text>
+                      Status: <Text style={styles.contractPaid}>Ativo</Text>
                     </EscalarText>
                   </View>
                 </View>

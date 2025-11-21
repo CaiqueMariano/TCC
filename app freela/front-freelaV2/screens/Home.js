@@ -11,23 +11,31 @@ export default function Home() {
   const [ultimoContrato, setUltimoContrato] = useState(null);
   const navigation = useNavigation();
   const [abaAtiva, setAbaAtiva] = useState(0);
- 
+
+
+  const fetchUltimoContrato = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/vizualizarContratosFree/${user.idProfissional}/Ativo`);
+      if (response.data.data && response.data.data.length > 0) {
+        // Pega o último contrato da lista
+        setUltimoContrato(response.data.data[0]);
+      }
+    } catch (error) {
+      console.log("Erro:", error.response?.data?.error);
+
+    }
+  };
   useEffect(() => {
     if (!user) return;
 
-    const fetchUltimoContrato = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/api/vizualizarContratosFree/${user.idProfissional}/ativo`);
-        if (response.data.data && response.data.data.length > 0) {
-          // Pega o último contrato da lista
-          setUltimoContrato(response.data.data[0]);
-        }
-      } catch (error) {
-        console.log('Erro ao buscar último contrato:', error);
-      }
-    };
-
+   
     fetchUltimoContrato();
+
+    const interval = setInterval(() => {
+      fetchUltimoContrato();
+    }, 2000); 
+  
+    return () => clearInterval(interval);
   }, [user]);
   const abas = [
     { titulo: 'Home', icone: 'home-outline', rota: 'Home' },
