@@ -267,21 +267,68 @@ public function destroyUsuario($idUsuario)
         return back()->with('error', 'Usuário não encontrado.');
     }
 
-    // Verifica se existe denúncia para esse usuário
     if (Denuncias::where('idUsuario', $idUsuario)->exists()) {
-
-        // Atualiza status
-        $usuario->update(['statusUsuario' => 'inativo']);
-
-        // Envia e-mail
-        Mail::to($usuario->emailUsuario)
-            ->send(new UsuarioBanidoMail($usuario->nomeUsuario));
+        $this->aplicarBanUsuario($usuario);
 
         return redirect()->route('denuncias')
-                        ->with('success', 'Usuário banido com sucesso!');
+            ->with('success', 'Usuário banido com sucesso!');
     }
 
     return back()->with('error', 'Nenhuma denúncia encontrada para esse usuário.');
+}
+
+public function banirUsuario(Request $request)
+{
+    $validated = $request->validate([
+        'idUsuario' => 'required|exists:tb_usuario,idUsuario',
+        'motivoDenuncia' => 'required|string',
+        'descDenuncia' => 'required|string',
+        'evidenciaDenuncia' => 'nullable|string',
+    ]);
+
+    $usuario = UsuarioModel::findOrFail($validated['idUsuario']);
+
+    Denuncias::updateOrCreate(
+        ['idUsuario' => $usuario->idUsuario],
+        [
+            'motivoDenuncia' => $validated['motivoDenuncia'],
+            'descDenuncia' => $validated['descDenuncia'],
+            'evidenciaDenuncia' => $validated['evidenciaDenuncia'] ?? '-',
+        ]
+    );
+
+    $this->aplicarBanUsuario($usuario);
+
+    // Se for requisição de API, retorna JSON
+    if ($request->expectsJson() || $request->is('api/*')) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Usuário banido com sucesso!',
+            'data' => [
+                'idUsuario' => $usuario->idUsuario,
+                'nomeUsuario' => $usuario->nomeUsuario,
+                'statusUsuario' => $usuario->statusUsuario
+            ]
+        ], 200);
+    }
+
+    return redirect()->route('denuncias')
+        ->with('success', 'Usuário banido com sucesso!');
+}
+
+private function aplicarBanUsuario(UsuarioModel $usuario)
+{
+    if ($usuario->statusUsuario === 'inativo') {
+        return;
+    }
+
+    $usuario->statusUsuario = 'inativo';
+    $usuario->save();
+
+    if (!empty($usuario->emailUsuario)) {
+        Mail::to($usuario->emailUsuario)
+            ->send(new UsuarioBanidoMail($usuario->nomeUsuario));
+    }
 }
 
 
@@ -1382,25 +1429,25 @@ public function vizualizarContratosFree($idProfissional, $status){
 
         $usuario->nomeUsuario = $request->nomeUsuario;
         $usuario->telefoneUsuario = $request->telefoneUsuario;
+        $usuario->emailUsuario = $request->emailUsuario ?? null;
         $usuario->senhaUsuario = bcrypt($request->senhaUsuario);
         $usuario->dataNasc = $request->dataNasc;
-        $usuario->tipoUsuario = 'idoso';
+        $tipoUsuario = $request->input('tipoUsuario', 'idoso');
+        $usuario->tipoUsuario = $tipoUsuario;
         $usuario->statusUsuario = 'ativo';
 
+        // Foto é opcional - só processa se for fornecida
         $image = $request->file('fotoUsuario');
-
-        if($image == null){
-            $path = "";
-        }else{
+        if($image != null){
             $path = $image->store('imagesPicture', 'public');
+            // Usa fill para evitar erro se coluna não existir
+            $usuario->fill(['fotoUsuario' => $path]);
         }
-
-        $usuario->fotoUsuario = $path;
 
         $usuario->save();
 
 //SE FOR IDOSO VAI PRA TABELA IDOSO
-        if($usuario->tipoUsuario === 'idoso')
+        if($tipoUsuario === 'idoso')
         {
         $idoso = new IdosoModel();
         $idoso->idUsuario = $usuario->idUsuario;
@@ -1413,7 +1460,7 @@ public function vizualizarContratosFree($idProfissional, $status){
         $idosoFamilia->idIdoso = $idoso->idIdoso;
 
         $idosoFamilia->save();
-        }else{
+        } elseif ($tipoUsuario === 'familiar') {
 
             //SE FOR FAMILIAR ELE VAI PRA TABELA FAMILIAR
             $familiar = new FamiliarModel();

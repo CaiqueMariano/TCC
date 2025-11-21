@@ -170,25 +170,39 @@ body {
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="banForm" method="POST" action="">
+                <form id="banForm" method="POST" action="{{ route('banir.usuario') }}">
                     @csrf
-                    @method('DELETE')
+                    <input type="hidden" name="_method" id="banFormMethod" value="POST">
+                    <input type="hidden" name="origem" id="banFormOrigem" value="">
+
                     <div class="row">
                         <div class="col-md-6">
-                            <label class="form-label">ID</label>
-                            <input type="text" id="banUserId" class="form-control" readonly>
-                            <label class="form-label mt-3">Nome</label>
-                            <input type="text" id="banUserName" class="form-control" readonly>
-                            <label class="form-label mt-3">Origem</label>
-                            <input type="text" id="banUserOrigem" class="form-control" readonly>
+                            <div class="mb-3">
+                                <label class="form-label">ID</label>
+                                <input type="text" id="banUserId" name="idUsuario" class="form-control" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nome</label>
+                                <input type="text" id="banUserName" class="form-control" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Origem</label>
+                                <input type="text" id="banUserOrigem" class="form-control" readonly>
+                            </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Motivo</label>
-                            <input type="text" id="banUserMotivo" class="form-control" readonly>
-                            <label class="form-label mt-3">Descrição</label>
-                            <textarea id="banUserDesc" class="form-control" readonly></textarea>
-                            <label class="form-label mt-3">Evidências</label>
-                            <textarea id="banUserEvidencia" class="form-control" readonly></textarea>
+                            <div class="mb-3">
+                                <label class="form-label">Motivo do banimento *</label>
+                                <textarea id="banUserMotivo" name="motivoDenuncia" class="form-control" rows="2" placeholder="Descreva o motivo principal" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descrição detalhada *</label>
+                                <textarea id="banUserDesc" name="descDenuncia" class="form-control" rows="3" placeholder="Contextualize a denúncia" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Evidências</label>
+                                <textarea id="banUserEvidencia" name="evidenciaDenuncia" class="form-control" rows="3" placeholder="Links, prints ou outras provas"></textarea>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -203,9 +217,20 @@ body {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+const banirUsuarioRoute = "{{ route('banir.usuario') }}";
+
 function abrirModalBanir(id, nome, motivo, desc, evidencia, origem) {
     const form = document.getElementById('banForm');
-    form.action = (origem === 'usuario') ? "/excluirPerfil/" + id : "/excluirPerfilFree/" + id;
+    const methodInput = document.getElementById('banFormMethod');
+    const origemHidden = document.getElementById('banFormOrigem');
+
+    if (origem === 'usuario') {
+        form.action = banirUsuarioRoute;
+        methodInput.value = 'POST';
+    } else {
+        form.action = "/excluirPerfilFree/" + id;
+        methodInput.value = 'DELETE';
+    }
 
     document.getElementById('banUserId').value = id;
     document.getElementById('banUserName').value = nome;
@@ -213,6 +238,7 @@ function abrirModalBanir(id, nome, motivo, desc, evidencia, origem) {
     document.getElementById('banUserDesc').value = desc;
     document.getElementById('banUserEvidencia').value = evidencia;
     document.getElementById('banUserOrigem').value = origem;
+    origemHidden.value = origem;
 
     new bootstrap.Modal(document.getElementById('banUserModal')).show();
 }

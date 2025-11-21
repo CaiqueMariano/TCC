@@ -38,6 +38,9 @@ Route::middleware([Authenticate::class])->group(function () {
     Route::get('/denuncias', [ZelooController::class, 'pesquisa'])
         ->name('denuncias');
 
+    Route::post('/banir-usuario', [ZelooController::class, 'banirUsuario'])
+        ->name('banir.usuario');
+
     // ============================
     // TELA ANALISAR RESPOSTAS
     // ============================

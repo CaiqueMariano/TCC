@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions,Modal , Image } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions,Modal , Image, Alert } from "react-native";
 import colors from "./colors";
 import { TextInput } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -112,56 +112,84 @@ export default function Cadastro({ navigation }) {
 
   const enviarDados = async () => {
     try{
+      // Validação antes de enviar
+      if (!nomeUsuario.trim()) {
+        Alert.alert("Erro", "Por favor, preencha o nome.");
+        return;
+      }
+
+      if (!telefoneUsuario.trim()) {
+        Alert.alert("Erro", "Por favor, preencha o telefone.");
+        return;
+      }
+
+      if (!senhaUsuario.trim()) {
+        Alert.alert("Erro", "Por favor, preencha a senha.");
+        return;
+      }
+
+      if (!dataNasc || !/^\d{2}\/\d{2}\/\d{4}$/.test(dataNasc)) {
+        Alert.alert("Erro", "Por favor, preencha uma data válida (DD/MM/AAAA).");
+        return;
+      }
 
       const partes = dataNasc.split('/');
-      const telefoneLimpo = telefoneUsuario.replace(/\D/g, '');
-    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
-
-    const formData = new FormData();
-    formData.append('nomeUsuario', nomeUsuario);
-    formData.append('telefoneUsuario', telefoneLimpo);
-    formData.append('senhaUsuario', senhaUsuario);
-    formData.append('tipoUsuario', value);
-    formData.append('dataNasc', dataFormatada);
-
-    
-    if (imagem) {
-      
-      const filename = imagem.split('/').pop();
-      const match = /\.(\w+)$/.exec(filename);
-      const type = match ? `image/${match[1]}` : `image`;
-
-      formData.append('fotoUsuario', {
-        uri: imagem,
-        name: filename,
-        type
-      });
-    }
-       const response = await axios.post(`${API_URL}/api/usuario`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+      if (partes.length !== 3) {
+        Alert.alert("Erro", "Data inválida. Use o formato DD/MM/AAAA.");
+        return;
       }
-    });
+
+      const telefoneLimpo = telefoneUsuario.replace(/\D/g, '');
+      const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+
+      const formData = new FormData();
+      formData.append('nomeUsuario', nomeUsuario);
+      formData.append('telefoneUsuario', telefoneLimpo);
+      formData.append('senhaUsuario', senhaUsuario);
+      formData.append('tipoUsuario', value);
+      formData.append('dataNasc', dataFormatada);
+
+      if (imagem) {
+        const filename = imagem.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const type = match ? `image/${match[1]}` : `image`;
+
+        formData.append('fotoUsuario', {
+          uri: imagem,
+          name: filename,
+          type
+        });
+      }
+
+      const response = await axios.post(`${API_URL}/api/usuario`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
 
       if(response.data.success){
         setUser(response.data.data);
         setEtapa(4);
-      }else{
-     
-        console.log("Erro", response.data.message);
+      } else {
+        Alert.alert("Erro", response.data.message || "Erro ao criar conta. Tente novamente.");
+      }
+    } catch(error){
+      let mensagemErro = "Erro ao criar conta. Tente novamente.";
       
+      if (error.response) {
+        console.error("Erro do servidor:", error.response.data);
+        mensagemErro = error.response.data?.message || error.response.data?.error || mensagemErro;
+      } else if (error.request) {
+        console.error("Sem resposta do servidor:", error.request);
+        mensagemErro = "Não foi possível conectar ao servidor. Verifique sua conexão.";
+      } else {
+        console.error("Erro na requisição:", error.message);
+        mensagemErro = error.message || mensagemErro;
       }
+      
+      Alert.alert("Erro", mensagemErro);
     }
-      catch(error){
-        if (error.response) {
-          console.error("Erro do servidor:", error.response.data);
-        } else if (error.request) {
-          console.error("Sem resposta do servidor:", error.request);
-        } else {
-          console.error("Erro na requisição:", error.message);
-        }
-      }
-    };
+  };
 
   const validarEtapa1 = () => {
     const apenasNumeros = (telefoneUsuario || "").replace(/\D/g, "");
@@ -212,7 +240,7 @@ export default function Cadastro({ navigation }) {
       <View style={styles.Form1}></View>
       <View style={styles.Form2}></View>
     
-       <TouchableOpacity style={styles.soundButton} onPress={() => alert('Auxiliar auditivo')}>
+       <TouchableOpacity style={styles.soundButton} onPress={() => Alert.alert('Auxiliar auditivo')}>
          <Image source={require('../../assets/images/audio.png')} style={styles.soundIcon} />
       </TouchableOpacity>
 
@@ -265,7 +293,7 @@ export default function Cadastro({ navigation }) {
               if (validarEtapa1()) {
                 setEtapa(2);
               } else {
-                alert("Preencha todos os campos antes de continuar!");
+                Alert.alert("Atenção", "Preencha todos os campos antes de continuar!");
               }
             }}
           >
@@ -312,7 +340,7 @@ export default function Cadastro({ navigation }) {
                   if (validarEtapa2()) {
                     setEtapa(3);
                   } else {
-                    alert("Selecione uma opção antes de finalizar!");
+                    Alert.alert("Atenção", "Selecione uma opção antes de continuar!");
                   }
                 }}
               >
@@ -379,10 +407,10 @@ export default function Cadastro({ navigation }) {
             <Text style={styles.buttonText}>Voltar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.bFoto, { opacity: imagem ? 1 : 0.5 }]}
-                onPress={enviarDados}
-              >
-            
+          <TouchableOpacity 
+            style={styles.bFoto}
+            onPress={enviarDados}
+          >
             <Text style={styles.buttonText}>Finalizar</Text>
           </TouchableOpacity>
         </View>
