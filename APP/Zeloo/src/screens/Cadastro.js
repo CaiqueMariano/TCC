@@ -4,6 +4,7 @@ import colors from "./colors";
 import { TextInput } from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from "axios";
 import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
@@ -18,14 +19,19 @@ export default function Cadastro({ navigation }) {
   const [nomeUsuario, setNomeUsuario] = useState("");
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
   const [senhaUsuario, setSenhaUsuario] = useState("");
+  const [senhaRepetida, setSenhaRepetida] = useState("");
   const [tipoUsuario, setTipoUsuario] = useState('');
-  const [dataNasc,setDataNascUsuario] = useState("");
+  const [dataNasc, setDataNascUsuario] = useState(null);
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
+
+
 
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('idoso');
+    const [value, setValue] = useState(null);
     const [items, setItems] = useState([
-      { label: 'Idoso', value: 'idoso' },
-      { label: 'Familiar', value: 'familiar' },
+      { label: 'Mulher', value: 'mulher' },
+      { label: 'Homem', value: 'homem' },
+      { label: 'Outro', value: 'outro' },
     ]);
 
   const formatarData = (texto) => {
@@ -44,6 +50,25 @@ export default function Cadastro({ navigation }) {
 
   setDataNascUsuario(numeros);
 };
+
+  const validarData = (data) => {
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data)) return false;
+
+    const [dia, mes, ano] = data.split('/').map(Number);
+
+    if (ano < 1900 || ano > new Date().getFullYear()) return false;
+    if (mes < 1 || mes > 12) return false;
+    if (dia < 1 || dia > 31) return false;
+
+    const dataObj = new Date(ano, mes - 1, dia);
+
+    return (
+      dataObj.getFullYear() === ano &&
+      dataObj.getMonth() + 1 === mes &&
+      dataObj.getDate() === dia
+    );
+  };
+
 
 
   const [imagem, setImagem] = useState(null);
@@ -145,7 +170,7 @@ export default function Cadastro({ navigation }) {
 
       if(response.data.success){
         setUser(response.data.data);
-        setEtapa(4);
+        navigation.navigate("Login")
       }else{
      
         console.log("Erro", response.data.message);
@@ -168,26 +193,35 @@ export default function Cadastro({ navigation }) {
 
     const telefoneValido =
       apenasNumeros.length === 11 &&
-      apenasNumeros.startsWith("9", 2); // garante que seja celular (9 após DDD)
+      apenasNumeros.startsWith("9", 2);
+
+    const senhaIgual = senhaUsuario === senhaRepetida;
 
     return (
       nomeUsuario.trim().length > 0 &&
       senhaUsuario.trim().length > 0 &&
+      senhaIgual &&
       telefoneValido
     );
   };
+  
 
-  const validarEtapa2 = () => {
-  const dataValida = /^\d{2}\/\d{2}\/\d{4}$/.test(dataNasc); 
-  return dataValida && value !== null && value !== "";
-};
 
-  const formatarTelefone = (valor, anterior) => {
-  // Remove tudo que não for número
-  let telefone = valor.replace(/\D/g, "");
+    const validarEtapa2 = () => {
+      return dataNasc instanceof Date && value !== null;
+    };
 
-    if (telefone.length < anterior.replace(/\D/g, "").length) {
-    return valor;
+
+
+    const formatarTelefone = (valor, anterior) => {
+    // Remove tudo que não for número
+    let telefone = valor.replace(/\D/g, "");
+
+      if (telefone.length < anterior.replace(/\D/g, "").length) {
+
+        
+
+  return valor;
   }
 
   telefone = telefone.slice(0, 11);
@@ -255,21 +289,39 @@ export default function Cadastro({ navigation }) {
       </TouchableOpacity>
     </View>
 
+    
+    <View style={styles.senhaContainer}>
+      <TextInput
+        style={styles.senhaInput}
+        placeholder="Repita sua Senha"
+        onChangeText={setSenhaRepetida}
+        secureTextEntry={!mostrarSenha}
+      />
+      <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+        <Text style={styles.senhaToggle}>{mostrarSenha ? <Ionicons size={25} name="eye-outline"></Ionicons>
+ : <Ionicons name="eye-off-outline" size={25}/> }</Text>
+      </TouchableOpacity>
+    </View>
+
     <View style={styles.botoes}>
       <TouchableOpacity style={styles.bFoto} onPress={() => navigation.navigate('BemVindo')}>
         <Text style={styles.buttonText}>Voltar</Text>
       </TouchableOpacity>
         <TouchableOpacity
           style={[styles.bFoto, { opacity: validarEtapa1() ? 1 : 0.5 }]}
-            onPress={() => {
-              if (validarEtapa1()) {
-                setEtapa(2);
+          onPress={() => {
+            if (validarEtapa1()) {
+              setEtapa(2);
+            } else {
+              if (senhaUsuario !== senhaRepetida) {
+                alert("As senhas não são iguais!");
               } else {
                 alert("Preencha todos os campos antes de continuar!");
               }
-            }}
-          >
-            <Text style={styles.buttonText}>Próximo</Text>
+            }
+          }}
+        >
+          <Text style={styles.buttonText}>Próximo</Text>
         </TouchableOpacity>
     </View>
   </View>
@@ -280,13 +332,32 @@ export default function Cadastro({ navigation }) {
         <View style={styles.form}>
             <Progresso />
           <Text style={styles.title}>Faça seu Cadastro</Text>
-          <TextInput 
-          style={styles.input} 
-          placeholder="Data de nascimento" 
-          keyboardType="numeric"
-          value={dataNasc}
-          onChangeText={formatarData}
-          />
+          
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setMostrarCalendario(true)}
+          >
+            <Text style={{ color: dataNasc ? colors.preto : colors.cinza, marginTop: 10, fontSize: 16}}>
+              {dataNasc ? dataNasc.toLocaleDateString() : "Qual sua data de nascimento?"}
+            </Text>
+          </TouchableOpacity>
+
+
+          {mostrarCalendario && (
+            <DateTimePicker
+              value={dataNasc || new Date()} 
+              mode="date"
+              display="spinner"
+              onChange={(event, selectedDate) => {
+                setMostrarCalendario(false);
+                if (event.type === 'set' && selectedDate) {
+                  setDataNascUsuario(selectedDate);
+                }
+              }}
+            />
+          )}
+
+
 
 
             <View style={styles.dropdowncontainer}>
@@ -299,6 +370,13 @@ export default function Cadastro({ navigation }) {
                 setItems={setItems}
                 style={styles.dropdown}
                 dropDownContainerStyle={styles.dropDownContainer}
+
+
+                placeholder="Qual o seu Gênero?"
+                placeholderStyle={{
+                  color: colors.preto,    
+                  fontSize: 16,            
+                }}
               />
             </View>
 
@@ -319,7 +397,7 @@ export default function Cadastro({ navigation }) {
               <Text style={styles.buttonText}>Próximo</Text>
             </TouchableOpacity>
           </View>
-        </View>
+       </View>
       )}
 
     {etapa === 3 && (
@@ -388,7 +466,7 @@ export default function Cadastro({ navigation }) {
         </View>
       </View>
     )}
-    {etapa === 4 && (
+    {/*{etapa === 4 && (
       <View style={styles.form}>
     
     
@@ -436,7 +514,7 @@ export default function Cadastro({ navigation }) {
                     </EscalarTouchable>
                 </View>
             </View>
-          )}
+          )}*/}
     </View>
   );
 }

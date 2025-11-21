@@ -5,13 +5,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '../temas/ThemeContext';
 import { UserProvider, UserContext } from "../screens/userContext";
 import { AccessibilityProvider } from "../screens/AccessibilityContext";
+
+
+import Pedidos from '../screens/Pedidos';
+import BemVindo from '../screens/BemVindo';
 import Cadastro from '../screens/Cadastro';
 import Home from '../screens/Home';
-import Pedidos from '../screens/Pedidos';
+
+import Pagos from '../screens/Pagos';
+import pendentes from '../screens/pendentes';
 import Perfil from '../screens/Perfil';
 import Historico from "../screens/Historico";
 import Login from '../screens/Login';
-import BemVindo from "../screens/BemVindo";
 import SobreNos from '../screens/SobreNos';
 import ListaConversas from "../screens/ListaConversas";
 import Configuracoes from '../screens/Configuracoes';

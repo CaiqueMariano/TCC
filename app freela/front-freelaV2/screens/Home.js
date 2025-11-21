@@ -251,3 +251,4 @@ textoBotaoDashboard: {
     fontWeight: '500',
   },
 });
+

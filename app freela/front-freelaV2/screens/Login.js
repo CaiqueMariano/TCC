@@ -30,7 +30,7 @@ const enviarLogin = async () => {
       }
   
     } catch (error) {
-        console.log(response.data.message, error)
+      console.log(error);
         setMensagem('E-mail ou senha incorretos');
     }
   };
@@ -47,8 +47,10 @@ const enviarLogin = async () => {
             placeholder="Email"
             placeholderTextColor="#444"
             keyboardType="email-address"
-            onChangeText={setEmail}
+          
             autoCapitalize="none"
+            value={emailProfissional}
+            onChangeText={setEmail}
           />
           <TextInput
             style={styles.input}
@@ -56,6 +58,8 @@ const enviarLogin = async () => {
             onChangeText={setSenha}
             placeholderTextColor="#444"
             secureTextEntry
+            value={senhaProfissional}
+    
           />
           <View style={styles.buttonRow}>
             <TouchableOpacity

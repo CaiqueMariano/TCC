@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform, Alert, Dimensions, ScrollView } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../temas/ThemeContext';
@@ -9,6 +8,9 @@ import axios from "axios";
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { API_URL } from '../screens/link';
+import DropDownPicker from 'react-native-dropdown-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 const { width } = Dimensions.get("window");
 
 export default function Cadastro() {
@@ -32,36 +34,127 @@ export default function Cadastro() {
   const [biografia, setBiografia] = useState('');
   const [dataNasc,setDataNascUsuario] = useState("");
   const [valorMinimo, setValorMinimo] = useState('');
-  const [cpf, setCpf] = useState('');
+  
   const [imagem, setImagem] = useState(null);
+  const [cpf, setCpf] = useState('');
+
+
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
+
+  //cpf
+  const validarCPF = (cpf) => {
+  const apenasNumeros = cpf.replace(/\D/g, '');
+
+  if (apenasNumeros.length !== 11) return false;
+
+  if (/^(\d)\1{10}$/.test(apenasNumeros)) return false;
+
+  let soma = 0;
+  for (let i = 0; i < 9; i++) {
+    soma += parseInt(apenasNumeros.charAt(i)) * (10 - i);
+  }
+
+  let digito1 = 11 - (soma % 11);
+  if (digito1 >= 10) digito1 = 0;
+
+  soma = 0;
+  for (let i = 0; i < 10; i++) {
+    soma += parseInt(apenasNumeros.charAt(i)) * (11 - i);
+  }
+
+  let digito2 = 11 - (soma % 11);
+  if (digito2 >= 10) digito2 = 0;
+
+  return digito1 === parseInt(apenasNumeros.charAt(9)) &&
+         digito2 === parseInt(apenasNumeros.charAt(10));
+};
 
   const formatarData = (texto) => {
-    // Remove tudo que não é número
-    let numeros = texto.replace(/\D/g, '');
-  
-    // Limita a 8 dígitos
-    if (numeros.length > 8) numeros = numeros.slice(0, 8);
-  
-    // Formata DD/MM/AAAA
-    if (numeros.length >= 5) {
-      numeros = numeros.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
-    } else if (numeros.length >= 3) {
-      numeros = numeros.replace(/(\d{2})(\d{1,2})/, '$1/$2');
-    }
-  
-    setDataNascUsuario(numeros);
+  // Remove tudo que não é número
+  let numeros = texto.replace(/\D/g, '');
+
+  // Limita a 8 dígitos
+  if (numeros.length > 8) numeros = numeros.slice(0, 8);
+
+  // Formata DD/MM/AAAA
+  if (numeros.length >= 5) {
+    numeros = numeros.replace(/(\d{2})(\d{2})(\d{1,4})/, '$1/$2/$3');
+  } else if (numeros.length >= 3) {
+    numeros = numeros.replace(/(\d{2})(\d{1,2})/, '$1/$2');
+  }
+
+  setDataNascUsuario(numeros);
+};
+
+  const validarData = (data) => {
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(data)) return false;
+
+    const [dia, mes, ano] = data.split('/').map(Number);
+
+    if (ano < 1900 || ano > new Date().getFullYear()) return false;
+    if (mes < 1 || mes > 12) return false;
+    if (dia < 1 || dia > 31) return false;
+
+    const dataObj = new Date(ano, mes - 1, dia);
+
+    return (
+      dataObj.getFullYear() === ano &&
+      dataObj.getMonth() + 1 === mes &&
+      dataObj.getDate() === dia
+    );
   };
+
+
+
+const formatarCpf = (texto) => {
+  let cpf = texto.replace(/\D/g, '');
+
+  if (cpf.length > 11) cpf = cpf.slice(0, 11);
+
+  if (cpf.length > 9) {
+    cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, "$1.$2.$3-$4");
+  } else if (cpf.length > 6) {
+    cpf = cpf.replace(/(\d{3})(\d{3})(\d{1,3})/, "$1.$2.$3");
+  } else if (cpf.length > 3) {
+    cpf = cpf.replace(/(\d{3})(\d{1,3})/, "$1.$2");
+  }
+
+  setCpf(cpf);
+};
+
+//EMAIL
+const validarEmail = (email) => {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+};
+
+
   // Formatações simples
-  const formatarTelefone = (texto) => {
-    let numeros = texto.replace(/\D/g, '');
-    if (numeros.length > 11) numeros = numeros.slice(0, 11);
-    if (numeros.length > 6) {
-      numeros = numeros.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
-    } else if (numeros.length > 2) {
-      numeros = numeros.replace(/(\d{2})(\d{1,4})/, '($1) $2');
-    }
-    setTelefoneProfissional(numeros);
-  };
+const formatarTelefone = (texto) => {
+  let numeros = texto.replace(/\D/g, '');
+  if (numeros.length > 11) numeros = numeros.slice(0, 11);
+
+  if (numeros.length > 6) {
+    numeros = numeros.replace(/(\d{2})(\d{5})(\d{1,4})/, '($1) $2-$3');
+  } else if (numeros.length > 2) {
+    numeros = numeros.replace(/(\d{2})(\d{1,4})/, '($1) $2');
+  }
+
+  setTelefoneProfissional(numeros);
+};
+
+const validarTelefone = (telefone) => {
+  const apenasNumeros = telefone.replace(/\D/g, '');
+
+  // fixo: 10 dígitos
+  if (apenasNumeros.length === 10) return true;
+
+  // celular: 11 dígitos e começando com 9
+  if (apenasNumeros.length === 11 && apenasNumeros[2] === '9') return true;
+
+  return false;
+};
+
 
   const formatarValor = (texto) => {
     let numeros = texto.replace(/[^\d]/g, '');
@@ -127,7 +220,7 @@ export default function Cadastro() {
           key={index}
           style={[
             styles.progressStep,
-            { backgroundColor: etapa > index ? '#0a84ff' : '#ccc' },
+            { backgroundColor: etapa > index ? '#b08cff' : '#ffffffff' },
           ]}
         />
       ))}
@@ -195,6 +288,105 @@ export default function Cadastro() {
       }
     }
   };
+  const validarEtapa2 = () => {
+
+  if (!value) {
+    Alert.alert("Campo obrigatório", "Selecione seu gênero.");
+    return false;
+  }
+
+  if (!dataNasc) {
+    Alert.alert("Campo obrigatório", "Selecione sua data de nascimento.");
+    return false;
+  }
+
+  if (typeof dataNasc === "string" && !validarData(dataNasc)) {
+    Alert.alert("Data inválida", "Escolha uma data de nascimento válida.");
+    return false;
+  }
+
+  if (dataNasc instanceof Date) {
+    const hoje = new Date();
+    const idade = hoje.getFullYear() - dataNasc.getFullYear();
+    const mes = hoje.getMonth() - dataNasc.getMonth();
+    const dia = hoje.getDate() - dataNasc.getDate();
+
+    const idadeFinal = mes < 0 || (mes === 0 && dia < 0) ? idade - 1 : idade;
+
+    if (idadeFinal < 18) {
+      Alert.alert("Idade inválida", "Você deve ter pelo menos 18 anos.");
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const avancarEtapa = () => {
+
+
+  if (etapa === 1) {
+
+    if (!nomeProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu nome completo.");
+      return;
+    }
+
+    if (!cpf.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu CPF.");
+      return;
+    }
+
+    if (!validarCPF(cpf)) {
+      Alert.alert("CPF inválido", "Digite um CPF válido.");
+      return;
+    }
+
+    if (!emailProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu e-mail.");
+      return;
+    }
+
+    if (!validarEmail(emailProfissional)) {
+      Alert.alert("E-mail inválido", "Digite um e-mail válido.");
+      return;
+    }
+
+    if (!telefoneProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite seu telefone.");
+      return;
+    }
+
+    if (!validarTelefone(telefoneProfissional)) {
+      Alert.alert("Telefone inválido", "Digite um telefone válido.");
+      return;
+    }
+
+    if (!senhaProfissional.trim()) {
+      Alert.alert("Campo obrigatório", "Digite sua senha.");
+      return;
+    }
+  }
+
+ if (etapa === 2) {
+  if (!validarEtapa2()) return;
+}
+
+if (etapa === 3) {
+  if (!imagem) {
+    Alert.alert("Campo obrigatório", "Adicione uma foto para continuar.");
+    return;
+  }
+}
+
+  if (etapa < 3) {
+    setEtapa(etapa + 1);
+  } else {
+    Alert.alert('Sucesso', 'Cadastro concluído!');
+    navigation.goBack();
+  }
+}
+
   return (
     <Background>
       <View style={styles.logoWrapper}>
@@ -220,7 +412,7 @@ export default function Cadastro() {
                 placeholderTextColor="#444"
                 keyboardType="numeric"
                 value={cpf}
-                onChangeText={setCpf}
+                onChangeText={formatarCpf}
               />
               <TextInput
                 style={styles.input}
@@ -231,14 +423,13 @@ export default function Cadastro() {
                 value={emailProfissional}
                 onChangeText={setEmailProfissional}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Telefone"
-                placeholderTextColor="#444"
-                keyboardType="phone-pad"
-                value={telefoneProfissional}
-                onChangeText={formatarTelefone}
-              />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Telefone"
+                  keyboardType="numeric"
+                  value={telefoneProfissional}
+                  onChangeText={formatarTelefone}
+                />
               <View style={styles.senhaContainer}>
                 <TextInput
                   style={styles.senhaInput}
@@ -275,42 +466,34 @@ export default function Cadastro() {
               />
             </View>
            
-               <TextInput 
-          style={styles.input} 
-          placeholder="Data de nascimento" 
-          keyboardType="numeric"
-          value={dataNasc}
-          onChangeText={formatarData}
-          />
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setMostrarCalendario(true)}
+          >
+            <Text style={{ color: dataNasc ? '#202020' : '#444', marginTop: 10, fontSize: 16}}>
+              {dataNasc ? dataNasc.toLocaleDateString() : "data de nascimento"}
+            </Text>
+          </TouchableOpacity>
+
+
+          {mostrarCalendario && (
+            <DateTimePicker
+              value={dataNasc || new Date()} 
+              mode="date"
+              display="spinner"
+              onChange={(event, selectedDate) => {
+                setMostrarCalendario(false);
+                if (event.type === 'set' && selectedDate) {
+                  setDataNascUsuario(selectedDate);
+                }
+              }}
+            />
+          )}
               
             </View>
           )}
+
           {etapa === 3 && (
-            <ScrollView style={styles.scrollArea} contentContainerStyle={styles.scrollContent}>
-           
-            <TextInput
-                style={[styles.input, styles.textarea]}
-                placeholder="Biografia"
-                placeholderTextColor="#444"
-                value={biografia}
-                onChangeText={setBiografia}
-                multiline
-                textAlignVertical="top"
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Valor mínimo (ex: R$ 50,00)"
-                placeholderTextColor="#444"
-                keyboardType="numeric"
-                value={valorMinimo}
-                onChangeText={formatarValor}
-              />
-
-              
-            </ScrollView>
-          )}
-
-          {etapa === 4 && (
             <>
               <Text style={styles.photoTitle}>Adicione uma foto sua</Text>
               <Image
@@ -341,21 +524,21 @@ export default function Cadastro() {
             <TouchableOpacity 
               style={[styles.button, styles.buttonPrimary]}
               onPress={() => {
-                if (etapa < 4) {
-                  setEtapa(etapa + 1);
+                if (etapa < 3) {
+                  
                 } else {
                   enviarDados();
                 }
               }}
             >
               <Text style={styles.buttonText}>
-                {etapa < 4 ? 'Seguinte' : 'Finalizar'}
+                {etapa < 3 ? 'Seguinte' : 'Finalizar'}
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
         <StatusBar style="light" />
       </View>
+    </View>
     </Background>
   );
 }
@@ -364,9 +547,7 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-  dropdowncontainerV:{
-     marginBottom:10,
-  },  
+    
   container: {
     flex: 1,
     alignItems: 'center',
@@ -385,7 +566,7 @@ const styles = StyleSheet.create({
   },
   loginBox: {
     width: '70%',
-    backgroundColor: '#e2d9ff',
+    backgroundColor: '#b08cff',
     padding: 20,
     paddingVertical: 28,
     minHeight: 320,
@@ -404,16 +585,9 @@ const styles = StyleSheet.create({
   loginTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111',
+    color: '#ffffffff',
     textAlign: 'center',
     marginBottom: 16,
-  },
-  scrollArea: {
-    maxHeight: 360,
-    width: '100%',
-  },
-  scrollContent: {
-    paddingBottom: 8,
   },
   input: {
     width: '100%',
@@ -446,22 +620,22 @@ const styles = StyleSheet.create({
   buttonSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#0a84ff',
+    borderColor: '#ffffffff',
     marginRight: 8,
     flex: 1,
   },
   buttonPrimary: {
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#ffffffff',
     marginLeft: 8,
     flex: 1,
   },
   buttonText: {
-    color: '#fff',
+    color: '#b08cff',
     fontWeight: '600',
     fontSize: 16,
   },
   buttonTextSecondary: {
-    color: '#0a84ff',
+    color: '#fff',
   },
   progressContainer: {
     flexDirection: 'row',
@@ -488,7 +662,7 @@ const styles = StyleSheet.create({
   },
   senhaInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: '#111',
   },
   dropdownContainer: {
@@ -533,10 +707,20 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     color: '#111',
   },
+  scrollArea: {
+    maxHeight: 360,
+    width: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 8,
+  },
+  dropdowncontainerV:{
+     marginBottom:10,
+  }, 
   photoTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111',
+    color: '#ffffffff',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -556,7 +740,7 @@ const styles = StyleSheet.create({
   photoButton: {
     flex: 1,
     height: 44,
-    backgroundColor: '#0a84ff',
+    backgroundColor: '#b08cff',
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
