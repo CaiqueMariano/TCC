@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import {View,Text,StyleSheet,TouchableWithoutFeedback,Dimensions,Image,FlatList,} from "react-native";
 import colors from "./colors";
+import * as Notifications from "expo-notifications";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,6 +32,20 @@ export default function BemVindo({ navigation }) {
     flatListRef.current?.scrollToIndex({ index: novoIndex, animated: true });
     setIndexAtual(novoIndex);
   };
+  
+  useEffect(() => {
+    const pedirPermissao = async () => { 
+      const { status } = await Notifications.requestPermissionsAsync();
+  
+      if (status !== 'granted') {
+        alert('Você negou a permissão de notificações.');
+      } else {
+        console.log("Permissão concedida!");
+      }
+    };
+  
+    pedirPermissao();
+  }, []);
 
   useEffect(() => {
     const intervalo = setInterval(irProximoSlide, 4000);

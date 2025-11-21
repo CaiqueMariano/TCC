@@ -11,6 +11,28 @@ import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get("window");
 import { API_URL } from '../screens/link';
+import * as Notifications from 'expo-notifications';
+
+
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  })
+});
+const completarCadastro = async () => {
+
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "Complete seu cadastro!",
+      body: "Preencha informações relevantes para futuros serviços",
+      sound: true
+    },trigger: { seconds: 1 }
+  });
+
+};
 
 export default function Cadastro({ navigation }) {
   const { setUser } = useContext(UserContext);
@@ -138,9 +160,19 @@ export default function Cadastro({ navigation }) {
   const enviarDados = async () => {
     try{
 
-      const partes = dataNasc.split('/');
+
+      let dataString;
+      if (dataNasc instanceof Date) {
+        dataString = dataNasc.toLocaleDateString("pt-BR");
+      } else {
+        dataString = dataNasc;
+      }
+  
+      const partes = dataString.split("/");
+      const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+  
+     
       const telefoneLimpo = telefoneUsuario.replace(/\D/g, '');
-    const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
 
     const formData = new FormData();
     formData.append('nomeUsuario', nomeUsuario);
@@ -170,6 +202,7 @@ export default function Cadastro({ navigation }) {
 
       if(response.data.success){
         setUser(response.data.data);
+        completarCadastro();
         navigation.navigate("Login")
       }else{
      

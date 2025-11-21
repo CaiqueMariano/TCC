@@ -243,7 +243,7 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
           <EscalarText style={styles.cardText}>Conversas</EscalarText>
         </EscalarTouchable>
 
-        <EscalarTouchable style={styles.card}>
+        <EscalarTouchable style={styles.card} onPress={()=> navigation.navigate('PerguntasC')}>
           <EscalarImage source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
           <EscalarText style={styles.cardText}>Fale Conosco</EscalarText>
         </EscalarTouchable>

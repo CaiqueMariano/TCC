@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet,TouchableOpacity, TextInput, Alert, Button,Dimensions,Platform, ImageBackground, Image, Modal, ScrollView} from "react-native";
+import React, { useState, useEffect, useContext, useRef } from 'react';
+import { View, Text, StyleSheet,TouchableOpacity, Animated, TextInput, Alert, Button,Dimensions,Platform, ImageBackground, Image, Modal, ScrollView} from "react-native";
 import DropDownPicker from 'react-native-dropdown-picker';
 import {Calendar, CalendarList, Agenda, LocaleConfig} from 'react-native-calendars';
 import axios from 'axios';
@@ -8,36 +8,59 @@ import { Ionicons } from '@expo/vector-icons';
 import { UserContext } from "./userContext";
 import { API_URL } from '../screens/link';
 
+
+const ABAS = [
+  { chave: 'info', titulo: 'Histórico' },
+  { chave: 'questionario', titulo: 'Informações Pessoais' },
+  
+];
+
+
 const { width, height } = Dimensions.get("window");
 
 export default function Perfil({navigation}) {
   const { user } = useContext(UserContext);
   const [abrir, setAbrir] = useState(false);
+  const [abaAtiva, definirAbaAtiva] = useState(0);
+  const indicador = useRef(new Animated.Value(0)).current;
   const [valor, setValor] = useState(null);
+  const dta = new Date(user.dataNasc);
+  const a = dta.getFullYear();
+  const m = dta.getMonth() + 1;
+  const d = dta.getDate() +1;
+
   const [editFoto, setEditFoto] = useState(false);
   const[mostrarEdicao, setMostrarEdicao] = useState(false);
   const[mostrarExcluir, setMostrarExcluir] = useState(false);
   const [usuario, setUsuario] = useState([]);
   const[emailUsuario, setEmailUsuario] = useState('');
   const[senhaUsuario, setSenhaUsuario] = useState('');
-
+  const [questionarioInfo, setQuestionarioinfo] = useState([])
   const[nomeUsuario, setNomeUsuario] = useState('');
   const[telefoneUsuario, setTelefoneUsuario] = useState('');
   const[tipoUsuario, setTipoUsuario] = useState('');
   const[dataNasc, setDataNasc] = useState('');
-
+  const [questionarioExiste, setQuestionarioExiste] = useState(false)
   const [dataSelecionada, setDataSelecionada] = useState('');
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
   const [abrirEs, setAbrirEs] = useState(false);
   const [valorEs, setValorEs] = useState(null);
   useEffect(() => {
+
     if (mostrarEdicao) {
       setNomeUsuario(user.nomeUsuario || '');
       setTelefoneUsuario(user.telefoneUsuario || '');
       setEmailUsuario(user.emailUsuario || '');
     }
   }, [mostrarEdicao, user]);
+
+  useEffect(() => {
+
+    questionario();
+    
+    
+  }, []);
   const editarPerfilInfo = async () =>{
     try{
       const response = await axios.put(`${API_URL}/api/updatePerfil/${user.idUsuario}`, {
@@ -58,9 +81,36 @@ export default function Perfil({navigation}) {
     }
   };
 
+  const larguraAba = width / ABAS.length;
+
+  useEffect(() => {
+    Animated.spring(indicador, {
+      toValue: abaAtiva * larguraAba,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 8,
+    }).start();
+  }, [abaAtiva]);
 
 
-
+  const questionario = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/api/verPerguntas/${user.idUsuario}`);
+  
+      const existe = response.data.existe == true;
+  
+      setQuestionarioExiste(existe);
+  
+      if (existe) {
+        setQuestionarioinfo(response.data.data);
+        console.log(questionarioExiste);
+      }
+  
+    } catch (error) {
+      setQuestionarioExiste(false);
+       console.log(questionarioExiste);
+    }
+  };
 
   return (
     <View style={styles.Container}>
@@ -143,7 +193,9 @@ export default function Perfil({navigation}) {
 
        <View style={styles.Container3}>
 
-      <TouchableOpacity onPress={() => setEditFoto(true)}>
+      
+
+      <TouchableOpacity style={{marginTop:20}} onPress={() => setEditFoto(true)}>
         <Image 
           source={{uri: `${API_URL}/storage/${user.fotoUsuario}`}}
           style={styles.perfil}
@@ -151,33 +203,258 @@ export default function Perfil({navigation}) {
       </TouchableOpacity>
 
       <Text style={styles.Nome}>{user.nomeUsuario}</Text>
-      
+      </View>
 
-      <View style={styles.Container2}>
+<View style={styles.conteudoInfo}>
+<View accessibilityRole="tablist" style={styles.barraAbas}>
+      <View style={{ position: 'relative' }}>
+        <Animated.View
+          style={{
+            position: 'absolute',
+            height: 3,
+            width: larguraAba - 32,
+            left: 16,
+            bottom: 0,
+            transform: [{ translateX: indicador }],
+            borderRadius: 2,
+            backgroundColor: colors.azul,
+          }}
+        />
 
-      <Text style={styles.infor}>Informações da Conta</Text>
-      <View style={styles.linha}></View>
-
-      <ScrollView
-        style={styles.ScrollContainer}
-        contentContainerStyle={{ alignItems: 'center', paddingBottom: 50 }}
-        showsVerticalScrollIndicator={true}
-      >
-         
-        <Text style={styles.titulo}>Telefone: <Text style={styles.info}> {user.telefoneUsuario}</Text></Text> 
-        <Text style={styles.titulo}>Data de Nascimento: <Text style={styles.info}> {user.dataNasc}</Text></Text> 
-        <Text style={styles.titulo}>E-mail: <Text style={styles.info}> {user.emailUsuario ? user.emailUsuario : "Email não cadastrado"}</Text></Text>
-      
-          <View style={styles.botoes}>
-            <TouchableOpacity style={styles.bFoto} onPress={()=> setMostrarEdicao(true)}>
-              <Text style={styles.buttonText}>Editar perfil</Text>
-          </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          {ABAS.map((aba, indice) => (
+            <TouchableOpacity
+              key={aba.chave}
+              style={styles.botaoAba}
+              onPress={() => definirAbaAtiva(indice)}
+            >
+              <Text
+                style={[
+                  styles.textoAba,
+                  abaAtiva === indice && styles.textoAbaAtiva,
+                ]}
+              >
+                {aba.titulo}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
+      </View>
+    </View>
+
+    <View style={{ flex: 1 }}>
+ 
+      {abaAtiva === 0 && (
+        <ScrollView style={styles.conteudoScroll} showsVerticalScrollIndicator={false}>
+
+         
+    
+
+          <Text style={styles.tituloSecao}>Histórico de Serviços</Text>
+
+          <TouchableOpacity 
+            style={styles.botaoEditar}
+            onPress={() => navigation.navigate("EditarPerfil")}
+          >
+            <Text style={styles.textoBotaoEditar}>Ver Histórico</Text>
+          </TouchableOpacity>
+
       
-      
-      </ScrollView>
+          <Text style={styles.tituloFeedback}>Últimos Feedbacks</Text>
+
+          <View style={styles.cardComentario}>
+            <View style={styles.Comentario}>
+             
+              <View style={{ flex: 1 }}>
+                <Text style={styles.nomeComentario}>Maria de Lourdes</Text>
+                <Text style={styles.dataComentario}>02/11/2025</Text>
+              </View>
             </View>
+
+            <Text style={styles.textoComentario}>
+              Ótima profissional, paciente e muito atenciosa. Recomendo fortemente.
+            </Text>
           </View>
+
+        </ScrollView>
+      )}
+
+
+      {abaAtiva === 1 && (
+        <ScrollView style={styles.conteudoScroll} showsVerticalScrollIndicator={false}>
+
+          <Text style={styles.tituloSecao}>Informações da Conta</Text>
+
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Telefone:</Text> {user.telefoneUsuario}
+            </Text>
+
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Email:</Text> {user.emailUsuario === "null" ? (""): ("Email não cadastrado")}
+            </Text>
+
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Data de Nascimento:</Text> {d}/{m}/{a}
+            </Text>
+
+
+            <TouchableOpacity 
+            style={styles.botaoEditar}
+            onPress={() => navigation.navigate("EditarPerfil")}
+          >
+            <Text style={styles.textoBotaoEditar}>Editar Perfil</Text>
+          </TouchableOpacity>
+            <View style={styles.separador} />
+
+            <Text style={styles.tituloSecao}>Questionário</Text>
+
+            {questionarioExiste === false ? (
+  <View>
+    <Text style={styles.linhaInfo}>
+      Questionário não preenchido, o preencha para cuidadores te ajudarem do melhor modo possível!
+    </Text>
+
+    <TouchableOpacity 
+      style={styles.botaoEditarQ}
+      onPress={() => navigation.navigate("PerguntasC")}
+    >
+      <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
+    </TouchableOpacity>
+  </View>
+) : (
+  questionarioInfo && questionarioInfo.length > 0 ? (
+    <View style={styles.container}>
+
+      {/* DOENÇAS */}
+      <Text style={styles.titulo}>Doenças</Text>
+      {questionarioInfo
+        .filter(item => item.doencaDiagnostico)
+        .map((item, index) => (
+          <View key={index} style={styles.cardInfo}>
+            <Text style={styles.texto}>• {item.doencaDiagnostico}</Text>
+          </View>
+        ))
+      }
+
+      {/* ALERGIAS */}
+      <Text style={styles.titulo}>Alergias</Text>
+      {questionarioInfo
+        .filter(item => item.alergiaDiagnostico)
+        .map((item, index) => (
+          <View key={index} style={styles.cardInfo}>
+            <Text style={styles.texto}>• {item.alergiaDiagnostico}</Text>
+          </View>
+        ))
+      }
+
+    </View>
+  ) : (
+    <Text style={{ color: "#fff" }}>Carregando questionário...</Text>
+  )
+)}
+{questionarioExiste === false ? (
+  <View>
+    <Text style={styles.linhaInfo}>
+      Questionário não preenchido, o preencha para cuidadores te ajudarem do melhor modo possível!
+    </Text>
+
+    <TouchableOpacity 
+      style={styles.botaoEditarQ}
+      onPress={() => navigation.navigate("PerguntasC")}
+    >
+      <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
+    </TouchableOpacity>
+  </View>
+) : (
+  questionarioInfo && questionarioInfo.length > 0 ? (
+    <View style={styles.container}>
+
+      {/* DOENÇAS */}
+      <Text style={styles.titulo}>Doenças</Text>
+      {questionarioInfo
+        .filter(item => item.doencaDiagnostico)
+        .map((item, index) => (
+          <View key={index} style={styles.cardInfo}>
+            <Text style={styles.texto}>• {item.doencaDiagnostico}</Text>
+          </View>
+        ))
+      }
+
+      {/* ALERGIAS */}
+      <Text style={styles.titulo}>Alergias</Text>
+      {questionarioInfo
+        .filter(item => item.alergiaDiagnostico)
+        .map((item, index) => (
+          <View key={index} style={styles.cardInfo}>
+            <Text style={styles.texto}>• {item.alergiaDiagnostico}</Text>
+          </View>
+        ))
+      }
+
+    </View>
+  ) : (
+    <Text style={{ color: "#fff" }}>Carregando questionário...</Text>
+  )
+)}
+{questionarioExiste === false ? (
+  <View>
+    <Text style={styles.linhaInfo}>
+      Questionário não preenchido, o preencha para cuidadores te ajudarem do melhor modo possível!
+    </Text>
+
+    <TouchableOpacity 
+      style={styles.botaoEditarQ}
+      onPress={() => navigation.navigate("PerguntasC")}
+    >
+      <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
+    </TouchableOpacity>
+  </View>
+) : (
+  questionarioInfo && questionarioInfo.length > 0 ? (
+    <View style={styles.container}>
+
+      {/* DOENÇAS */}
+      <Text style={styles.titulo}>Doenças</Text>
+      {questionarioInfo
+        .filter(item => item.doencaDiagnostico)
+        .map((item, index) => (
+          <View key={index} style={styles.cardInfo}>
+            <Text style={styles.texto}>• {item.doencaDiagnostico}</Text>
+          </View>
+        ))
+      }
+
+      {/* ALERGIAS */}
+      <Text style={styles.titulo}>Alergias</Text>
+      {questionarioInfo
+        .filter(item => item.alergiaDiagnostico)
+        .map((item, index) => (
+          <View key={index} style={styles.cardInfo}>
+            <Text style={styles.texto}>• {item.alergiaDiagnostico}</Text>
+          </View>
+        ))
+      }
+
+    </View>
+  ) : (
+    <Text style={{ color: "#fff" }}>Carregando questionário...</Text>
+  )
+)}
+
+
+
+          
+
+          
+
+        </ScrollView>
+      )}
+
+    </View>
+          
+
+</View>
+      
     </View>
   
 
@@ -190,12 +467,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.branco,
   },
   Container2: {
-    marginTop: 75,
+   
     
   },
   Container3: {
-    marginTop: 50,
+    flex: 0.45,
     
+  },
+  linhaInfo:{fontSize:20,
+    marginBottom:20,
+  },
+
+  conteudoInfo:{
+    flex:1,
   },
   textInput:{
     fontWeight:'400',
@@ -236,6 +520,232 @@ const styles = StyleSheet.create({
   info:{
     color:colors.preto,
   },
+
+  separador: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 20,
+  },
+  
+    navBar: {
+      backgroundColor: '#b08cff',
+      paddingTop: 40,
+      paddingVertical: 16,
+      alignItems: 'center',
+    },
+    tituloNav: {
+      color: '#fff',
+      fontSize: 18,
+      fontWeight: '600',
+    },
+  
+    rotulo: {
+      fontWeight: '600',
+    },
+  
+    blocoTopo: {
+      flexDirection: 'row',
+      padding: 20,
+      alignItems: 'center',
+    },
+    foto: {
+      width: 95,
+      height: 95,
+      borderRadius: 50,
+    },
+    nome: {
+      fontSize: 22,
+      fontWeight: '700',
+    },
+    idade: {
+      fontSize: 15,
+      color: '#555',
+      marginTop: 4,
+    },
+  
+    linhaEndereco: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: 6,
+    },
+    endereco: {
+      marginLeft: 4,
+      fontSize: 15,
+      color: '#444',
+    },
+  
+    barraAbas: {
+      borderBottomWidth: 1,
+      borderBottomColor: '#E5E7EB',
+    },
+    botaoAba: {
+      flex: 1,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    textoAba: {
+      color: '#6B7280',
+      fontSize: 14,
+    },
+    textoAbaAtiva: {
+      color: '#000',
+      fontWeight: '600',
+    },
+
+    
+  botaoEditar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.azul,
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginTop: 25,
+    gap: 8,
+  },
+
+  botaoEditarQ: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.azul,
+    paddingVertical: 14,
+    borderRadius: 12,
+  marginBottom:90,
+    gap: 8,
+  },
+  
+  textoBotaoVerExtrato: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
+  textoBotaoEditar: {
+    color: '#202020',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
+    conteudo: {
+      marginTop:10,
+    },
+  
+    conteudoScroll: {
+      padding: 20,
+    },
+  
+    tituloSecao: {
+      fontSize: 22,
+      fontWeight: '700',
+      marginBottom:10,
+      
+    },
+  
+    tituloExtrato: {
+      marginTop: 20,
+      fontSize: 22,
+      fontWeight: '700',
+      marginBottom: 16,
+    },
+  
+    cartao: {
+      backgroundColor: '#fff',
+      padding: 16,
+      borderRadius: 16,
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOpacity: 0.08,
+      shadowOffset: { width: 0, height: 2 },
+    },
+  
+  
+  
+  itemExtratoLinha: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  
+  dataExtrato: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  
+  tipoExtrato: {
+    fontSize: 13,
+    color: '#777',
+  },
+  
+  ladoDireito: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  
+  valorPositivo: {
+    fontWeight: '700',
+    color: '#3ab940',
+    fontSize: 14,
+  },
+  
+    valorPositivo: {
+      fontWeight: '600',
+      color: 'green',
+    },
+  
+    tituloFeedback: {
+      marginTop: 20,
+      fontSize: 22,
+      fontWeight: '700',
+      marginBottom: 16,
+    },
+  
+    cardComentario: {
+      backgroundColor: '#fff',
+      borderRadius: 16,
+      padding: 16,
+      marginTop: 10,
+      elevation: 3,
+      shadowColor: '#000',
+      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 2 },
+    },
+  
+    Comentario: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+  
+    fotoComentario: {
+      width: 45,
+      height: 45,
+      borderRadius: 22,
+      marginRight: 12,
+    },
+  
+    nomeComentario: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: '#000',
+    },
+  
+    dataComentario: {
+      fontSize: 12,
+      color: '#777',
+      marginTop: 2,
+    },
+  
+    textoComentario: {
+      fontSize: 15,
+      lineHeight: 20,
+      color: '#333',
+    },
     nav: { 
       width: "100%", 
       paddingTop: Platform.OS === "web" ? 20 : 45, 
@@ -299,6 +809,7 @@ const styles = StyleSheet.create({
     marginTop: height * 0.17,
   },
   perfil: {
+    
     borderRadius:100,
     alignSelf: 'center',
     width: width * 0.45,
@@ -313,10 +824,9 @@ const styles = StyleSheet.create({
   },
 
   Nome: {
-    marginBottom:60,
+    
     top: 170,
     alignSelf: 'center',
-    position: 'absolute',
     fontSize: 30,
     paddingVertical: 8,
   

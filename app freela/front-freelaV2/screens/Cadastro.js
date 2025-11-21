@@ -4,10 +4,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../temas/ThemeContext';
 import Background from '../components/Background';
-import axios from "axios";
 import * as ImagePicker from 'expo-image-picker';
+import axios from 'axios';
+import { API_URL } from './link';
 import { Ionicons } from '@expo/vector-icons';
-import { API_URL } from '../screens/link';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -17,13 +17,6 @@ export default function Cadastro() {
   const navigation = useNavigation();
   const { theme } = useTheme();
   
-  const [open, setOpen] = useState(false);
-    const [value, setValue] = useState('idoso');
-    const [items, setItems] = useState([
-      { label: 'Masculino', value: 'masculino' },
-      { label: 'Feminino', value: 'feminino' },
-      { label: 'Outro', value: 'outro' },
-    ]);
   // Estados para controle das etapas e dados
   const [etapa, setEtapa] = useState(1);
   const [nomeProfissional, setNomeProfissional] = useState('');
@@ -32,13 +25,20 @@ export default function Cadastro() {
   const [senhaProfissional, setSenhaProfissional] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [biografia, setBiografia] = useState('');
-  const [dataNasc,setDataNascUsuario] = useState("");
   const [valorMinimo, setValorMinimo] = useState('');
-  
+  const [areaAtuacao, setAreaAtuacao] = useState('');
+  const [mostrarDropdownArea, setMostrarDropdownArea] = useState(false);
+  const [servicosOferecidos, setServicosOferecidos] = useState('');
   const [imagem, setImagem] = useState(null);
   const [cpf, setCpf] = useState('');
-
-
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+  { label: "Masculino", value: "masculino" },
+  { label: "Feminino", value: "feminino" },
+  { label: "Outro", value: "outro" },
+]);
+  const [dataNasc, setDataNascUsuario] = useState(null);
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
   //cpf
@@ -212,22 +212,6 @@ const validarTelefone = (telefone) => {
     }
   };
 
-  // Componente de progresso
-  const Progresso = () => (
-    <View style={styles.progressContainer}>
-      {Array.from({ length: 4 }).map((_, index) => (
-        <View
-          key={index}
-          style={[
-            styles.progressStep,
-            { backgroundColor: etapa > index ? '#b08cff' : '#ffffffff' },
-          ]}
-        />
-      ))}
-    </View>
-  );
-
-  // Função de envio de dados
   const enviarDados = async () => {
     try {
       if (
@@ -239,10 +223,19 @@ const validarTelefone = (telefone) => {
         return;
       }
 
-      const partes = dataNasc.split('/');
-      const telefoneLimpo = telefoneProfissional.replace(/\D/g, '');
+    let dataString;
+
+    if (dataNasc instanceof Date) {
+      dataString = dataNasc.toLocaleDateString("pt-BR");
+    } else {
+      dataString = dataNasc;
+    }
+
+    const partes = dataString.split("/");
     const dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
 
+    const telefoneLimpo = telefoneProfissional.replace(/\D/g, '');
+    const cpfLimpo = cpf.replace(/\D/g, '');
       const formData = new FormData();
       formData.append("nomeProfissional", nomeProfissional);
       formData.append("emailProfissional", emailProfissional);
@@ -250,7 +243,7 @@ const validarTelefone = (telefone) => {
       formData.append("dataNascProfissional", dataFormatada);
       formData.append("generoProfissional", value);
       formData.append("senhaProfissional", senhaProfissional);
-      formData.append("documentosProfissional", cpf);
+      formData.append("documentosProfissional", cpfLimpo);
       formData.append("biografiaProfissional", biografia);
       formData.append("valorMin", valorMinimo.replace(/\D/g, "")); 
 
@@ -288,6 +281,22 @@ const validarTelefone = (telefone) => {
       }
     }
   };
+
+  // Componente de progresso
+  const Progresso = () => (
+    <View style={styles.progressContainer}>
+      {Array.from({ length: 3 }).map((_, index) => (
+        <View
+          key={index}
+          style={[
+            styles.progressStep,
+            { backgroundColor: etapa > index ? '#b08cff' : '#ffffffff' },
+          ]}
+        />
+      ))}
+    </View>
+  );
+
   const validarEtapa2 = () => {
 
   if (!value) {
@@ -382,8 +391,7 @@ if (etapa === 3) {
   if (etapa < 3) {
     setEtapa(etapa + 1);
   } else {
-    Alert.alert('Sucesso', 'Cadastro concluído!');
-    navigation.goBack();
+    enviarDados();
   }
 }
 
@@ -511,7 +519,6 @@ if (etapa === 3) {
             </>
           )}
 
-
           <View style={styles.buttonRow}>
             <TouchableOpacity 
               style={[styles.button, styles.buttonSecondary]} 
@@ -521,24 +528,18 @@ if (etapa === 3) {
                 {etapa === 1 ? 'Cancelar' : 'Voltar'}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.button, styles.buttonPrimary]}
-              onPress={() => {
-                if (etapa < 3) {
-                  
-                } else {
-                  enviarDados();
-                }
-              }}
-            >
-              <Text style={styles.buttonText}>
-                {etapa < 3 ? 'Seguinte' : 'Finalizar'}
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.button, styles.buttonPrimary]}
+                onPress={avancarEtapa}
+              >
+                <Text style={styles.buttonText}>
+                  {etapa < 3 ? 'Seguinte' : 'Finalizar'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         <StatusBar style="light" />
       </View>
-    </View>
     </Background>
   );
 }
@@ -547,7 +548,6 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
-    
   container: {
     flex: 1,
     alignItems: 'center',
@@ -588,6 +588,13 @@ const styles = StyleSheet.create({
     color: '#ffffffff',
     textAlign: 'center',
     marginBottom: 16,
+  },
+  scrollArea: {
+    maxHeight: 360,
+    width: '100%',
+  },
+  scrollContent: {
+    paddingBottom: 8,
   },
   input: {
     width: '100%',
@@ -752,5 +759,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-

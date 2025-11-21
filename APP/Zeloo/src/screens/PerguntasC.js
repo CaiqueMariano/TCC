@@ -1,8 +1,9 @@
 import React, { useState, useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions,Alert, Image, ScrollView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions,Alert, Image, ScrollView, DevSettings } from "react-native";
 import colors from "./colors";
 import { TextInput } from "react-native";
 import axios from "axios";
+import { API_URL } from "./link";
 import { UserContext } from "./userContext";
 import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from './AccessibilityContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,7 +13,7 @@ import Home from './Home';
 const { width, height } = Dimensions.get("window");
 
 export default function PerguntasC ({ navigation }) {
-  const { setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const [etapa, setEtapa] = useState(1);
   const totalEtapas = 7;
 
@@ -69,6 +70,83 @@ const [emo5, setEmo5] = useState(false);
 const [checked1E8, setChecked1E8] = useState(false);
 const [checked2E8, setChecked2E8] = useState(false);
 const [checked3E8, setChecked3E8] = useState(false);
+
+
+const enviarRespostas = async () =>{
+  const respostasHigiene = [];
+
+if (checked1E2) respostasHigiene.push("Preciso de ajuda com banho e higiene");
+if (checked2E2) respostasHigiene.push("Uso e preciso de fralda trocada");
+if (checked3E2) respostasHigiene.push("Uso sonda");
+if (checked4E2) respostasHigiene.push("Preciso de ajuda no banheiro");
+if (checked5E2) respostasHigiene.push("Nenhum dos anteriores");
+
+const rAutonomia = [];
+if (checked1) rAutonomia.push("Eu ando sozinho");
+if (checked2) rAutonomia.push("Uso cadeira de rodas");
+if (checked3) rAutonomia.push("Uso andador/bengala");
+if (checked4) rAutonomia.push("Estou acamado");
+
+const rAlimentacao = [];
+if (checked1E3) rAlimentacao.push("Eu como sozinho");
+if (checked2E3) rAlimentacao.push("Preciso de uma dieta especial");
+if (checked3E3) rAlimentacao.push("Tenho dificuldade de engolir");
+if (checked4E3) rAlimentacao.push("Preciso que me ajudem a comer");
+
+const rMedicamentos = [];
+if (checked1E5) rMedicamentos.push("Medicamentos");
+if (checked2E5) rMedicamentos.push("Supervisão");
+if (checked3E5) rMedicamentos.push("Nenhum dos anteriores");
+
+
+if (checked1E8) Comportamento.push("Tenho tendência a me perder");
+if (checked2E8) Comportamento.push("Costumo resiustir a banho");
+if (checked3E8) Comportamento.push("Nenhum dos anteriores");
+
+const rCognitivo = [];
+if (cog1) rCognitivo.push("Lúcido");
+if (cog2) rCognitivo.push("Confuso");
+if (cog3) rCognitivo.push("Demência leve");
+if (cog4) rCognitivo.push("Demência moderada");
+if (cog5) rCognitivo.push("Demência serevera");
+
+const rEmocional = [];
+if (emo1) rEmocional.push("Deprimido");
+if (emo2) rEmocional.push("Ansioso");
+if (emo3) rEmocional.push("Tranquilo");
+if (emo4) rEmocional.push("Comunicativo");
+if (emo5) rEmocional.push("Agressivo");
+
+console.log(alergias);
+console.log(diagnosticos);
+
+axios.post(`${API_URL}/api/perguntas`,{
+  idUsuario:user.idUsuario,
+  autonomia: rAutonomia,
+  higiene: respostasHigiene,
+  medicamentos: rMedicamentos,
+  cognicao: rCognitivo,
+  alimentacao: rAlimentacao,
+  dietaTexto,
+  alergias: alergias,
+  doencas: diagnosticos,
+  comportamento: Comportamento, 
+  emocional:rEmocional
+}).catch(error => {
+  if (error.response) {
+    // Erro vindo do backend (status 400, 500, etc.)
+    console.log("ERRO DO SERVIDOR:", error.response.data);
+  } else if (error.request) {
+    // Não chegou resposta (servidor offline, bloqueio de rede...)
+    console.log("ERRO DE REDE:", error.request);
+  } else {
+    // Erro interno do axios ou do código
+    console.log("ERRO AXIOS/CÓDIGO:", error.message);
+  }
+});
+
+
+};
 
   const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
 
@@ -818,10 +896,7 @@ const [checked3E8, setChecked3E8] = useState(false);
 
       <EscalarTouchable
         style={styles.finalButton}
-        onPress={() => {
-          Alert.alert("Concluído!", "Suas respostas foram salvas!");
-          navigation.navigate("Home");
-        }}
+        onPress={()=> enviarRespostas()}
       >
         <EscalarText style={styles.finalButtonText}>Finalizar</EscalarText>
       </EscalarTouchable>

@@ -22,8 +22,6 @@ return new class extends Migration
             $table->string('generoProfissional');
             $table->string('senhaProfissional');
             $table->bigInteger('documentosProfissional');
-            $table->string('biografiaProfissional');
-            $table->decimal('valorMin', 8, 2);
             $table->string('statusProfissional');
             $table->string('fotoProfissional')->nullable();
             $table->timestamps();

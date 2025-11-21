@@ -12,6 +12,15 @@ use App\Models\servicoModel;
 use App\Models\enderecoModel; 
 use App\Models\enderecoUsuarioModel; 
 use App\Models\User;
+use App\Models\PerguntaModel;
+use App\Models\AutonomiaModel;
+use App\Models\HigieneModel;
+use App\Models\AlimentacaoModel;
+use App\Models\DiagnosticoModel;
+use App\Models\MedicamentosModel;
+use App\Models\CognicaoModel;
+use App\Models\EmocionalModel;
+use App\Models\ComportamentoModel;
 use App\Models\IdosoFamiliaModel;
 use App\Models\FavoritosModel;
 use App\Models\UsuarioModel;
@@ -932,6 +941,146 @@ public function desbanirFree($idProfissional)
       }
 
 
+      //PERGUNTAS DO CAO
+
+      public function perguntas(Request $request){
+
+        try{
+        $perguntas = new PerguntaModel();
+        $perguntas->idUsuario = $request->idUsuario;
+
+        $perguntas->save();
+
+
+
+        foreach($request->autonomia as $autonomiaT){
+            AutonomiaModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'nivelAutonomia' => $autonomiaT
+            ]);
+        }
+
+        foreach($request->higiene as $higieneT){
+            HigieneModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'nivelHigiene' => $higieneT
+            ]);
+        }
+
+
+        foreach($request->medicamentos as $medicamentosT){
+            MedicamentosModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'tipoMedicamento' => $medicamentosT
+            ]);
+        }
+
+        foreach($request->cognicao as $cognicaoT){
+            CognicaoModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'nivelCognicao' => $cognicaoT
+            ]);
+        }
+
+        foreach($request->emocional as $emocionalT){
+            EmocionalModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'nivelEmocional' => $emocionalT
+            ]);
+        }
+        foreach($request->alimentacao as $alimentacaoT){
+            AlimentacaoModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'tipoAlimentacao' => $alimentacaoT,
+                'descAlimentacao' => $request->dietaTexto,
+            ]);
+        }
+
+        foreach($request->doencas as $doencasT){
+            DiagnosticoModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'doencaDiagnostico' => $doencasT,
+            ]);
+        }
+
+        foreach($request->alergias as $alergiasT){
+            DiagnosticoModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'alergiaDiagnostico' => $alergiasT,
+            ]);
+        }
+
+
+        foreach($request->comportamento as $comportamentoT){
+            ComportamentoModel::create([
+                'idPergunta' => $perguntas->idPergunta,
+                'tipoComportamento' => $comportamentoT,
+            ]);
+        }
+
+        
+
+        
+        return response()->json([
+            
+            'message' => 'funcionoi aidna bem n aguenotm mais'
+    
+    
+    ]);
+
+        
+        
+       
+      }catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Erro ao listar usuários',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+    
+    }
+
+
+    public function verPerguntas($id){
+
+
+        $perguntasE = PerguntaModel::where('idUsuario', $id)
+        ->first();
+
+        if($perguntasE){
+
+
+            $perguntas = DB::table('tb_pergunta')
+            ->join('tb_autonomia', 'tb_pergunta.idPergunta', '=', 'tb_autonomia.idPergunta')
+            ->join('tb_alimentacao', 'tb_alimentacao.idPergunta', '=', 'tb_alimentacao.idPergunta')
+            ->join('tb_cognicao', 'tb_cognicao.idPergunta', '=', 'tb_cognicao.idPergunta')
+            ->join('tb_comportamento', 'tb_comportamento.idPergunta', '=', 'tb_comportamento.idPergunta')
+            ->join('tb_diagnostico', 'tb_diagnostico.idPergunta', '=', 'tb_diagnostico.idPergunta')
+            ->join('tb_emocional', 'tb_emocional.idPergunta', '=', 'tb_emocional.idPergunta')
+            ->join('tb_higiene', 'tb_higiene.idPergunta', '=', 'tb_higiene.idPergunta')
+            ->join('tb_medicamentos', 'tb_medicamentos.idPergunta', '=', 'tb_medicamentos.idPergunta')
+            ->select('tb_pergunta.*', 'tb_autonomia.*', 'tb_alimentacao.*', 
+            'tb_cognicao.*', 'tb_comportamento.*','tb_diagnostico.*',
+            'tb_emocional.*', 'tb_higiene.*', 'tb_medicamentos.*')
+            ->get();
+
+
+
+            return response()->json([
+                'existe' => true,
+                'data' => $perguntas,
+                'message' => 'existe'
+            ], 200);
+
+        }else{
+            return response()->json([
+                'existe' => false,
+                'message' => 'Não existe'
+            ], 400);
+        }
+    }
+
       //CRIA FAMILAI
       public function criarFamilia(Request $request){
         
@@ -1657,10 +1806,8 @@ return response()->json([
             $profissional->nomeProfissional = $request->nomeProfissional;
             $profissional->emailProfissional = $request->emailProfissional;
             $profissional->telefoneProfissional = $request->telefoneProfissional;
-            $profissional->valorMin = $request->valorMin;
             $profissional->senhaProfissional = bcrypt($request->senhaProfissional);
             $profissional->documentosProfissional = $request->documentosProfissional;
-            $profissional->biografiaProfissional = $request->biografiaProfissional;
             $profissional->generoProfissional = $request->generoProfissional;
             $profissional->dataNascProfissional = $request->dataNascProfissional;
             $profissional->statusProfissional = "ativo";

@@ -13,6 +13,5 @@ class ProfissionalModel extends Model
      protected $primaryKey = 'idProfissional';
 
     public $fillable = ['idProfissional', 'nomeProfissional', 'emailProfissional', 
-    'telefoneUsuario', 'senhaProfissional', 'documentosProfissional', 
-    'biografiaProfissional','valorMin', 'generoProfissional',	'dataNascProfissional', 'statusProfissional', 'fotoProfissional'];
+    'telefoneUsuario', 'senhaProfissional', 'documentosProfissional','generoProfissional',	'dataNascProfissional', 'statusProfissional', 'fotoProfissional'];
 }
