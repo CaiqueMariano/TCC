@@ -5,6 +5,8 @@ import { API_URL } from "./link";
 import { UserContext } from "./userContext";
 import { Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import * as ImagePicker from "expo-image-picker";
 import { useAccessibility } from "./AccessibilityContext";
 
@@ -21,14 +23,67 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
   const [audioTocandoId, setAudioTocandoId] = useState(null);
   const [mostrarEdicao, setMostrarEdicao] = useState(false);
   const [somAtual, setSomAtual] = useState(null);
+  const [modalAlterarServico, setModalAlterarServico] = useState(false);
   const [valorProposta, setValorProposta] = useState({});
+  const [itemSelecionado, setItemSelecionado] = useState([]);
+  const [nomeServico, setNomeServico] = useState("");
+  const [dataServico, setDataServico] = useState("");
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
+  const [descServico, setDescServico] = useState("");
+  const [horaInicioServico, setHoraInicioServico] = useState("");
+  const [horaTerminoServico, setHoraTerminoServico] = useState("");
+  const [servicoSelecionado, setServicoSelecionado] = useState([]);
+  const [modalVer, setModalVer] = useState(false);
   const [ouvindoPrevia, setOuvindoPrevia] = useState(false);
   const [imagem, setImagem] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [conversa, setConversa] = useState([]);
   const [servicos, setServicos] = useState([]);
 
+  const precoParaBackend = (valor) => {
+    if (!valor) return 0;
+  
+    // Remove tudo que não é número
+    let numeros = valor.replace(/\D/g, "");
+  
+    // Converte para decimal
+    let convertido = (Number(numeros) / 100).toFixed(2);
+  
+    return convertido; // "12.50"
+  };
+const formatarPreco = (valor) => {
+ 
+  let numeros = valor.replace(/\D/g, "");
 
+
+  if (numeros.length === 0) return "";
+
+ 
+  let valorFormatado = (Number(numeros) / 100).toFixed(2);
+
+  return valorFormatado.replace(".", ",");
+};
+  const formatarHora = (date) => {
+    const hora = date.getHours().toString().padStart(2, "0");
+    const minuto = date.getMinutes().toString().padStart(2, "0");
+    return `${hora}:${minuto}`;
+  };
+
+  const abrirTimePicker = (setHorario) => {
+    if (Platform.OS === "web") {
+      const hora = prompt("Digite o horário (hh:mm):");
+      if (hora) setHorario(hora);
+    } else {
+      DateTimePickerAndroid.open({
+        value: new Date(),
+        mode: "time",
+        is24Hour: true,
+        onChange: (event, selectedDate) => {
+          if (selectedDate) setHorario(formatarHora(selectedDate));
+        },
+      });
+    }
+  };
   const verServico = async()=>{
     axios.get(`${API_URL}/api/verServico/${converSelecionada.idConversa}`)
     .then(response =>{
@@ -52,15 +107,26 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
     } catch (error) {
     }
   };
+
   useEffect(() => {
-    console.log(converSelecionada);
+    
+    const interval = setInterval(() => {
+
+      verServico();
+      //console.log(itemSelecionado);
+    }, 30000);
+    return () => clearInterval(interval);
+  }, []);
+  useEffect(() => {
+    
     pegarMensagens();
 
     const interval = setInterval(() => {
       pegarMensagens();
-    }, 2000); 
+      //console.log(itemSelecionado);
+    }, 5000); 
   
-    return () => clearInterval(interval);
+   
   }, []);
   //IMAGEEEM
 
@@ -139,7 +205,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
     await axios.post(`${API_URL}/api/enviarproposta`, {
           idProfissional:user.idProfissional,
           idServico:item.idServico,
-          precoPersonalizado: valorProposta[item.idMensagens],
+          precoPersonalizado: precoParaBackend(valorProposta[item.idMensagens]),
           idConversa: converSelecionada.idConversa,
           remententeConversa: "cuidador",
         }).catch(error =>{
@@ -289,7 +355,28 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
     setGravacaoURI(null);
     pegarMensagens();
   };
+  const formatarData = (data) => {
+    const d = new Date(data);
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  };
 
+  const  alterarServico = async() =>{
+    axios.put(`${API_URL}/api/updateServico/${servicoSelecionado.idServico}`,{
+      nomeServico:nomeServico,
+      dataServico:formatarData(dataServico),
+      descServico:descServico,
+      horaInicioServico:horaInicioServico,
+      horaTerminoServico:horaTerminoServico
+    }).then(response=>{
+      setModalAlterarServico(false);
+    }).catch((error) => {
+      console.log("Erro:", error.response.data);
+     
+    });
+  }
 //se o TECLADOO abre ou fecha e animacao dele
 
 const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor da altura pra  mover o input cima e naixo
@@ -343,6 +430,115 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
       <View style={styles.container}>
 
 
+<Modal
+          visible={modalAlterarServico}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalAlterarServico(false)}
+        >
+
+<View style={styles.modal}>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <View style={styles.modalViewF}>
+
+<TouchableOpacity onPress={()=>setModalAlterarServico(false)}>
+        <Ionicons name="close-outline" size={30} color={"gray"} style={{position: "absolute",right:10, top:-14}}/>
+        </TouchableOpacity>
+       
+        <Text style={styles.titulo}>Alterar servico:</Text>
+       <Text style={styles.tituloF}>Nome:</Text> 
+      <TextInput style={styles.inputA}
+       placeholder="Digite o novo nome"
+       value={nomeServico}
+       onChangeText={setNomeServico}
+       
+      />
+
+    
+      <Text style={styles.tituloF}>Descrição:</Text>
+    <TextInput style={styles.inputA}
+       placeholder="Digite a nova descrição"
+       value={descServico}
+       multiline={true}
+       numberOfLines={5}
+       onChangeText={setDescServico}
+       
+      />
+      
+    <Text style={styles.tituloF}>Data:</Text>
+    <TouchableOpacity
+            style={styles.inputA}
+            onPress={() => setMostrarCalendario(true)}
+          >
+            <Text style={{ marginTop: 10, fontSize: 16, marginLeft: 10, marginBottom: 10}}>
+              {dataServico ? dataServico.toLocaleDateString() : "Coloque a nova data"}
+            </Text>
+          </TouchableOpacity>
+  <Text style={styles.tituloF}>Hora de Início:</Text>
+  <TouchableOpacity style={styles.inputA} onPress={() => abrirTimePicker(setHoraInicioServico)}>
+            <Text style={{ marginTop: 10, fontSize: 16, marginLeft: 10, marginBottom: 10}}>{horaInicioServico || "Horário de Início"}</Text>
+          </TouchableOpacity>
+      <Text style={styles.tituloF}>Hora de Término:</Text>
+     
+<TouchableOpacity style={styles.inputA} onPress={() => abrirTimePicker(setHoraTerminoServico)}>
+            <Text style={{ marginTop: 10, fontSize: 16, marginLeft: 10, marginBottom: 10}}>{horaTerminoServico || "Horário de Término"}</Text>
+          </TouchableOpacity>
+
+<View style={styles.botao}>
+  <TouchableOpacity
+            style={styles.actionButton}
+            onPress={()=> alterarServico()}
+          >
+            <Text style={styles.buttonText}>Enviar</Text>
+          </TouchableOpacity>
+          </View>
+
+
+</View>
+    </ScrollView>
+  </View>
+
+  </Modal>
+
+  {mostrarCalendario && (
+            <DateTimePicker
+              value={dataServico || new Date()} 
+              mode="date"
+              display="spinner"
+              onChange={(event, selectedDate) => {
+                setMostrarCalendario(false);
+                if (event.type === 'set' && selectedDate) {
+                  setDataServico(selectedDate);
+                }
+              }}
+            />
+          )}
+
+
+  <Modal
+          visible={modalVer}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setmModalVer(false)}
+        >
+
+<View style={styles.modal}>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <View style={styles.modalView}>
+
+<TouchableOpacity onPress={()=>setModalVer(false)}>
+        <Ionicons name="close-outline" size={30} color={"gray"} style={{position: "absolute",right:10, top:-14}}/>
+        </TouchableOpacity>
+       
+     
+
+
+</View>
+    </ScrollView>
+  </View>
+
+  </Modal>
+
         {/**MODAL SERVICOD */}
 
         
@@ -360,7 +556,9 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
 <TouchableOpacity onPress={()=>setMostrarEdicao(false)}>
         <Ionicons name="close-outline" size={30} color={"gray"} style={{position: "absolute",right:10, top:-14}}/>
         </TouchableOpacity>
-      <Text style={styles.titulo}>Selecione o servico correspondente:</Text>
+       
+      <Text style={styles.titulo}>Selecione o servico correspondente e envie sua proposta!:</Text>
+     
 
       {servicos
             .map((item, index) => {
@@ -368,19 +566,24 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
               const dataServico = new Date(item.dataServico);
               const a = dataServico.getFullYear();
               const m = dataServico.getMonth() + 1;
-              const d = dataServico.getDay();
+              const d = dataServico.getDate();
             return (
-      <TouchableOpacity onPress={()=> enviarServico(item)}>
+              <View>
+            <TouchableOpacity onPress={()=> enviarServico(item)}>
                 <View style={styles.cardG} key={index}>
          
                         <Text style={styles.nomeServico}>{item.nomeServico}</Text>
                         <Text style={styles.data}>{d}/{m}/{a}</Text>
-                        <Text style={styles.detalhes}>Ver Mais</Text>
+                        
                            
                     
         
                 </View>
                 </TouchableOpacity>
+<TouchableOpacity onPress={()=>{ setModalVer(true);setItemSelecionado(item)}}>
+        <Text style={styles.detalhes}>Ver Mais</Text>
+        </TouchableOpacity>
+        </View>
                  );
                 })}
 
@@ -433,6 +636,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
 
     item.tipoMensagens === "agendamento" && styles.cardAgendamentoContainer,
     item.tipoMensagens === "proposta" && styles.cardAgendamentoContainer,
+    item.tipoMensagens === "servico" && styles.cardAgendamentoContainerS,
 
     audioTocandoId === item.idMensagens && styles.audioTocando
   ]}
@@ -453,7 +657,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
           <View  style={styles.cardAgendamento}>
 
           <Text style={styles.textoContrato}>Informações do agendamento</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>{ setServicoSelecionado(item);setNomeServico(item.nomeServico);setDescServico(item.descServico);setDataServico(new Date(item.dataServico));setHoraInicioServico(item.horaInicioServico);setHoraTerminoServico(item.horaTerminoServico);setModalAlterarServico(true)}}>
           <Text style={styles.textoContrato2}>Alterar <Ionicons name = "pencil-sharp" size={15}/> </Text>
           </TouchableOpacity>
           <View style={styles.label}>
@@ -468,8 +672,13 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
           </View>
 
           <View style={styles.label}>
-            <Text style={styles.labelText}>Horário: </Text>
+            <Text style={styles.labelText}>Horário Início: </Text>
             <Text style={styles.infoText}>{item.horaInicioServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Horário Término: </Text>
+            {(!item.horaTerminoServico || item.horaTerminoServico === "") ? (<Text style={styles.infoText}>Não Especificado</Text>): (<Text style={styles.infoText}>{item.horaTerminoServico}</Text>)}
           </View>
 
           <View style={styles.label}>
@@ -499,7 +708,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     onChangeText={(text) =>
                       setValorProposta((prev) => ({
                         ...prev,
-                        [item.idMensagens]: text,
+                        [item.idMensagens]: formatarPreco(text),
                       }))
                     }
                     
@@ -526,7 +735,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
           </View>
 
           <View style={styles.label}>
-            <Text style={styles.labelText}>Horário: </Text>
+            <Text style={styles.labelText}>Horário Início: </Text>
             <Text style={styles.infoText}>{item.horaInicioServico}</Text>
           </View>
 
@@ -550,6 +759,54 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             <Text style={styles.labelTextValor}>{item.precoPersonalizado}</Text>
           </View>
           <TouchableOpacity style={styles.botaoContrato}><Text style={styles.textoBotao}>{item.statusServico === "nAceito" ? ("Aguardando Confirmação"):("Proposta Aceita")}</Text></TouchableOpacity>
+          </View>
+        ) : item.tipoMensagens === "servico" ? (
+
+          <View  style={styles.cardAgendamento}>
+
+          <Text style={styles.textoContratoS}>Informações do Servico</Text>
+          <TouchableOpacity>
+          </TouchableOpacity>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Tipo:</Text>
+            <Text style={styles.infoTextS}>{item.nomeServico}</Text>
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Descrição: </Text>
+          
+           
+          </View>
+          <Text style={styles.infoTextS}>{item.descServico}</Text>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Data: </Text>
+            <Text style={styles.infoTextS}>{item.dataServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Horário Início: </Text>
+            <Text style={styles.infoTextS}>{item.horaInicioServico}</Text>
+          </View>
+          <View style={styles.label}>
+          <Text style={styles.labelTextS}>Horário Término: </Text>
+          {(!item.horaTerminoServico || item.horaTerminoServico === "") ? (<Text style={styles.infoTextS}>Não Especificado</Text>): (<Text style={styles.infoTextS}>{item.horaTerminoServico}</Text>)}
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Rua: </Text>
+            <Text style={styles.infoTextS}>{item.ruaUsuario}, {item.numLogradouroUsuario}</Text>
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Cidade: </Text>
+            <Text style={styles.infoTextS}>{item.cidadeUsuario}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>CEP: </Text>
+            <Text style={styles.infoTextS}>{item.cepUsuario}</Text>
+          </View>
+
+
+         
+         
           </View>
         ) : (
           <Text style={styles.msgTexto}>{item.conteudoMensagens}</Text>
@@ -641,10 +898,23 @@ const styles = StyleSheet.create({
 
   },
 
+  textoContratoS:{
+    marginBottom:10,
+    fontWeight:'500'
+  },
+
+  labelTextS:{
+    fontWeight:'500'
+  },
+
   labelValor:{
     marginTop:20,
     marginBottom:10,
     flexDirection:"row",
+  },
+
+  infoTextS:{
+    marginBottom:5,
   },
 
   labelTextValor:{
@@ -692,6 +962,19 @@ const styles = StyleSheet.create({
     borderColor: '#fff' ,
   },
 
+  actionButton: {
+    marginBottom:20,
+    marginRight:10,
+    height: 40,
+    width: 150,
+    borderColor: '#202020', 
+    backgroundColor: "#b08cff",
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 10,
+  },
+
   textoBotao: {
     color: '#b08cff',
     fontSize: 15,
@@ -733,12 +1016,13 @@ data:{
 },
 
 detalhes:{
+  fontSize:17,
   color:"gray",
   textDecorationLine:"underline",
   textDecorationColor:"gray",
   position:"absolute",
-  bottom:2,
-  right:10
+  bottom:5,
+  right:35
 },
   modal:{
     flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', 
@@ -755,11 +1039,19 @@ detalhes:{
   },
 
   titulo:{
-    marginTop:20,
+    marginTop:17,
     fontSize:18,
     fontWeight:"600",
     color:"#b08cff"
   },
+
+  tituloP:{
+
+    fontSize:18,
+    fontWeight:"600",
+    color:"#b08cff"
+  },
+
 
   
   botoes:{
@@ -876,4 +1168,43 @@ detalhes:{
     marginLeft: 4,
     marginBottom: 45,
   },
+
+
+  informacoes:{
+    fontSize:16,
+    marginBottom:10,
+  },
+
+  textoT:{
+    fontWeight:'600',
+  },
+
+  tituloF:{
+    fontWeight:'600'
+  },
+  inputA:{
+    borderWidth:1,
+    borderRadius:10,
+    marginBottom:20,
+  },
+
+  modalViewF:{
+    paddingTop:20,
+    fontSize:20,
+    paddingLeft:15,
+    paddingRight:15,
+    marginTop:80,
+    backgroundColor: '#fff', 
+    width:340,
+    borderRadius: 10, 
+  },
+
+  buttonText:{
+    color:"#fff"
+  },
+
+  botao:{
+    alignItems:'center'
+  }
+
 });

@@ -1,8 +1,9 @@
-import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity,  } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, Modal, TextInput  } from 'react-native';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { API_URL } from '../screens/link';
 import axios from 'axios';
 import { useState, useEffect, useContext } from 'react';
+import colors from './colors';
 import { UserContext } from './userContext';
 import Icon from "react-native-vector-icons/Feather";
 import Icons from "react-native-vector-icons/Entypo";
@@ -11,6 +12,10 @@ export default function perfilProfissional({route, navigation}) {
   const {user} = useContext(UserContext);
   const anoNasc = new Date(servico.dataNascProfissional).getFullYear();
   const hoje = new Date();
+  const [modalDenuncia, setModalDenuncia] = useState(false);
+  const [motivo, setMotivo] = useState("");
+  const [desc, setDesc] = useState("");
+  const [evidencia, setEvidencia] = useState("");
   const ano = hoje.getFullYear();
   const [idade, setIdade] = useState("");
   const CalcularIdade =  () =>{
@@ -22,6 +27,23 @@ export default function perfilProfissional({route, navigation}) {
     CalcularIdade();
   }, []);
 
+
+  const denunciar = async()=>{
+    await axios.post(`${API_URL}/api/denunciarFree`,{
+      idProfissional:servico.idProfissional,
+      motivoDenuncia:motivo,
+      descDenuncia: desc,
+      evidenciaDenuncia:evidencia
+    }).then(response=>{
+      setMotivo("");
+      setDesc("");
+      setEvidencia("");
+      alert("Denúncia enviada!");
+      setModalDenuncia(false);
+    }).catch(error => {
+      console.log("Erro:", error.response.data);
+    })
+   }
 
   const favoritar = async () =>{
     axios.post (`${API_URL}/api/favoritar`,{
@@ -37,6 +59,62 @@ export default function perfilProfissional({route, navigation}) {
   }
   return (
     <View style={styles.container}>
+
+<Modal
+      animationType="fade"
+      transparent={true}
+      visible={modalDenuncia}
+      onRequestClose={() => setModalDenuncia(false)}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+        <TouchableOpacity  style={styles.sair} 
+        onPress={() => setModalDenuncia(false)}
+        >
+          <Ionicons name="close" size={30} color={"gray"}></Ionicons>
+          </TouchableOpacity>
+          <Text style={styles.modalText}>Denunciar Usuario</Text>
+         
+          <TextInput
+        style={styles.input}
+        placeholder="Digite em poucas palavras o motivo"
+        value={motivo}
+        onChangeText={setMotivo}
+        maxLength={40}
+      />
+
+      
+          <TextInput
+        style={styles.inputD}
+        multiline={true}
+        numberOfLines={5}
+        maxLength={250}
+        value={desc}
+        onChangeText={setDesc}
+        placeholder="Descreva o que aconteceu"
+        
+      />
+
+<TextInput
+        style={styles.input}
+        placeholder="Coloque as evidências"
+        value={evidencia}
+        onChangeText={setEvidencia}
+      />
+
+      
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={()=> denunciar()}
+          >
+            <Text style={styles.buttonText}>Enviar</Text>
+          </TouchableOpacity>
+
+
+        </View>
+      </View>
+    </Modal>
+
       <View style={styles.topSection}>
         <Image
           source={{ uri: `${API_URL}/storage/${servico.fotoProfissional}` }}
@@ -125,7 +203,7 @@ export default function perfilProfissional({route, navigation}) {
           <Text style={[styles.buttonText, { color: '#000' }]}>Favoritar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.customButton, { backgroundColor: '#d9534f' }]}>
+        <TouchableOpacity style={[styles.customButton, { backgroundColor: '#d9534f' }]} onPress={()=> setModalDenuncia(true)}>
           <Ionicons name="alert-circle-outline" size={22} color="#fff" style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Denunciar</Text>
         </TouchableOpacity>
@@ -276,9 +354,107 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#202020',
   },
   buttonIcon: {
     marginRight: 10,
 },
+
+
+  //MODAL DENUNCIUA
+
+  
+
+  actionButton: {
+    padding:10,
+    marginRight:10,
+    paddinLeft:0,
+    height: 50,
+    borderColor: '#202020',
+   
+    backgroundColor: colors.azul,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginTop: 10,
+  },
+
+  openButton: {
+    padding: 12,
+    backgroundColor: '#ddd',
+    borderRadius: 10,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 25,
+    borderRadius: 12,
+    width: '80%',
+    
+  },
+  modalText: {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  modalReceivedText: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    fontWeight: '600',
+  },
+
+  modalFoto: {
+    width: 80,            
+    height: 80,           
+    borderRadius: 60,      
+    marginBottom: 15,
+    resizeMode: 'cover',
+  },
+  profileImage: {
+    width: 54,
+    height: 54,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  modalReceivedText:{
+    fontSize: 18,
+    fontWeight: '600',
+    marginLeft: 12,         
+    color: '#83DBC2',
+  },
+  modalInfo:{
+    flexDirection: 'row',      
+    alignItems: 'center',    
+    marginBottom: 20,       
+    justifyContent: 'flex-start',
+  },
+
+  botoes: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+    marginBottom: 15,
+  },
+
+  input:{
+    padding:10,
+    borderWidth:1,
+    borderRadius:10,
+    marginBottom:20,
+  },
+
+  inputD:{
+    padding:10,
+    textAlignVertical: 'top',
+    borderWidth:1,
+    borderRadius:10,
+    marginBottom:20,
+  },
 });

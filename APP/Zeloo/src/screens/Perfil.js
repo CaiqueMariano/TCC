@@ -33,11 +33,15 @@ export default function Perfil({navigation}) {
   const[mostrarEdicao, setMostrarEdicao] = useState(false);
   const[mostrarExcluir, setMostrarExcluir] = useState(false);
   const [usuario, setUsuario] = useState([]);
-  const[emailUsuario, setEmailUsuario] = useState('');
-  const[senhaUsuario, setSenhaUsuario] = useState('');
+
+
   const [questionarioInfo, setQuestionarioinfo] = useState([])
+
+ 
+  
+  
+  
   const[nomeUsuario, setNomeUsuario] = useState('');
-  const[telefoneUsuario, setTelefoneUsuario] = useState('');
   const[tipoUsuario, setTipoUsuario] = useState('');
   const[dataNasc, setDataNasc] = useState('');
   const [questionarioExiste, setQuestionarioExiste] = useState(false)
@@ -56,7 +60,7 @@ export default function Perfil({navigation}) {
   }, [mostrarEdicao, user]);
 
   useEffect(() => {
-
+    console.log("UQEST",questionarioExiste)
     questionario();
     
     
@@ -70,6 +74,7 @@ export default function Perfil({navigation}) {
 
       if(response.data.success){
         setUser(response.data.data);
+        navigation.replace("Perfil");
         setMostrarEdicao(false);
       }else{
         console.log(response.data.message);
@@ -93,6 +98,18 @@ export default function Perfil({navigation}) {
   }, [abaAtiva]);
 
 
+
+  const [alimentacao, setAlimentacao] = useState([]);
+  const [diagnostico, setDiagnostico] = useState([]);
+  const [autonomia, setAutonomia] = useState([]);
+  const [cognicao, setCognicao] = useState([]);
+  const [telefoneUsuario, setTelefoneUsuario] = useState("");
+  const [emailUsuario, setEmailUsuario] = useState("");
+  const [comportamento, setComportamento] = useState([]);
+  const [emocional, setEmocional] = useState([]);
+  const [higiene, setHigiene] = useState([]);
+  const [medicamentos, setMedicamentos] = useState([]);
+
   const questionario = async () => {
     try {
       const response = await axios.get(`${API_URL}/api/verPerguntas/${user.idUsuario}`);
@@ -103,6 +120,14 @@ export default function Perfil({navigation}) {
   
       if (existe) {
         setQuestionarioinfo(response.data.data);
+        setAlimentacao(response.data.alimentacao);
+        setDiagnostico(response.data.diagnostico);
+        setAutonomia(response.data.autonomia);
+        setCognicao(response.data.cognicao);
+        setComportamento(response.data.comportamento);
+        setEmocional(response.data.emocional);
+        setHigiene(response.data.higiene);
+        setMedicamentos(response.data.medicamentos);
         console.log(questionarioExiste);
       }
   
@@ -130,7 +155,7 @@ export default function Perfil({navigation}) {
       <TextInput
       style={styles.input}
       placeholder="Nome Inteiro"
-      value={user.nomeUsuario}
+      value={nomeUsuario}
       onChangeText={setNomeUsuario}
     />
 
@@ -138,7 +163,7 @@ export default function Perfil({navigation}) {
     <TextInput
       style={styles.input}
       placeholder="Telefone"
-      value={user.telefoneUsuario}
+      value={telefoneUsuario}
       onChangeText={setTelefoneUsuario}
     />
 
@@ -146,7 +171,7 @@ export default function Perfil({navigation}) {
   <TextInput
       style={styles.input}
       placeholder="E-mail"
-      value={user.emailUsuario}
+      value={emailUsuario}
       onChangeText={setEmailUsuario}
     />
 
@@ -254,7 +279,7 @@ export default function Perfil({navigation}) {
 
           <TouchableOpacity 
             style={styles.botaoEditar}
-            onPress={() => navigation.navigate("EditarPerfil")}
+            onPress={() => {setEmailUsuario(user.emailUsuario);setNomeUsuario(user.nomeUsuario);setTelefoneUsuario(user.telefoneUsuario);navigation.navigate("EditarPerfil")}}
           >
             <Text style={styles.textoBotaoEditar}>Ver Histórico</Text>
           </TouchableOpacity>
@@ -290,7 +315,14 @@ export default function Perfil({navigation}) {
             </Text>
 
             <Text style={styles.linhaInfo}>
-              <Text style={styles.rotulo}>Email:</Text> {user.emailUsuario === "null" ? (""): ("Email não cadastrado")}
+              <Text style={styles.rotulo}>Email:</Text> {(!user.emailUsuario || user.emailUsuario === "") ? (
+                <Text style={styles.email}>
+                <Text style={styles.textEmail}>Email não cadastrado! </Text>
+                
+                <Text style={styles.textEmail2}>Cadastre em <Text style={styles.editarPerfilText}>editar perfil</Text> para receber avisos!</Text>
+                </Text>
+
+              ): ("")}
             </Text>
 
             <Text style={styles.linhaInfo}>
@@ -300,7 +332,7 @@ export default function Perfil({navigation}) {
 
             <TouchableOpacity 
             style={styles.botaoEditar}
-            onPress={() => navigation.navigate("EditarPerfil")}
+            onPress={() => setMostrarEdicao(true)}
           >
             <Text style={styles.textoBotaoEditar}>Editar Perfil</Text>
           </TouchableOpacity>
@@ -308,145 +340,101 @@ export default function Perfil({navigation}) {
 
             <Text style={styles.tituloSecao}>Questionário</Text>
 
-            {questionarioExiste === false ? (
-  <View>
-    <Text style={styles.linhaInfo}>
-      Questionário não preenchido, o preencha para cuidadores te ajudarem do melhor modo possível!
-    </Text>
+            {questionarioExiste === false? (        
+             <View>
+              <Text style={styles.qText}>Questionário não preenchido, o preencha para cuidadores o ajudar do melhor modo possível!</Text>
+              <Text style={styles.qText2}>O questionário faz perguntas sobre medicamentos, tipo de alimentação e etc.</Text>
 
-    <TouchableOpacity 
-      style={styles.botaoEditarQ}
-      onPress={() => navigation.navigate("PerguntasC")}
-    >
-      <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
-    </TouchableOpacity>
-  </View>
-) : (
-  questionarioInfo && questionarioInfo.length > 0 ? (
-    <View style={styles.container}>
+              <TouchableOpacity 
+            style={styles.botaoEditarQ}
+            onPress={() => navigation.navigate("PerguntasC")}
+          >
+            <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
+          </TouchableOpacity>
+             </View>
+          ): (<View>
 
-      {/* DOENÇAS */}
-      <Text style={styles.titulo}>Doenças</Text>
-      {questionarioInfo
-        .filter(item => item.doencaDiagnostico)
-        .map((item, index) => (
-          <View key={index} style={styles.cardInfo}>
-            <Text style={styles.texto}>• {item.doencaDiagnostico}</Text>
-          </View>
-        ))
-      }
+            <Text style={styles.tituloQ}>Alimentação</Text>
+            {alimentacao.map((item, index) =>(
+                    <View>
+                   
+                    <Text style={styles.atributo}><Text style={styles.textoA}>Tipo: </Text>{item.tipoAlimentacao}</Text>
+                    {(!item.descAlimentacao || item.descAlimentacao === "") ? (""): (<Text style={styles.atributo}><Text style={styles.textoA}>Descrição: </Text>{item.descAlimentacao}</Text>)}
+                    </View>
+            ))}
+            <Text style={styles.tituloQ}>Diagnósticos</Text>
+            {diagnostico.map((item, index) =>(
+                    <View>
+                    
+                    {(!item.doencaDiagnostico || item.doencaDiagnostico === "") ? (""): (<Text style={styles.atributo}><Text style={styles.textoA}>Doença: </Text>{item.doencaDiagnostico}</Text>)}
+                    {(!item.alergiaDiagnostico || item.alergiaDiagnostico=== "") ? (""): (<Text style={styles.atributo}><Text style={styles.textoA}>Alergia: </Text>{item.alergiaDiagnostico}</Text>)}
+                    </View>
+            ))}
+            <Text style={styles.tituloQ}>Autonomia</Text>
+            {autonomia.map((item) => (
+              <View key={item.idAutonomia}>
+                
+                <Text style={styles.atributo}>
+                  <Text style={styles.textoA}>Nível: </Text>{item.nivelAutonomia}
+                </Text>
+              </View>
+            ))}
 
-      {/* ALERGIAS */}
-      <Text style={styles.titulo}>Alergias</Text>
-      {questionarioInfo
-        .filter(item => item.alergiaDiagnostico)
-        .map((item, index) => (
-          <View key={index} style={styles.cardInfo}>
-            <Text style={styles.texto}>• {item.alergiaDiagnostico}</Text>
-          </View>
-        ))
-      }
+        <Text style={styles.tituloQ}>Cognição</Text>
+            {cognicao.map(item => (
+              <View key={item.idCognicao}>
+                
+                <Text style={styles.atributo}>
+                  <Text style={styles.textoA}>Nível: </Text>{item.nivelCognicao}
+                </Text>
+              </View>
+            ))}
 
-    </View>
-  ) : (
-    <Text style={{ color: "#fff" }}>Carregando questionário...</Text>
-  )
-)}
-{questionarioExiste === false ? (
-  <View>
-    <Text style={styles.linhaInfo}>
-      Questionário não preenchido, o preencha para cuidadores te ajudarem do melhor modo possível!
-    </Text>
+          <Text style={styles.tituloQ}>Comportamento</Text>
+          {comportamento.map(item => (
+                       
+                          
+                          <Text style={styles.atributo}>
+                            <Text style={styles.textoA}>°</Text>{item.tipoComportamento}
+                          </Text>
+                ))}
 
-    <TouchableOpacity 
-      style={styles.botaoEditarQ}
-      onPress={() => navigation.navigate("PerguntasC")}
-    >
-      <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
-    </TouchableOpacity>
-  </View>
-) : (
-  questionarioInfo && questionarioInfo.length > 0 ? (
-    <View style={styles.container}>
-
-      {/* DOENÇAS */}
-      <Text style={styles.titulo}>Doenças</Text>
-      {questionarioInfo
-        .filter(item => item.doencaDiagnostico)
-        .map((item, index) => (
-          <View key={index} style={styles.cardInfo}>
-            <Text style={styles.texto}>• {item.doencaDiagnostico}</Text>
-          </View>
-        ))
-      }
-
-      {/* ALERGIAS */}
-      <Text style={styles.titulo}>Alergias</Text>
-      {questionarioInfo
-        .filter(item => item.alergiaDiagnostico)
-        .map((item, index) => (
-          <View key={index} style={styles.cardInfo}>
-            <Text style={styles.texto}>• {item.alergiaDiagnostico}</Text>
-          </View>
-        ))
-      }
-
-    </View>
-  ) : (
-    <Text style={{ color: "#fff" }}>Carregando questionário...</Text>
-  )
-)}
-{questionarioExiste === false ? (
-  <View>
-    <Text style={styles.linhaInfo}>
-      Questionário não preenchido, o preencha para cuidadores te ajudarem do melhor modo possível!
-    </Text>
-
-    <TouchableOpacity 
-      style={styles.botaoEditarQ}
-      onPress={() => navigation.navigate("PerguntasC")}
-    >
-      <Text style={styles.textoBotaoEditar}>Preencher Questionário</Text>
-    </TouchableOpacity>
-  </View>
-) : (
-  questionarioInfo && questionarioInfo.length > 0 ? (
-    <View style={styles.container}>
-
-      {/* DOENÇAS */}
-      <Text style={styles.titulo}>Doenças</Text>
-      {questionarioInfo
-        .filter(item => item.doencaDiagnostico)
-        .map((item, index) => (
-          <View key={index} style={styles.cardInfo}>
-            <Text style={styles.texto}>• {item.doencaDiagnostico}</Text>
-          </View>
-        ))
-      }
-
-      {/* ALERGIAS */}
-      <Text style={styles.titulo}>Alergias</Text>
-      {questionarioInfo
-        .filter(item => item.alergiaDiagnostico)
-        .map((item, index) => (
-          <View key={index} style={styles.cardInfo}>
-            <Text style={styles.texto}>• {item.alergiaDiagnostico}</Text>
-          </View>
-        ))
-      }
-
-    </View>
-  ) : (
-    <Text style={{ color: "#fff" }}>Carregando questionário...</Text>
-  )
-)}
+        <Text style={styles.tituloQ}>Estado Emocional</Text>
+          {emocional.map(item => (
+                       
+                          
+                          <Text style={styles.atributo}>
+                            <Text style={styles.textoA}>Nível: </Text>{item.nivelEmocional}
+                          </Text>
+                ))}
 
 
+            <Text style={styles.tituloQ}>Higiene</Text>
+          {higiene.map(item => (
+                       
+                          
+                          <Text style={styles.atributo}>
+                            <Text style={styles.textoA}>°</Text>{item.nivelHigiene}
+                          </Text>
+                ))}
+                <View styles={styles.cognicaoS}>
+      <Text style={styles.tituloQ}>Preciso que alguém administre: </Text>
+        {medicamentos.map(item => (
+                       
+                          
+                       <Text style={styles.atributo}>
+                         <Text style={styles.textoA}></Text>{item.tipoMedicamento}
+                       </Text>
+             ))}
 
-          
+      </View>
 
-          
+          <Text>aaaa</Text>
+      
+          </View>)}
 
+         
+        
         </ScrollView>
       )}
 
@@ -469,6 +457,26 @@ const styles = StyleSheet.create({
   Container2: {
    
     
+  },
+  tituloQ:{
+    textDecorationLine:'underline',
+    textDecorationColor: colors.azul,
+    fontSize:20,
+    marginBottom:15,
+    marginTop:20,
+    fontWeight:'500'
+  },
+
+  cognicaoS:{
+    
+    marginBottom: 80
+  },
+
+  textoA:{
+    fontWeight: '500',
+  },
+  atributo:{
+    fontSize:20,
   },
   Container3: {
     flex: 0.45,
@@ -519,6 +527,34 @@ const styles = StyleSheet.create({
   },
   info:{
     color:colors.preto,
+  },
+  textEmail:{
+    marginRight:40,
+    marginTop:20,
+   
+  },
+
+  editarPerfilText:{
+    textDecorationLine:'underline',
+    textDecorationColor: "red",
+  },
+
+  qText:{
+    fontSize:20,
+  },
+  qText2:{
+    fontSize:18,
+    marginTop:10,
+    marginBottom:20,
+  },
+
+
+  textEmail2:{
+  marginBottom:40,
+  },
+
+  email:{
+   
   },
 
   separador: {

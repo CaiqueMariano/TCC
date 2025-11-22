@@ -541,9 +541,10 @@ public function desbanirFree($idProfissional)
    public function verServico($id){
     $servicos= DB::table('tb_servico_mensagem')
     ->join('tb_servico', 'tb_servico_mensagem.idServico', '=', 'tb_servico.idServico')
+    ->join('tb_endereco', 'tb_servico.idEndereco', '=', 'tb_endereco.idEndereco')
     ->where('tb_servico_mensagem.idConversa', $id)
     ->where('tb_servico.statusServico', 'nAceito')
-    ->select('tb_servico_mensagem.*', 'tb_servico.*')
+    ->select('tb_servico_mensagem.*', 'tb_servico.*', 'tb_endereco.*')
     ->get();
 
     return response()->json([
@@ -566,6 +567,9 @@ public function desbanirFree($idProfissional)
         $msg->conteudoMensagens = $request->conteudoMensagens;
 
     }else if($request->tipoMensagens === "agendamento"){
+        $msg->idServico = $request->idServico;
+
+    }else if($request->tipoMensagens === "servico"){
         $msg->idServico = $request->idServico;
 
     }else if ($request->tipoMensagens !== "texto" && $request->hasFile('arquivoMensagens')) {
@@ -1098,25 +1102,61 @@ public function desbanirFree($idProfissional)
         if($perguntasE){
 
 
-            $perguntas = DB::table('tb_pergunta')
-            ->join('tb_autonomia', 'tb_pergunta.idPergunta', '=', 'tb_autonomia.idPergunta')
-            ->join('tb_alimentacao', 'tb_alimentacao.idPergunta', '=', 'tb_alimentacao.idPergunta')
-            ->join('tb_cognicao', 'tb_cognicao.idPergunta', '=', 'tb_cognicao.idPergunta')
-            ->join('tb_comportamento', 'tb_comportamento.idPergunta', '=', 'tb_comportamento.idPergunta')
-            ->join('tb_diagnostico', 'tb_diagnostico.idPergunta', '=', 'tb_diagnostico.idPergunta')
-            ->join('tb_emocional', 'tb_emocional.idPergunta', '=', 'tb_emocional.idPergunta')
-            ->join('tb_higiene', 'tb_higiene.idPergunta', '=', 'tb_higiene.idPergunta')
-            ->join('tb_medicamentos', 'tb_medicamentos.idPergunta', '=', 'tb_medicamentos.idPergunta')
-            ->select('tb_pergunta.*', 'tb_autonomia.*', 'tb_alimentacao.*', 
-            'tb_cognicao.*', 'tb_comportamento.*','tb_diagnostico.*',
-            'tb_emocional.*', 'tb_higiene.*', 'tb_medicamentos.*')
+            $alimentacao = DB::table('tb_alimentacao')
+            ->where('tb_alimentacao.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_alimentacao.*')
             ->get();
 
+           
+            $diagnostico = DB::table('tb_diagnostico')
+            ->where('tb_diagnostico.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_diagnostico.*')
+            ->get();
+ 
+
+            $autonomia = DB::table('tb_autonomia')
+            ->where('tb_autonomia.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_autonomia.*')
+            ->get();
+
+            $cognicao = DB::table('tb_cognicao')
+            ->where('tb_cognicao.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_cognicao.*')
+            ->get();
+
+            $comportamento = DB::table('tb_comportamento')
+            ->where('tb_comportamento.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_comportamento.*')
+            ->get();
+
+
+            $emocional = DB::table('tb_emocional')
+            ->where('tb_emocional.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_emocional.*')
+            ->get();
+
+            $higiene = DB::table('tb_higiene')
+            ->where('tb_higiene.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_higiene.*')
+            ->get();
+
+            $medicamentos = DB::table('tb_medicamentos')
+            ->where('tb_medicamentos.idPergunta', $perguntasE->idPergunta)
+            ->select('tb_medicamentos.*')
+            ->get();
 
 
             return response()->json([
                 'existe' => true,
-                'data' => $perguntas,
+                'data' => $perguntasE,
+                'alimentacao' => $alimentacao,
+                'diagnostico' => $diagnostico,
+                'autonomia' => $autonomia,
+                'cognicao' => $cognicao,
+                'comportamento' => $comportamento,
+                'emocional' => $emocional,
+                'higiene' => $higiene,
+                'medicamentos' => $medicamentos,
                 'message' => 'existe'
             ], 200);
 
@@ -1157,11 +1197,77 @@ public function desbanirFree($idProfissional)
        
     }
 
+
+    //DENUNCIAR IDOSO
+    public function denunciarIdoso(Request $request){
+
+        $denunciar = new Denuncias();
+        
+        $denunciar->idUsuario= $request->idUsuario;
+        $denunciar->motivoDenuncia= $request->motivoDenuncia;
+        $denunciar->descDenuncia= $request->descDenuncia;
+        $denunciar->evidenciaDenuncia= $request->evidenciaDenuncia;
+        
+        $denunciar ->save();
+
+        return response()->json([
+            'message'=> 'Denunciado',
+            'success' => true,
+            'code'=>200]
+        );
+        
+        
+        }
+
+
+        //DENUNCIAR CUIDADOR
+        public function denunciarFree(Request $request){
+
+            $denunciar = new DenunciasFreeModel();
+            
+            $denunciar->idProfissional= $request->idProfissional;
+            $denunciar->motivoDenuncia= $request->motivoDenuncia;
+            $denunciar->descDenuncia= $request->descDenuncia;
+            $denunciar->evidenciaDenuncia= $request->evidenciaDenuncia;
+            
+            $denunciar ->save();
+
+            return response()->json([
+                'message'=> 'Denunciado',
+                'success' => true,
+                'code'=>200]
+            );
+            
+            
+            }
+
     public function updatePerfil(Request $request, $idUsuario){
         UsuarioModel::where('idUsuario', $idUsuario)->update([
             'nomeUsuario' => $request->nomeUsuario,
             'telefoneUsuario' => $request-> telefoneUsuario,
             'emailUsuario' => $request-> emailUsuario,
+
+        ]);
+
+        return response()->json([
+            'message'=> 'Dados alterados com sucesso',
+            'success' => true,
+            'code'=>200]
+        );
+
+
+    }
+
+
+    //Alterar servico
+    public function updateServico(Request $request, $idServico){
+        servicoModel::where('idServico', $idServico)->update([
+            'nomeServico' => $request->nomeServico,
+            'descServico' => $request->descServico,
+            'tipoServico' => $request-> nomeServico,
+            'dataServico' => $request-> dataServico,
+            'horaInicioServico' => $request-> horaInicioServico,
+            'horaTerminoServico' => $request-> horaTerminoServico
 
         ]);
 

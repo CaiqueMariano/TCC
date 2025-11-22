@@ -97,6 +97,14 @@ const aceitar = async () => {
 
     if (response.data.success) {
       const conversa = response.data.data[0];
+      const idConversa = conversa.idConversa;
+
+      axios.post(`${API_URL}/api/mandarMensagem`,{
+        idConversa:idConversa,
+        remententeConversa: "idoso",
+        tipoMensagens: "servico",
+        idServico: itemSelecionado.idServico
+      })
       navigation.navigate("Conversas", { converSelecionada: conversa });
 
      
@@ -215,6 +223,13 @@ const pegarServicos = async () =>{
   function CardPedido({ item, localizacao, pegarCoordenadasPorCEP, calcularDistancia, abrirModal }) {
     const [distancia, setDistancia] = useState(null);
   
+    if (item.generoServico === "homem" && user.generoProfissional === "feminino") {
+      return null;
+    }
+
+    if (item.generoServico === "mulher" && user.generoProfissional === "masculino") {
+      return null;
+    }
     useEffect(() => {
       if (!localizacao) return;
     
@@ -472,6 +487,8 @@ itemSelecionado
       {/* Conteúdo das abas */}
       <ScrollView contentContainerStyle={{ padding: 12 }}>
       {pedidosFiltrados(ABAS[abaAtiva].chave).map(item => {
+
+
   return (
     <CardPedido 
       key={item.idServico}

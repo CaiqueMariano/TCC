@@ -322,27 +322,39 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                 </View>
                 
                 <View style={{ flex: 1 }}>
-  <FlatList
-    data={conversa}
-   keyExtractor={(item, index) => `${item.idMensagens}_${index}`}
-    renderItem={({ item }) => (
+                <FlatList
+  data={conversa}
+  keyExtractor={(item, index) => `${item.idMensagens}_${index}`}
+  renderItem={({ item }) => {
+
+    if (item.tipoMensagens === "servico") {
+      return null;
+    }
+
+    if (item.tipoMensagens === "agendamento") {
+      return null;
+    }
+
+    return (
       <View
-  style={[
-    styles.msgContainer,
-    item.remententeConversa === "idoso"
-      ? styles.msgIdoso
-      : styles.msgCuidador,
+        style={[
+          styles.msgContainer,
+          item.remententeConversa === "idoso"
+            ? styles.msgIdoso
+            : styles.msgCuidador,
 
-    item.tipoMensagens === "agendamento" && styles.cardAgendamentoContainer,
-    item.tipoMensagens === "proposta" && styles.cardAgendamentoContainer,
+          item.tipoMensagens === "agendamento" && styles.cardAgendamentoContainer,
+          item.tipoMensagens === "proposta" && styles.cardAgendamentoContainer,
 
-    audioTocandoId === item.idMensagens && styles.audioTocando
-  ]}
->
+          audioTocandoId === item.idMensagens && styles.audioTocando
+        ]}
+      >
         {item.tipoMensagens === "audio" ? (
           <TouchableOpacity 
-          onPress={() => tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)}
-        >
+            onPress={() =>
+              tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)
+            }
+          >
             <Ionicons name="play-circle" size={32 * scale} color="#fff" />
           </TouchableOpacity>
         ) : item.tipoMensagens === "imagem" ? (
@@ -350,66 +362,69 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             source={{ uri: `${API_URL}/storage/${item.arquivoMensagens}` }}
             style={{ width: 180, height: 180, borderRadius: 12 }}
           />
-        ): item.tipoMensagens === "proposta" ? (
+        ) : item.tipoMensagens === "proposta" ? (
 
-          <View  style={styles.cardAgendamento}>
+          <View style={styles.cardAgendamento}>
+            <Text style={styles.textoContrato}>Informações da Proposta</Text>
 
-          <Text style={styles.textoContrato}>Informações da Proposta</Text>
-          <TouchableOpacity>
-          </TouchableOpacity>
-          <View style={styles.label}>
-            <Text style={styles.labelText}>Tipo:</Text>
-            <Text style={styles.infoText}>{item.nomeServico}</Text>
-          </View>
-          
+            <View style={styles.label}>
+              <Text style={styles.labelText}>Tipo:</Text>
+              <Text style={styles.infoText}>{item.nomeServico}</Text>
+            </View>
 
-          <View style={styles.label}>
-            <Text style={styles.labelText}>Data: </Text>
-            <Text style={styles.infoText}>{item.dataServico}</Text>
+            <View style={styles.label}>
+              <Text style={styles.labelText}>Data: </Text>
+              <Text style={styles.infoText}>{item.dataServico}</Text>
+            </View>
+
+            <View style={styles.label}>
+              <Text style={styles.labelText}>Horário: </Text>
+              <Text style={styles.infoText}>{item.horaInicioServico}</Text>
+            </View>
+
+            <View style={styles.label}>
+              <Text style={styles.labelText}>Rua: </Text>
+              <Text style={styles.infoText}>{item.ruaUsuario}, {item.numLogradouroUsuario}</Text>
+            </View>
+
+            <View style={styles.label}>
+              <Text style={styles.labelText}>Cidade: </Text>
+              <Text style={styles.infoText}>{item.cidadeUsuario}</Text>
+            </View>
+
+            <View style={styles.label}>
+              <Text style={styles.labelText}>CEP: </Text>
+              <Text style={styles.infoText}>{item.cepUsuario}</Text>
+            </View>
+
+            <View style={styles.labelValor}>
+              <Text style={styles.labelTextValor}>Valor: R$</Text>
+              <Text style={styles.labelTextValor}>{item.precoPersonalizado}</Text>
+            </View>
+
+            {item.statusServico === "nAceito" ? (
+              <TouchableOpacity
+                style={styles.botaoContrato}
+                onPress={() => confirmarContrato(item)}
+              >
+                <Text style={styles.textoBotao}>CONFIRMAR</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.botaoContrato}>
+                <Text style={styles.textoBotao}>CONFIRMADO</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
-          <View style={styles.label}>
-            <Text style={styles.labelText}>Horário: </Text>
-            <Text style={styles.infoText}>{item.horaInicioServico}</Text>
-          </View>
-
-          <View style={styles.label}>
-            <Text style={styles.labelText}>Rua: </Text>
-            <Text style={styles.infoText}>{item.ruaUsuario}, {item.numLogradouroUsuario}</Text>
-          </View>
-          <View style={styles.label}>
-            <Text style={styles.labelText}>Cidade: </Text>
-            <Text style={styles.infoText}>{item.cidadeUsuario}</Text>
-          </View>
-
-          <View style={styles.label}>
-            <Text style={styles.labelText}>CEP: </Text>
-            <Text style={styles.infoText}>{item.cepUsuario}</Text>
-          </View>
-
-
-          <View style={styles.labelValor}>
-            <Text style={styles.labelTextValor}>Valor: R$</Text>
-            <Text style={styles.labelTextValor}>{item.precoPersonalizado}</Text>
-          </View>
-          {item.statusServico === "nAceito" ?
-          (
-          <TouchableOpacity style={styles.botaoContrato} onPress={()=> confirmarContrato(item)}>
-            <Text style={styles.textoBotao}>CONFIRMAR</Text>
-            </TouchableOpacity>
-            ):( <TouchableOpacity style={styles.botaoContrato}>
-            <Text style={styles.textoBotao}>CONFIRMADO</Text>
-            </TouchableOpacity>)
-            }
-          </View>
         ) : (
           <Text style={styles.msgTexto}>{item.conteudoMensagens}</Text>
         )}
       </View>
-    )}
-    contentContainerStyle={{ padding: 12 }}
-    showsVerticalScrollIndicator={false}
-  />
+    );
+  }}
+  contentContainerStyle={{ padding: 12 }}
+  showsVerticalScrollIndicator={false}
+/>
 </View>
 
                 {gravacaoURI && (

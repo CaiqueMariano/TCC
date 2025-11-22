@@ -6,10 +6,12 @@ scrcpy -s RQ8N2098ZZW
 scrcpy -s a3a366b6
 
 
-
 Criar migration
 
 
+<TouchableOpacity style={styles.input} onPress={() => abrirTimePicker(horarioTerminoServico)}>
+            <Text style={styles.inputText}>{horarioTerminoServico || "Horário de Término"}</Text>
+          </TouchableOpacity>
 
 php artisan make:migration create_tbComportamento_table
 
