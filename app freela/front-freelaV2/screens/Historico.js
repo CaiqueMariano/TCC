@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import { UserContext } from './userContext';
 import { API_URL } from './link';
 
-export default function HistoricoContratos() {
+export default function HistoricoContratos({navigation}) {
   const { user } = useContext(UserContext);
   const [finalizados, setFinalizados] = useState([]);
 
   useEffect(() => {
-    // Buscar apenas contratos finalizados
     axios
       .get(`${API_URL}/api/vizualizarContratosFree/${user.idProfissional}/finalizado`)
       .then(response => {
@@ -57,6 +56,17 @@ export default function HistoricoContratos() {
                 <Text style={styles.rotulo}>Horário: </Text>
                 {item.horaInicioServico}
               </Text>
+
+              <View style={styles.botoes}> 
+              {!item.jaAvaliou && (
+  <TouchableOpacity
+    style={styles.botaoM}
+    onPress={() => navigation.navigate("Avaliar", { contrato: item })}
+  >
+    <Text style={styles.mais}>Avaliar</Text>
+  </TouchableOpacity>
+)}
+                    </View>
             </View>
           </View>
         );
@@ -71,6 +81,24 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     backgroundColor: '#fff',
   },
+
+  botaoM: {
+    marginRight:10,  
+    borderColor: '#b08cff',
+    borderWidth: 2,
+    width: 90,
+    height: 40,
+    borderRadius: 16,
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  mais: { 
+    color: '#b08cff',
+    alignSelf: 'center', 
+    fontWeight: '600' 
+  },
+
+
   titulo: {
     fontSize: 22,
     fontWeight: '700',

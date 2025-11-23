@@ -65,9 +65,7 @@ export default function Contrato({ navigation }) {
         paddingHorizontal: 10,
         alignItems: 'center',
       }} style={styles.content}>
-         <Text style={styles.subtitle}>
-        Você tem até 2 dias para pagar ou cancelar um serviço
-      </Text>
+        
         
         {servicos.length === 0 ? (
   <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
@@ -117,9 +115,6 @@ export default function Contrato({ navigation }) {
           <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
 
           <View style={styles.buttonRow}>
-            <TouchableOpacity style={styles.button2} onPress={()=> cancelar(servico)} >
-              <Text style={styles.buttonText2}>Cancelar</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate("telaPagamento", {servico})}>
               <Text style={styles.buttonText}>Pagar</Text>
             </TouchableOpacity>

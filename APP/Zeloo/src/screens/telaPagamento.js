@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Platform } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Platform, Modal} from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
@@ -11,6 +11,38 @@ export default function telaPagamento({ route, navigation }) {
   const { increaseScale, decreaseScale, resetScale, scale } = useAccessibility();
   const { servico } = route.params;
   const dataAtual = new Date();
+  const hoje = new Date();
+      const horas = String(hoje.getHours()).padStart(2, '0');
+      const minutos = String(hoje.getMinutes()).padStart(2, '0');
+      const segundos = String(hoje.getSeconds()).padStart(2, '0');
+      const [modalAvaliacao, setModalAvaliacao] = useState(false);
+
+
+      const horario = `${horas}:${minutos}:${segundos}`;
+
+      const ano = hoje.getFullYear();
+      const mes = String(hoje.getMonth() + 1).padStart(2, '0'); // 0–11 → soma 1
+      const dia = String(hoje.getDate()).padStart(2, '0');
+
+      const dataFormatada = `${ano}-${mes}-${dia}`;
+
+  const extrato = async () =>{
+    console.log("aparece???!")
+    await axios.post(`${API_URL}/api/extrato`,{
+      idProfissional: servico.idProfissional,
+      idContrato: servico.idContrato,
+      valor: servico.precoPersonalizado,
+      dataExtrato: dataFormatada,
+      horarioExtrato: horario,
+    }).then(response =>{
+      console.log("EXTRATADO!")
+    }).catch(error =>{
+      console.log("erro");
+      console.log(error.response.error);
+    })
+  }
+    /*
+  const extrato = */
   const pagar = async () => {
     try {
 
@@ -35,25 +67,11 @@ export default function telaPagamento({ route, navigation }) {
         idContrato: servico.idContrato
       });
 
-      
-      const extrato = await axios.post(`${API_URL}/api/extrato`,{
-        idProfissional: servico.idProfissional,
-        idContrato: servico.idContrato,
-        valor: servico.precoPersonalizado,
-        dataExtrato: dataFormatada,
-        horarioExtrato: horario,
-      })
-
-      if(extrato.data.success){
-        console.log("sucesso");
-      }else{
-        console.log("erro")
-      }
 
 
       if (response.data.success) {
-        alert('Pagamento Feito!');
-        navigation.navigate("Ativos");
+        extrato();
+        setModalAvaliacao(true);
       }
     } catch (error) {
       console.log(error);
@@ -62,6 +80,37 @@ export default function telaPagamento({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+
+<Modal
+      animationType="fade"
+      transparent={true}
+      visible={modalAvaliacao}
+      onRequestClose={()=>setModalAvaliacao(false)}
+    >
+      <View style={styles.overlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>Serviço Terminado!</Text>
+
+          <Text style={styles.modalText}>
+            Aguarde o Pagamento
+          </Text>
+
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+            onPress={()=>navigation.navigate("Avaliar",{servico})}
+          >
+            <Text style={styles.buttonText}>Avaliar Cuidador</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+            onPress={()=>navigation.navigate("Home")}
+          >
+            <Text style={styles.buttonText}>Fechar</Text>
+          </TouchableOpacity>
+
+        </View>
+      </View>
+    </Modal>
       {/* 🔹 Barra superior */}
       <View style={styles.nav}>
         <EscalarTouchable onPress={() => navigation.goBack()}>
@@ -137,7 +186,7 @@ export default function telaPagamento({ route, navigation }) {
         <Text style={styles.totalFinal}>Total: R${servico.precoPersonalizado}</Text>
 
         {/* 🔹 Botão pagar */}
-        <TouchableOpacity style={styles.pagamentoButton} onPress={pagar}>
+        <TouchableOpacity style={styles.pagamentoButton} onPress={()=> pagar()}>
           <Text style={styles.pagamentoButtonText}>Efetuar Pagamento</Text>
         </TouchableOpacity>
       </View>
@@ -298,4 +347,97 @@ const styles = StyleSheet.create({
     width: 65,
     height: 65,
   },
+
+  //MODAL AVALIAÇÃO
+  // === MODAL ===
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.55)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+modalContainer: {
+  width: '80%',
+  backgroundColor: '#fff',
+  borderRadius: 14,
+  padding: 20,
+  alignItems: 'center',
+},
+
+
+modalFoto: {
+  width: 100,
+  height: 100,
+  borderRadius: 10,
+  marginBottom: 12,
+},
+
+modalInfo: { marginBottom: 12 },
+
+
+actionButton: {
+  width: '100%',
+  paddingVertical: 12,
+  borderRadius: 10,
+  marginTop: 10,
+  alignItems: 'center',
+},
+
+openButton: {
+  padding: 12,
+  backgroundColor: '#ddd',
+  borderRadius: 10,
+  marginBottom: 20,
+  alignItems: 'center',
+},
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.5)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  backgroundColor: 'white',
+  padding: 25,
+  borderRadius: 12,
+  width: '80%',
+  alignItems: 'center',
+},
+modalText: {
+  fontSize: 22,
+  fontWeight: '600',
+  marginBottom: 10,
+},
+modalReceivedText: {
+  fontSize: 22,
+  fontWeight: 'bold',
+  fontWeight: '600',
+},
+
+modalFoto: {
+  width: 80,            
+  height: 80,           
+  borderRadius: 60,      
+  marginBottom: 15,
+  resizeMode: 'cover',
+},
+profileImage: {
+  width: 54,
+  height: 54,
+  borderRadius: 10,
+  marginRight: 10,
+},
+modalReceivedText:{
+  fontSize: 18,
+  fontWeight: '600',
+  marginLeft: 12,         
+  color: '#83DBC2',
+},
+modalInfo:{
+  flexDirection: 'row',      
+  alignItems: 'center',    
+  marginBottom: 20,       
+  justifyContent: 'flex-start',
+},
 });

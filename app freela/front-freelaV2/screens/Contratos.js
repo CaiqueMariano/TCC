@@ -189,9 +189,7 @@ export default function Contratos({navigation}) {
                     {item.horaInicioServico}
                   </Text>
   
-                  <TouchableOpacity style={styles.botaoM}> 
-                    <Text style={styles.mais}>Ver Mais</Text>
-                  </TouchableOpacity>
+    
 
                   <TouchableOpacity style={styles.botaoM} onPress={()=>finalizar(item)}> 
                     <Text style={styles.mais}>Terminar</Text>
@@ -252,14 +250,7 @@ export default function Contratos({navigation}) {
                     <Text style={styles.mais}>Ver Mais</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity style={styles.botaoM} onPress={() => navigation.navigate("Conversas", {
-   idUsuario: item.idUsuario, 
-   idProfissional: user.idProfissional,
-   idConversa: item.idConversa ?? null,
-  })}> 
-                    <Text style={styles.mais}>Conversar</Text>
-                  </TouchableOpacity>
-                  
+      
                 </View>
                 </View>
               </View>

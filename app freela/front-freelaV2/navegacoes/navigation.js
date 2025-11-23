@@ -1,13 +1,14 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef} from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '../temas/ThemeContext';
 import { UserProvider, UserContext } from "../screens/userContext";
 import { AccessibilityProvider } from "../screens/AccessibilityContext";
-
-
+import axios from "axios";
+import { API_URL } from "../screens/link";
 import Pedidos from '../screens/Pedidos';
+import avaliacoescuidador from "../screens/avaliacoescuidador";
 import BemVindo from '../screens/BemVindo';
 import Cadastro from '../screens/Cadastro';
 import Home from '../screens/Home';
@@ -31,7 +32,11 @@ import Icons from "react-native-vector-icons/AntDesign";
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+
+
 function AppTabs() {
+
+  const { user } = useContext(UserContext);
   return (
     <Tab.Navigator screenOptions={{
       headerShown: false,
@@ -66,6 +71,7 @@ function AppTabs() {
 
 <Tab.Screen name="Mensagens" component={ListaConversas} options={{
           tabBarLabel: "Conversas",
+          unmountOnBlur: true,
           tabBarIcon: ({ color }) => (
             <Icons name="message" size={24} color={color} />
           )
@@ -123,7 +129,7 @@ export default function App() {
         component={AppTabs} 
         options={{ headerShown: false }} 
       />
-
+        <Stack.Screen name="Avaliar" component={avaliacoescuidador} />
         <Stack.Screen name="SobreNos" component={SobreNos} options={{ headerShown: false }} />
         <Stack.Screen name="Dashboard" component={Dashboard} />
         <Stack.Screen name="Configuracoes" component={Configuracoes} />
@@ -215,3 +221,5 @@ const styles = StyleSheet.create({
     color: '#0a84ff',
   },
 });
+
+

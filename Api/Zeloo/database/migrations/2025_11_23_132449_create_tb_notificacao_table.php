@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tb_avaliacao', function (Blueprint $table) {
-            $table->id('idAvaliacao');
-            $table->integer('notaAvaliacao');
-            $table->date('dataAvaliacao');
-            $table->string('comentAvaliacao');
+        Schema::create('tb_notificacao', function (Blueprint $table) {
+            $table->id();
+            $table->integer('idUsuario');
+            $table->string('token');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tb_avaliacao');
+        Schema::dropIfExists('tb_notificacao');
     }
 };

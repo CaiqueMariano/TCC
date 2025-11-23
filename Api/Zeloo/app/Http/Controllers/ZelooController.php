@@ -16,6 +16,8 @@ use App\Models\PerguntaModel;
 use App\Models\AutonomiaModel;
 use App\Models\HigieneModel;
 use App\Models\AlimentacaoModel;
+use App\Models\AvaliacaoCuidadorModel;
+use App\Models\AvaliacaoIdosoModel;
 use App\Models\DiagnosticoModel;
 use App\Models\MedicamentosModel;
 use App\Models\CognicaoModel;
@@ -487,6 +489,99 @@ public function desbanirFree($idProfissional)
 
     /*Funcões da API*/ 
     
+
+    //AVALIAR IDOSO
+
+    public function avaliarIdoso(Request $request){
+        $avaliar = new AvaliacaoIdosoModel();
+
+        $avaliar->idUsuario = $request->idUsuario;
+        $avaliar->idContrato = $request->idContrato;
+        $avaliar->comentAvaliacao = $request->comentAvaliacao;
+        $avaliar->notaAvaliacao = $request->notaAvaliacao;
+
+        $avaliar->save();
+
+        return response()->json([
+            'success' =>true,
+            'data' => $avaliar
+
+        ],200);
+    }
+
+    public function avaliarCuidador(Request $request){
+        $avaliar = new AvaliacaoCuidadorModel();
+
+        $avaliar->idProfissional= $request->idProfissional;
+        $avaliar->idContrato = $request->idContrato;
+        $avaliar->comentAvaliacao = $request->comentAvaliacao;
+        $avaliar->notaAvaliacao = $request->notaAvaliacao;
+
+        $avaliar->save();
+
+        return response()->json([
+            'success' =>true,
+            'data' => $avaliar
+
+        ],200);
+    }
+
+//VER AVALIACAO IDOSO
+    public function verAvaliacaoIdoso($id){
+
+        $ver = DB::table('tb_avaliacao_idoso')
+        ->join('tb_contrato', 'tb_avaliacao_idoso.idContrato', '=', 'tb_contrato.idContrato')
+        ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
+        ->join('tb_profissional', 'tb_profissional_servico.idProfissional', '=', 'tb_profissional.idProfissional')
+        ->where('tb_avaliacao_idoso.idUsuario', $id)
+        ->select('tb_avaliacao_idoso.*', 'tb_profissional.*', 'tb_avaliacao_idoso.created_at as dataDoEnvio')
+        ->get();
+
+
+        return response()->json([
+            'data' => $ver
+        ]);
+    }
+
+    public function mediaAvaliarIdoso($id){
+        $media = AvaliacaoIdosoModel::where('idUsuario', $id)->avg('notaAvaliacao');
+        $media = round($media, 1);
+
+        return response()->json([
+            'data' => $media
+
+        ]);
+    }
+
+    public function mediaAvaliarCuidador($id){
+        $media = AvaliacaoCuidadorModel::where('idProfissional', $id)->avg('notaAvaliacao');
+        $media = round($media, 1);
+
+        return response()->json([
+            'data' => $media
+
+        ]);
+    }
+
+    //VER AVALIACAO CUIDADOR
+    public function verAvaliacaoCuidador($id){
+
+        $ver = DB::table('tb_avaliacao_cuidador')
+        ->join('tb_contrato', 'tb_avaliacao_cuidador.idContrato', '=', 'tb_contrato.idContrato')
+        ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
+        ->join('tb_servico', 'tb_profissional_servico.idServico','=', 'tb_servico.idServico')
+        ->join('tb_idoso_familia', 'tb_servico.idIdosoFamilia', '=', 'tb_idoso_familia.idIdosoFamilia')
+        ->join('tb_idoso', 'tb_idoso_familia.idIdoso', '=', 'tb_idoso.idIdoso')
+        ->join('tb_usuario', 'tb_idoso.idUsuario', '=', 'tb_usuario.idUsuario')
+        ->where('tb_avaliacao_cuidador.idProfissional', $id)
+        ->select('tb_avaliacao_cuidador.*', 'tb_usuario.*', 'tb_avaliacao_cuidador.created_at as dataDoEnvio')
+        ->get();
+
+
+        return response()->json([
+            'data' => $ver
+        ]);
+    }
 
 //COMBINAR SERVICO
    public function conversar(Request $request){
@@ -1480,6 +1575,15 @@ public function vizualizarContratosFree($idProfissional, $status){
     ->where('tb_contrato.statusContrato', $status)
     ->select('tb_contrato.*', 'tb_servico.*', 'tb_usuario.*', 'tb_profissional_servico.*'/*, 'tb_conversa.*'/*/)
     ->get();
+
+
+    foreach ($contratos as $contrato) {
+        $avaliacaoExiste = DB::table('tb_avaliacao_idoso')
+            ->where('idContrato', $contrato->idContrato)
+            ->exists();
+
+        $contrato->jaAvaliou = $avaliacaoExiste;
+    }
 
 
     return response()->json([

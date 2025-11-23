@@ -10,29 +10,11 @@ import { EscalarText, EscalarTouchable, EscalarImage, useAccessibility } from '.
 import { UserContext } from "./userContext";
 import { Ionicons } from '@expo/vector-icons';
 const { width, height } = Dimensions.get("window");
+import { completarCadastro } from "../../AppM";
 import { API_URL } from '../screens/link';
 import * as Notifications from 'expo-notifications';
 
 
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  })
-});
-const completarCadastro = async () => {
-
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "Complete seu cadastro!",
-      body: "Preencha informações relevantes para futuros serviços",
-      sound: true
-    },trigger: { seconds: 1 }
-  });
-
-};
 
 export default function Cadastro({ navigation }) {
   const { setUser } = useContext(UserContext);
@@ -178,7 +160,7 @@ export default function Cadastro({ navigation }) {
     formData.append('nomeUsuario', nomeUsuario);
     formData.append('telefoneUsuario', telefoneLimpo);
     formData.append('senhaUsuario', senhaUsuario);
-    formData.append('tipoUsuario', value);
+   // formData.append('tipoUsuario', value);
     formData.append('dataNasc', dataFormatada);
 
     
@@ -202,17 +184,18 @@ export default function Cadastro({ navigation }) {
 
       if(response.data.success){
         setUser(response.data.data);
-        completarCadastro();
         navigation.navigate("Login")
+        completarCadastro();
       }else{
      
         console.log("Erro", response.data.message);
+        
       
       }
     }
       catch(error){
-        if (error.response) {
-          console.error("Erro do servidor:", error.response.data);
+        if (error.response?.data?.error?.includes("1062")) {
+          Alert.alert("Erro", "Este telefone já está cadastrado!");
         } else if (error.request) {
           console.error("Sem resposta do servidor:", error.request);
         } else {

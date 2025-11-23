@@ -40,13 +40,13 @@ export default function ListaConversas({navigation}) {
             response =>{
                 setConversas(response.data.data)
             }
-        ).catch(error => console.log("erro:", error));
+        ).catch(error => console.log("erro é esse?:", error));
     }
     useEffect(() => {
         atualizarConversas()
         const interval = setInterval(() => {
             atualizarConversas();
-          }, 2000); 
+          }, 15000); 
         
           return () => clearInterval(interval);
     }, []);

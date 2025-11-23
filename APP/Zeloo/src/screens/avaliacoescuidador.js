@@ -4,15 +4,32 @@ import colors from './colors';
 import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import axios from "axios";
+import { API_URL } from "./link";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 
 // Tela estilo mobile com rating por estrelas, área de texto, passo indicador e navegação inferior
-export default function avaliacoescuidador({ navigation }) {
+export default function avaliacoescuidador({ navigation, route }) {
+  const {servico} = route.params;
   const [rating, setRating] = useState(5);
   const [note, setNote] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const stars = [1, 2, 3, 4, 5];
+
+
+  const avaliar = async () =>{
+    console.log(servico)
+    axios.post(`${API_URL}/api/avaliarCuidador`,{
+      idProfissional:servico.idProfissional,
+      idContrato:servico.idContrato,
+      comentAvaliacao:note,
+      notaAvaliacao:rating
+    }).then(response =>{
+      alert("avaliado");
+    }).catch(error=>{
+      console.log(error.response.data);
+    })
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -65,7 +82,7 @@ export default function avaliacoescuidador({ navigation }) {
         />
 
 
-      <TouchableOpacity style={styles.nextBtn} onPress={() => setModalVisible(true)}>
+      <TouchableOpacity style={styles.nextBtn} onPress={() => avaliar()}>
       <Text style={styles.nextText}>Avaliar</Text>
       <Ionicons name="arrow-forward" size={18} style={{marginLeft: 8}} />
       </TouchableOpacity>

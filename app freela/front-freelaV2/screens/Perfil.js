@@ -4,6 +4,7 @@ import { API_URL } from './link';
 import { Modal } from 'react-native';
 import {View,Text,StyleSheet,Image,TouchableOpacity,Animated,Dimensions,ScrollView,} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import axios from 'axios';
 
 
 
@@ -19,10 +20,10 @@ export default function PerfilCuidador({ navigation }) {
   const  {user} = useContext(UserContext);
   const [abaAtiva, definirAbaAtiva] = useState(0);
   const indicador = useRef(new Animated.Value(0)).current;
-
+  const [media, setMedia] = useState("");
   const [modalVisivel, setModalVisivel] = useState(false);
 const [itemSelecionado, setItemSelecionado] = useState(null);
-
+const [avaliacao, setAvaliacao] = useState([]);
 const anoNasc = new Date(user.dataNascProfissional).getFullYear();
   const hoje = new Date();
   const ano = hoje.getFullYear();
@@ -33,8 +34,25 @@ const anoNasc = new Date(user.dataNascProfissional).getFullYear();
   };
 
   useEffect(() => {
+    avaliacoes();
+    mediaA();
     CalcularIdade();
   }, []);
+
+  const mediaA = async () =>{
+    await axios.get(`${API_URL}/api/mediaAvaliarCuidador/${user.idProfissional}`)
+    .then(response=>{
+      setMedia(response.data.data);
+    })
+  }
+
+  const avaliacoes = async()=>{
+    await axios.get(`${API_URL}/api/verAvaliacaoCuidador/${user.idProfissional}`)
+    .then(response=>{
+      setAvaliacao(response.data.data);
+    })
+  }
+  
 
 const abrirModalExtrato = (item) => {
   setItemSelecionado(item);
@@ -68,7 +86,7 @@ return (
 
         <View style={styles.linhaEndereco}>
           <Ionicons name="star" size={18} color="#b08cff" />
-          <Text style={styles.endereco}>4,8</Text>
+          <Text style={styles.endereco}>{media}</Text>
         </View>
       </View>
     </View>
@@ -135,22 +153,41 @@ return (
       
           <Text style={styles.tituloFeedback}>Últimos Feedbacks</Text>
 
-          <View style={styles.cardComentario}>
-            <View style={styles.Comentario}>
-              <Image
-                source={require('../assets/perfilicon.png')}
-                style={styles.fotoComentario}
-              />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.nomeComentario}>Maria de Lourdes</Text>
-                <Text style={styles.dataComentario}>02/11/2025</Text>
-              </View>
-            </View>
+            {avaliacao.map((item, index) => {
 
-            <Text style={styles.textoComentario}>
-              Ótima profissional, paciente e muito atenciosa. Recomendo fortemente.
-            </Text>
-          </View>
+                const data = new Date(item.dataDoEnvio);
+                const m = data.getMonth() + 1;
+                const a = data.getFullYear();
+                const d = data.getDate();
+              return(
+                <View style={styles.cardComentario}>
+                <View style={styles.Comentario}>
+                  <TouchableOpacity onPress={()=> navigation.navigate("Perfil Idoso", {
+                    itemSelecionado: item
+                  })}>
+                  <Image
+                    source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
+                    style={styles.fotoComentario}
+                  />
+                  </TouchableOpacity>
+                  <View style={styles.estrela}>
+                 <Text style={styles.estrelaT}>{item.notaAvaliacao}</Text>
+                  <Ionicons  name="star" size={21} color="#b08cff" />
+                  
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.nomeComentario}>{item.nomeUsuario}</Text>
+                    <Text style={styles.dataComentario}>{d}/{m}/{a}</Text>
+                  </View>
+                </View>
+    
+                <Text style={styles.textoComentario}>
+                {item.comentAvaliacao}
+                </Text>
+              </View>
+              );
+            })}
+        
 
         </ScrollView>
       )}
@@ -210,6 +247,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+
+
+  estrela:{
+    flexDirection:'row',
+   
+    position: 'absolute',
+    right: 0,
+    top: 0
+  },
+
+  estrelaT:{
+    fontWeight:'600',
+    color: "#b08cff",
+    marginRight:5,
+    fontSize:18
+    
+  },
+
+
 separador: {
   height: 1,
   backgroundColor: '#E5E7EB',

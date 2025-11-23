@@ -114,7 +114,7 @@ const formatarPreco = (valor) => {
 
       verServico();
       //console.log(itemSelecionado);
-    }, 30000);
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
   useEffect(() => {
@@ -124,8 +124,8 @@ const formatarPreco = (valor) => {
     const interval = setInterval(() => {
       pegarMensagens();
       //console.log(itemSelecionado);
-    }, 5000); 
-  
+    }, 10000); 
+    return () => clearInterval(interval);
    
   }, []);
   //IMAGEEEM
@@ -526,9 +526,53 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
     <ScrollView contentContainerStyle={{ padding: 20 }}>
       <View style={styles.modalView}>
 
-<TouchableOpacity onPress={()=>setModalVer(false)}>
-        <Ionicons name="close-outline" size={30} color={"gray"} style={{position: "absolute",right:10, top:-14}}/>
+      <TouchableOpacity onPress={()=>setModalVer(false)}>
+        <Ionicons name="close-outline" size={30} color={"gray"} style={{position: "absolute",right:10, top:0}}/>
         </TouchableOpacity>
+
+      <Text style={styles.titulo}>Infromações do Pedido:</Text>
+      <View style={styles.label}>
+            <Text style={styles.labelTextS}>Tippo de Servico: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.nomeServico}</Text>
+          </View>
+
+      <View style={styles.label}>
+            <Text style={styles.labelTextS}>Descrição: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.descServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Data: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.descServico}</Text>
+          </View>
+      <View style={styles.label}>
+            <Text style={styles.labelTextS}>Horário de Início: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.horaInicioServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Horário de Início: </Text>
+            <Text style={styles.infoTextS}>{!itemSelecionado.horaTerminoServico ?("Não informado"): (<Text>{itemSelecionado.horaTerminoServico}</Text>)}</Text>
+          </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Endereco: </Text>
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Rua: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.ruaUsuario},{itemSelecionado.numLogradouroUsuario}</Text>
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>CEP: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.cepUsuario}</Text>
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.labelTextS}>Cidade: </Text>
+            <Text style={styles.infoTextS}>{itemSelecionado.cidadeUsuario}</Text>
+          </View>
+
+
+
        
      
 
@@ -559,7 +603,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
        
       <Text style={styles.titulo}>Selecione o servico correspondente e envie sua proposta!:</Text>
      
-
+      
       {servicos
             .map((item, index) => {
 
@@ -580,7 +624,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
         
                 </View>
                 </TouchableOpacity>
-<TouchableOpacity onPress={()=>{ setModalVer(true);setItemSelecionado(item)}}>
+<TouchableOpacity onPress={()=>{setItemSelecionado(item);setModalVer(true)}}>
         <Text style={styles.detalhes}>Ver Mais</Text>
         </TouchableOpacity>
         </View>
@@ -605,10 +649,14 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     <Ionicons name="arrow-back" size={28 * scale} color="#202020" />
                   </TouchableOpacity>
                   <View style={styles.navInfo}>
+                    <TouchableOpacity onPress={()=> navigation.navigate("Perfil Idoso",{
+                      itemSelecionado:converSelecionada
+                    })}>
                     <Image
                       source={{uri: `${API_URL}/storage/${converSelecionada.fotoUsuario}`}}
                       style={styles.perfilFree}
                     />
+                    </TouchableOpacity>
                     <Text style={styles.freeNome}>{converSelecionada.nomeUsuario}</Text>
                   </View>
                   <Ionicons

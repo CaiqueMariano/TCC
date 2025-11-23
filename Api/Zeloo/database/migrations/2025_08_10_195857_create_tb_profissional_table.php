@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('senhaProfissional');
             $table->bigInteger('documentosProfissional');
             $table->string('statusProfissional');
+            $table->string('fcm_token')->nullable();
             $table->string('fotoProfissional')->nullable();
             $table->timestamps();
 

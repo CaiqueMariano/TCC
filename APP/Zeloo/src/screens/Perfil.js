@@ -61,6 +61,7 @@ export default function Perfil({navigation}) {
 
   useEffect(() => {
     console.log("UQEST",questionarioExiste)
+    avaliacoes();
     questionario();
     
     
@@ -103,9 +104,11 @@ export default function Perfil({navigation}) {
   const [diagnostico, setDiagnostico] = useState([]);
   const [autonomia, setAutonomia] = useState([]);
   const [cognicao, setCognicao] = useState([]);
+  const [avaliacao, setAvaliacao] = useState([]);
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
   const [emailUsuario, setEmailUsuario] = useState("");
   const [comportamento, setComportamento] = useState([]);
+  const [media, setMedia] = useState("");
   const [emocional, setEmocional] = useState([]);
   const [higiene, setHigiene] = useState([]);
   const [medicamentos, setMedicamentos] = useState([]);
@@ -136,6 +139,15 @@ export default function Perfil({navigation}) {
        console.log(questionarioExiste);
     }
   };
+
+  
+  const avaliacoes = async()=>{
+    await axios.get(`${API_URL}/api/verAvaliacaoIdoso/${user.idUsuario}`)
+    .then(response=>{
+      setAvaliacao(response.data.data);
+    })
+  }
+
 
   return (
     <View style={styles.Container}>
@@ -287,19 +299,35 @@ export default function Perfil({navigation}) {
       
           <Text style={styles.tituloFeedback}>Últimos Feedbacks</Text>
 
-          <View style={styles.cardComentario}>
+          {avaliacao.map((item, index)=>{
+
+            const data = new Date(item.dataDoEnvio);
+            const m = data.getMonth() + 1;
+            const a = data.getFullYear();
+            const d = data.getDate();
+              return (
+        <View style={styles.cardComentario}>
             <View style={styles.Comentario}>
              
               <View style={{ flex: 1 }}>
-                <Text style={styles.nomeComentario}>Maria de Lourdes</Text>
-                <Text style={styles.dataComentario}>02/11/2025</Text>
+                <Text style={styles.nomeComentario}>{item.nomeProfissional}</Text>
+                <View style={styles.estrela}>
+                 <Text style={styles.estrelaT}>{item.notaAvaliacao}</Text>
+                  <Ionicons  name="star" size={21} color={colors.azul} />
+                  
+                  </View>
+                <Text style={styles.dataComentario}>{d}/{m}/{a}</Text>
               </View>
             </View>
 
             <Text style={styles.textoComentario}>
-              Ótima profissional, paciente e muito atenciosa. Recomendo fortemente.
+            {item.comentAvaliacao}
             </Text>
           </View>
+          );
+          })}
+
+          
 
         </ScrollView>
       )}
@@ -456,6 +484,21 @@ const styles = StyleSheet.create({
   },
   Container2: {
    
+    
+  },
+
+  estrela:{
+    flexDirection:'row',
+   
+    position: 'absolute',
+    right: 0,
+    top: 0
+  },
+
+  estrelaT:{
+    fontWeight:'600',
+    marginRight:5,
+    fontSize:18
     
   },
   tituloQ:{

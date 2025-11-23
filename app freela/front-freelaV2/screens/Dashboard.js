@@ -37,7 +37,7 @@ export default function Dashboard() {
                 response =>{
                     setRendaMensal(response.data.data)
                 }
-            ).catch(error => console.log("erro:", error));
+            ).catch(error => console.log("erro é esse?:", error));
             console.log("RENDAAAAAAAAAAAA",rendaMensal);
 
         };

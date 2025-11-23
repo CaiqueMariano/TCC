@@ -31,11 +31,12 @@ export default function PerfilIdoso({ navigation, route }) {
   //const [modalConfirmar, setModalConfirmar] = useState(false);
   const { width } = Dimensions.get('window');
   const larguraAba = width / ABAS.length;
-
+  const [avaliacao, setAvaliacao] = useState([]);
   const [questionarioInfo, setQuestionarioinfo] = useState([])
   const [alimentacao, setAlimentacao] = useState([]);
   const [diagnostico, setDiagnostico] = useState([]);
   const [motivo, setMotivo] = useState("");
+  const [media, setMedia] = useState("");
   const [desc, setDesc] = useState("");
   const [evidencia, setEvidencia] = useState("");
   const [autonomia, setAutonomia] = useState([]);
@@ -47,9 +48,27 @@ export default function PerfilIdoso({ navigation, route }) {
   const [questionarioExiste, setQuestionarioExiste] = useState(false)
 
   useEffect(() => {
+    mediaA();
+    avaliacoes();
     questionario();
   }, []);
+
+
+  const avaliacoes = async()=>{
+    await axios.get(`${API_URL}/api/verAvaliacaoIdoso/${itemSelecionado.idUsuario}`)
+    .then(response=>{
+      setAvaliacao(response.data.data);
+    })
+  }
+
   
+  
+  const mediaA = async () =>{
+    await axios.get(`${API_URL}/api/mediaAvaliarIdoso/${itemSelecionado.idUsuario}`)
+    .then(response=>{
+      setMedia(response.data.data);
+    })
+  }
   
   const questionario = async () => {
     try {
@@ -178,7 +197,7 @@ export default function PerfilIdoso({ navigation, route }) {
 
           <View style={styles.linhaEndereco}>
             <Ionicons name="star" size={18} color="#b08cff" />
-            <Text style={styles.endereco}>4,5</Text>
+            <Text style={styles.endereco}>{media}</Text>
           </View>
         </View>
       </View>
@@ -234,22 +253,39 @@ export default function PerfilIdoso({ navigation, route }) {
 
             <Text style={styles.tituloEndere}>Feedbacks</Text>
 
-            <View style={styles.cardComentario}>
-              <View style={styles.Comentario}>
-                <Image
-                  source={require('../assets/perfilicon.png')}
-                  style={styles.fotoComentario}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.nomeComentario}>João da Silva</Text>
-                  <Text style={styles.dataComentario}>12/11/2025</Text>
-                </View>
-              </View>
+            {avaliacao.map((item, index) =>  {
+              const data = new Date(item.dataDoEnvio);
+              const m = data.getMonth() + 1;
+              const a = data.getFullYear();
+              const d = data.getDate();
 
-              <Text style={styles.textoComentario}>
-                O idoso foi muito educado e fácil de cuidar. A experiência foi tranquila e repetiria novamente sem problemas.
-              </Text>
-            </View>
+              return(
+               <View style={styles.cardComentario}>
+               <View style={styles.Comentario}>
+                 <Image
+                  source={{uri: `${API_URL}/storage/${item.fotoProfissional}`}}
+                   style={styles.fotoComentario}
+                 />
+                 <View style={styles.estrela}>
+                 <Text style={styles.estrelaT}>{item.notaAvaliacao}</Text>
+                  <Ionicons  name="star" size={21} color="#b08cff" />
+                  
+                  </View>
+                 <View style={{ flex: 1 }}>
+                   <Text style={styles.nomeComentario}>{item.nomeProfissional}</Text>
+                   <Text style={styles.dataComentario}>{d}/{m}/{a}</Text>
+                 </View>
+               </View>
+ 
+               <Text style={styles.textoComentario}>
+                {item.comentAvaliacao}
+               </Text>
+             </View>
+           ); 
+          
+          })}
+
+           
           </ScrollView>
         )}
 
@@ -369,6 +405,22 @@ const styles = StyleSheet.create({
     position:'absolute',
     right:30,
     top:30
+  },
+
+  estrela:{
+    flexDirection:'row',
+   
+    position: 'absolute',
+    right: 0,
+    top: 0
+  },
+
+  estrelaT:{
+    fontWeight:'600',
+    color: "#b08cff",
+    marginRight:5,
+    fontSize:18
+    
   },
   navBar: {
     backgroundColor: '#b08cff',

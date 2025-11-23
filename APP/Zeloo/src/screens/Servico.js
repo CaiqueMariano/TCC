@@ -179,10 +179,10 @@ const validarEtapa5 = () => genero !== null;
           console.log('Endereços encontrados!');
           setEnderecosCadastrados(response.data.data);
         }else{
-          console.log('Endereços desencontrados!');
+          //console.log('Endereços desencontrados!');
         }
       }catch(error){
-        console.log('Endereços desencontrados!');
+        console.log('Endereços desencontrados!', error.response.data);
       }
     }
 
@@ -692,8 +692,8 @@ const styles = StyleSheet.create({
   },
   
   selectedRb: {
-    width: 12,
-    height: 12,
+    width: 20,
+    height: 20,
     borderRadius: 6,
     backgroundColor: colors.azul,
   },

@@ -44,7 +44,7 @@ export default function ListaConversas({navigation}) {
         atualizarConversas()
         const interval = setInterval(() => {
             atualizarConversas();
-          }, 2000); 
+          }, 15000); 
         
           return () => clearInterval(interval);
     }, []);

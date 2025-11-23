@@ -18,6 +18,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//Media Idoso
+Route::get('/mediaAvaliarIdoso/{id}','App\Http\Controllers\ZelooController@mediaAvaliarIdoso');
+//Media Cuidador
+Route::get('/mediaAvaliarCuidador/{id}','App\Http\Controllers\ZelooController@mediaAvaliarCuidador');
+//Ver avaliações
+Route::get('/verAvaliacaoIdoso/{id}','App\Http\Controllers\ZelooController@verAvaliacaoIdoso');
+//cuidador verAvaliacaoCuidador
+Route::get('/verAvaliacaoCuidador/{id}','App\Http\Controllers\ZelooController@verAvaliacaoCuidador');
+//avaliar
+//idoso
+Route::post('/avaliarIdoso','App\Http\Controllers\ZelooController@avaliarIdoso');
+//cuidador
+Route::post('/avaliarCuidador','App\Http\Controllers\ZelooController@avaliarCuidador');
+
+
 //Aletrar servico
 Route::put('/updateServico/{idServico}','App\Http\Controllers\ZelooController@updateServico');
 //denuncias
@@ -25,7 +40,6 @@ Route::put('/updateServico/{idServico}','App\Http\Controllers\ZelooController@up
 Route::post('/denunciarFree','App\Http\Controllers\ZelooController@denunciarFree');
 //idoso
 Route::post('/denunciarIdoso','App\Http\Controllers\ZelooController@denunciarIdoso');
-
 
 //ver perguntas
 Route::get('/verPerguntas/{id}','App\Http\Controllers\ZelooController@verPerguntas');
@@ -35,11 +49,15 @@ Route::post('/perguntas','App\Http\Controllers\ZelooController@perguntas');
 Route::get('/infoAgendamento/{id}','App\Http\Controllers\ZelooController@infoAgendamento');
 //ENVIAR PROPOSTA
 Route::post('/enviarproposta','App\Http\Controllers\ZelooController@enviarproposta');
+Route::middleware('throttle:200,1')->group(function () {
 
+    Route::get('/getMensagens/{id}','App\Http\Controllers\ZelooController@getMensagens');
+    Route::get('/verServico/{id}','App\Http\Controllers\ZelooController@verServico');
+});
 //Ver os servicos daquela conversa 
-Route::get('/verServico/{id}','App\Http\Controllers\ZelooController@verServico');
+
 //Pegar mensagens
-Route::get('/getMensagens/{id}','App\Http\Controllers\ZelooController@getMensagens');
+
 //CRIAR CONVERSA
 Route::post('/conversar','App\Http\Controllers\ZelooController@conversar');
 

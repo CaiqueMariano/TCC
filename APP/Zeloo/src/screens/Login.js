@@ -6,6 +6,8 @@ import colors from './colors';
 import { UserContext } from "./userContext";
 import { API_URL } from '../screens/link';
 
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 import { Ionicons } from '@expo/vector-icons';
 import { useAccessibility } from "./AccessibilityContext";
 import * as Speech from 'expo-speech';
@@ -65,8 +67,12 @@ const { narrar } = useAccessibility();
    
   
       if (response.data.success) {
-        setUser(response.data.data);
+        const usuario = response.data.data;
+        setUser(usuario);
         navigation.navigate("Home");
+        setMensagem("");
+
+        
       } else {
        
         setMensagem('Telefone ou senha incorretos');
@@ -79,6 +85,8 @@ const { narrar } = useAccessibility();
       console.error(error);
     }
   };
+
+
 
   return (
     <View style={styles.Container}>
@@ -141,8 +149,8 @@ const { narrar } = useAccessibility();
     </View>
 
       <View style={styles.botoes}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText} onPress={enviarLogin}>Entrar</Text>
+        <TouchableOpacity style={styles.button} onPress={enviarLogin}>
+          <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button2}>
           <Text style={styles.buttonText} onPress={() => navigation.navigate('Cadastro')}>Cadastrar</Text>

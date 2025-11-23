@@ -193,7 +193,7 @@ const pegarServicos = async () =>{
 
     const interval = setInterval(() => {
       pegarServicos();
-    }, 2000); 
+    }, 15000); 
   
     return () => clearInterval(interval);
   },[])
@@ -664,8 +664,8 @@ const styles = StyleSheet.create({
     fontSize:20,
     color:'#b08cff',
     position:'absolute',
-    bottom:40,
-    left:210
+    top:0,
+    right:0
   },
   
   modalNome: {

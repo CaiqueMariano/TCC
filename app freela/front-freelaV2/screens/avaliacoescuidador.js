@@ -1,37 +1,43 @@
 import React, { useEffect, useContext, useState, useRef } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, Image,  ScrollView, SafeAreaView, Animated, TextInput,  Modal } from "react-native";
-import colors from './colors';
+
 import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
 import axios from "axios";
+import { API_URL } from "./link";
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 
 // Tela estilo mobile com rating por estrelas, área de texto, passo indicador e navegação inferior
-export default function avaliacoescuidador({ navigation }) {
+export default function avaliacoescuidador({ navigation, route}) {
+  const{contrato} = route.params;
   const [rating, setRating] = useState(5);
   const [note, setNote] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
 
   const stars = [1, 2, 3, 4, 5];
+  const avaliar = async () =>{
+    console.log(contrato)
+    axios.post(`${API_URL}/api/avaliarIdoso`,{
+      idUsuario:contrato.idUsuario,
+      idContrato:contrato.idContrato,
+      comentAvaliacao:note,
+      notaAvaliacao:rating
+    }).then(response =>{
+      alert("Avaliação enviada!");
+      navigation.navigate("Historico")
+    }).catch(error=>{
+      console.log(error.response.data);
+    })
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
        {/* TOPO */}
-           <View style={styles.header}>
-             <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-               <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
-             </TouchableOpacity>
-     
-             <Text style={styles.titletab}>Avaliar</Text>
-     
-             <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
-               <Ionicons name="settings-outline" size={28} color={colors.preto} />
-             </TouchableOpacity>
-           </View>
+           
 
       {/* Conteúdo principal */}
      <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
-        <Text style={styles.title}>Avalie o Cuidador:</Text>
+        <Text style={styles.title}>Avalie o Idoso:</Text>
         <Text style={styles.subtitle}>Nota <Text style={{color: '#cc0000'}}>*</Text></Text>
         <View style={styles.starsRow}>
           {stars.map((s) => {
@@ -65,7 +71,7 @@ export default function avaliacoescuidador({ navigation }) {
         />
 
 
-      <TouchableOpacity style={styles.nextBtn} onPress={() => setModalVisible(true)}>
+      <TouchableOpacity style={styles.nextBtn} onPress={() => avaliar()}>
       <Text style={styles.nextText}>Avaliar</Text>
       <Ionicons name="arrow-forward" size={18} style={{marginLeft: 8}} />
       </TouchableOpacity>
@@ -92,12 +98,12 @@ export default function avaliacoescuidador({ navigation }) {
                   navigation.navigate('Dashboard');
                 }}
               >
-                <Image source={require('../../assets/images/correct.png')} style={styles.modalFoto} />
+               
                 <Text style={styles.buttonText}>Visualizar Ganhos</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: colors.azul,}]}
+                style={[styles.actionButton, { backgroundColor: "#202020"}]}
                 onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.buttonText}>Fechar</Text>
@@ -124,12 +130,12 @@ const COLORS = {
 };
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.offWhite },
+  safe: { flex: 1, backgroundColor: "#FBFBFB" },
 
 
   progressRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, marginTop: 6 },
   stepCircle: { width: 28, height: 28, borderRadius: 14, borderWidth: 1, borderColor: '#CFCFCF', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
-  stepActive: { borderColor: COLORS.primaryGreen, backgroundColor: COLORS.lightGreen },
+  stepActive: { borderColor: "#fff", backgroundColor: "#fff" },
   stepText: { fontSize: 12 },
   progressLine: { flex: 1, height: 1, backgroundColor: '#E2E2E2', marginHorizontal: 10 },
 
@@ -143,10 +149,10 @@ const styles = StyleSheet.create({
   justifyContent: 'space-between',
   marginTop: 2,     // antes era 6
 },
-  starBox: { backgroundColor: COLORS.greyBox, borderRadius: 10, padding: 12, marginTop: 20, alignItems: 'center', justifyContent: 'center', width: 56, height: 56 },
-  starBoxActive: { backgroundColor:'#ddf1f0ff', borderColor: '#a4e9e5', borderWidth: 1 },
-  starIcon: { color: '#9AA0A6' },
-  starIconActive: { color: '#a4e9e5' },
+  starBox: { backgroundColor: "#fff", borderRadius: 10, padding: 12, marginTop: 20, alignItems: 'center', justifyContent: 'center', width: 56, height: 56 },
+  starBoxActive: { backgroundColor:'#E5DEFD', borderColor: '#b08cff', borderWidth: 1 },
+  starIcon: { color: '#b08cff' },
+  starIconActive: { color: '#b08cff' },
 
   labelsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 8, paddingHorizontal: 4 },
   labelLeft: { fontSize: 12, color: '#7a7a7a' },
@@ -170,7 +176,7 @@ const styles = StyleSheet.create({
   alignSelf: 'flex-end',
   flexDirection: 'row',
   alignItems: 'center',
-  backgroundColor: colors.azul, 
+  backgroundColor: "#fff", 
   paddingVertical: 14,
   paddingHorizontal: 22,
   borderRadius: 8,
@@ -196,14 +202,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: colors.azul,
+    backgroundColor: "#fff",
     paddingHorizontal: 20,
     paddingVertical: Platform.OS === 'web' ? 20 : 35,
   },
     titletab: {
       fontSize: 22,
       fontWeight: 'bold',
-      color: colors.preto,
+      color: "#202020",
     },
       overlay: {
     flex: 1,

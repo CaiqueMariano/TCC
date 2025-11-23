@@ -14,7 +14,7 @@ export default function ModalFinalizacao({
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Serviço Terminado!</Text>
+          <Text style={styles.modalText}>Serviço Finalizado!</Text>
 
           <Image 
             source={require('../assets/correct.png')} 

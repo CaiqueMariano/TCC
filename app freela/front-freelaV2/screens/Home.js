@@ -31,11 +31,7 @@ export default function Home() {
    
     fetchUltimoContrato();
 
-    const interval = setInterval(() => {
-      fetchUltimoContrato();
-    }, 2000); 
-  
-    return () => clearInterval(interval);
+
   }, [user]);
   const abas = [
     { titulo: 'Home', icone: 'home-outline', rota: 'Home' },

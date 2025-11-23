@@ -40,7 +40,7 @@ const [gravacaoURI, setGravacaoURI] = useState(null); // uri do audio
 
     const interval = setInterval(() => {
       pegarMensagens();
-    }, 2000); 
+    }, 5000); 
   
     return () => clearInterval(interval);
   }, []);

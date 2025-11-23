@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import {View,Text,StyleSheet,TouchableWithoutFeedback,Dimensions,Image,FlatList,} from "react-native";
 import colors from "./colors";
-import * as Notifications from "expo-notifications";
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,6 +34,7 @@ export default function BemVindo({ navigation }) {
     setIndexAtual(novoIndex);
   };
   
+  /*
   useEffect(() => {
     const pedirPermissao = async () => { 
       const { status } = await Notifications.requestPermissionsAsync();
@@ -45,7 +47,7 @@ export default function BemVindo({ navigation }) {
     };
   
     pedirPermissao();
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     const intervalo = setInterval(irProximoSlide, 4000);
