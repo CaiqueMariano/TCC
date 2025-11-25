@@ -1,9 +1,9 @@
-    <!DOCTYPE html>
-    <html lang="pt-BR">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Dashboard - Analisar Denúncias</title>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Analisar Denúncias</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
         <style>
@@ -222,7 +222,7 @@
 
         <ul class="sidebar-menu">
             <li>
-                <a href="{{url('/dashboard')}}" class="active">
+                <a href="{{url('/dashboard')}}" >
                     <i class="bi bi-speedometer2"></i> Dashboard
                 </a>
             </li>
@@ -232,7 +232,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{url('denunciados')}}">
+                <a href="{{url('denunciados')}}" class="active">
                     <i class="bi bi-clipboard-check"></i> Analisar Respostas
                 </a>
             </li>
@@ -258,8 +258,9 @@
             </div>
         </div>
 
-<div class="container my-4">
-    <form action="{{ route('buscarDenuncia') }}" method="GET" 
+
+        <div class="container my-4">
+    <form action="" method="GET" 
           class="d-flex justify-content-center"
           style="gap: 8px; max-width: 450px; margin: 0 auto;">
         
@@ -275,169 +276,158 @@
     </form>
 </div>
 
-        <!--CARDS DO BIXOOO!!!-->
+
+    <!--CARDS DO BIXOOO!!!-->
 
 
-        @if($usuarios->isEmpty())
+    @if($usuarios->isEmpty())
     <p>Nenhuma denúncia encontrada.</p>
     @else
-      <table class="table">
-    <thead>
-        <tr>
-            <th scope="col">ID</th>
-            <th scope="col">Nome</th>
-            <th scope="col">Motivo Denúncia</th>
-            <th scope="col">Status</th>
-            <th scope="col">Ações</th>
-        </tr>
-    </thead>
-        <tbody>
-        @foreach ($usuarios as $usuario)
-        <tr>
-            <th scope="row">{{ $usuario->id }}</th>
-            <td>{{ $usuario->nome }}</td>
-            <td>{{ $usuario->motivo }}</td>
-            <td>
-               @if($usuario->status === 'inativo')
-
-                    <span class="badge bg-danger">Banido</span>
-                @else
-                    <span class="badge bg-success">Ativo</span>
-                @endif
-            </td>
-
-            <td>
-                 @if($usuario->status === 'inativo')
-
-                    <!-- Botão reativar -->
-                    <a href="#" class="btn btn-reativar btn-sm"
-                        onclick="abrirModalReativar(
-                            '{{ $usuario->id }}',
-                            '{{ $usuario->nome }}',
-                            '{{ $usuario->motivo }}',
-                            '{{ $usuario->desc }}',
-                            '{{ $usuario->evidencia }}'
-                        )">
-                        Reativar
-                    </a>
-                @else
-                    <a href="#" class="btn btn-danger btn-sm"
-                        onclick="abrirModalBanir(
-                            '{{ $usuario->id }}',
-                            '{{ $usuario->nome }}',
-                            '{{ $usuario->motivo }}',
-                            '{{ $usuario->desc }}',
-                            '{{ $usuario->evidencia }}'
-                        )">
-                        Banir
-                    </a>
-                @endif
-            </td>
-        </tr>
-        @endforeach
-    </tbody>
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Nome</th>
+      <th scope="col">Motivo Denúncia</th>
+      <th scope="col">Tipo de Usuario</th>
+      <th scope="col">Reativar</th>
+    </tr>
+  </thead>
+  <tbody>
+@foreach ($usuarios as $usuario)
+    <tr>
+        <th scope="row">{{$usuario->id}}</th>
+        <td>{{$usuario->nome}}</td>
+        <td>{{$usuario->motivo}}</td>
+        <td>{{$usuario->origem}}</td>
+        <td>
+            <a href="#" class="btn btn-reativar btn-sm"
+            onclick="abrirModalBanir(
+    '{{ $usuario->id }}',
+    '{{ $usuario->nome }}',
+    '', 
+    '{{ $usuario->motivo }}',
+    '{{ $usuario->desc }}',
+    '{{ $usuario->evidencia }}',
+    '{{ $usuario->origem }}'
+)">
+               Reativar
+            </a>
+        </td>
+    </tr>
+@endforeach
+</tbody>
 </table>
+@endif 
 
-<div class="d-flex justify-content-center">
-    {{ $usuarios->links('pagination::bootstrap-5') }}
-</div>
-@endif
-        
+ 
 
-    
-
-        <!--MODAL DE BANIMENTO!!!-->
-        <div class="modal fade" id="banUserModal" tabindex="-1">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title">
-                                <i class="bi bi-person-x"></i> Reativar Usuário
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="banForm" method="POST">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label class="form-label">ID do Usuário</label>
-                                            <input type="text" class="form-control" id="banUserId" readonly>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Nome do Usuário</label>
-                                            <input type="text" class="form-control" id="banUserName" readonly>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Tipo de Usuário</label>
-                                            <input type="text" class="form-control" id="banUserOrigem" readonly>
-                                        </div>
+    <!--MODAL DE BANIMENTO!!!-->
+    <div class="modal fade" id="banUserModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-person-x"></i> Banir Usuário
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="banForm" method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">ID do Usuário</label>
+                                        <input type="text" class="form-control" id="banUserId" readonly>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                        <label class="form-label">Motivo do Banimento</label>
-                                        <input type="text" class="form-control" id="banUserMotivo" readonly>
-                                        </div>
-                                
-                                <div class="mb-3">
-                                <label class="form-label">Descrição</label>
-                                <textarea class="form-control" id="banUserDesc" readonly></textarea>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nome do Usuário</label>
+                                        <input type="text" class="form-control" id="banUserName" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de Usuário</label>
+                                        <input type="text" class="form-control" id="banUserOrigem" readonly>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                <label class="form-label">Evidências</label>
-                                <textarea class="form-control" id="banUserEvidencia" readonly></textarea>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-info" id="backToDenunciaBtn" style="display: none;" onclick="backToDenuncia()">
-                                <i class="bi bi-arrow-left"></i> Voltar à Denúncia
-                            </button>
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-person-x"></i> Confirmar Reativação
-                        </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                    <label class="form-label">Motivo do Banimento</label>
+                                    <input type="text" class="form-control" id="banUserMotivo" readonly>
+                                    </div>
+                            
+                            <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="banUserDesc" readonly></textarea>
+                            </div>
+                            <div class="mb-3">
+                            <label class="form-label">Evidências</label>
+                            <textarea class="form-control" id="banUserEvidencia" readonly></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-info" id="backToDenunciaBtn" style="display: none;" onclick="backToDenuncia()">
+                            <i class="bi bi-arrow-left"></i> Voltar à Denúncia
+                        </button>
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-person-x"></i> Confirmar Desbanimento
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>         
-
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            // Navbar scroll effect
-            window.addEventListener('scroll', function() {
-                const navbar = document.getElementById('mainNavbar');
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
-
-          function abrirModalReativar(id, nome, motivo, desc, evidencia) {
-          document.getElementById('banUserId').value = id;
-          document.getElementById('banUserName').value = nome;
-          document.getElementById('banUserMotivo').value = motivo;
-          document.getElementById('banUserDesc').value = desc;
-          document.getElementById('banUserEvidencia').value = evidencia;
-
-        document.getElementById('banForm').action = '/desbanir/' + id;
-
-        const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
-        modal.show();
-}
-
-
-    // Sempre usa a mesma rota de desbanir
-    document.getElementById('banForm').action = '/desbanir/' + id;
-
-    const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
-    modal.show();
-
-
-        </script>
         </div>
-    </body>
-    </html>
+    </div>         
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+
+document.querySelector('input[name="q"]').addEventListener('keyup', function() {
+    let valor = this.value.trim();
+    let linhas = document.querySelectorAll("table tbody tr");
+
+    linhas.forEach(tr => {
+        let id = tr.querySelector("th").innerText;
+
+        if (id.includes(valor) || valor === "") {
+            tr.style.display = "";
+        } else {
+            tr.style.display = "none";
+        }
+    });
+});
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        function abrirModalBanir(id, nome, tipo, motivo, desc, evidencia, origem){
+            document.getElementById('banUserId').value = id;
+            document.getElementById('banUserName').value = nome;
+     
+            document.getElementById('banUserMotivo').value = motivo;
+            document.getElementById('banUserDesc').value = desc;
+            document.getElementById('banUserEvidencia').value = evidencia;
+           document.getElementById('banUserOrigem').value = origem;
+
+           let form = document.getElementById('banForm');
+
+        if (origem === 'usuario') {
+            form.action = `/desbanir/${id}`;
+        } else {
+            form.action = `/desbanirFree/${id}`;
+        }
+           
+            const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
+            modal.show();
+        }
+    </script>
+</body>
+</html>

@@ -104,17 +104,33 @@ class ZelooController extends Controller
 }*/
 
 // Deixando o grafico mais interativo com dados dinamicos 
-
 public function DashboardData()
 {
-    // Gráfico 1: Idosos cadastrados por mês
+
+    $dados = DB::table('tb_extrato')
+    ->select(
+        DB::raw('MONTH(dataExtrato) as mes'),
+        DB::raw('SUM(valor) as total')
+    )
+    ->groupBy(DB::raw('MONTH(dataExtrato)'))
+    ->orderBy(DB::raw('MONTH(dataExtrato)'))
+    ->get();
+
+$meses = array_fill(1, 12, 0);
+
+foreach ($dados as $d) {
+    $meses[$d->mes] = (float) $d->total;
+}
+
+
+
+   
   $idososAtivos = DB::table('tb_idoso')
     ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
     ->groupBy('mes')
     ->orderBy('mes')
     ->pluck('total');
 
-    // === Reclamações por mês ===
     $reclamacoesPorMes = DB::table('denuncias')
         ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
         ->groupBy('mes')
@@ -125,7 +141,7 @@ public function DashboardData()
         $reclamacoesPorMes = array_fill(0, 12, 0);
     }
 
-    // === Cuidadores ativos por mês ===
+   
     $cuidadoresAtivos = DB::table('tb_profissional')
         ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
         ->groupBy('mes')
@@ -136,7 +152,7 @@ public function DashboardData()
         $cuidadoresAtivos = array_fill(0, 12, 0);
     }
 
-    // === Tipos de reclamações ===
+
     $tiposReclamacoes = DB::table('denuncias')
         ->select('motivoDenuncia', DB::raw('COUNT(*) as total'))
         ->groupBy('motivoDenuncia')
@@ -146,10 +162,14 @@ public function DashboardData()
         $tiposReclamacoes = ['Sem Dados' => 1];
     }
 
+
+    $contratos = DB::table('tb_contrato')->where('statusContrato', 'finalizado')->count();
+    $totalIdosos = DB::table('tb_idoso')->count();
+$totalCuidadores = DB::table('tb_profissional')->count();
     $receitaMensal = [1200, 1500, 1800, 2000, 2500, 3000];
     $rentabilidadeAnual = [5, 7, 6, 8, 9, 10, 12, 11, 13, 14, 15, 16];
 
-    // === Verifica se não há dados para exibir ===
+  
     $semDados = empty($reclamacoesPorMes) && empty($cuidadoresAtivos) && empty($tiposReclamacoes);
 
     return response()->json([
@@ -160,10 +180,13 @@ public function DashboardData()
         'rentabilidadeAnual' => $rentabilidadeAnual,
         'semDados' => $semDados,
         'idososAtivos' => $idososAtivos,
+        'meses' => $meses,
+        'totalIdosos' => $totalIdosos,
+        'contratos' => $contratos,
+    'totalCuidadores' => $totalCuidadores,
        
     ]);
 }
-
     public function registro()
     {
         return view('nenhum-registro');
@@ -192,54 +215,152 @@ public function downloadDashboardPdf()
     return $pdf->download('dashboard.pdf');
 }
 // pesquisa por nome
-
-public function pesquisa(Request $request)
+/*BANIR USUARIO*/
+public function destroyUsuario($idUsuario)
 {
-    $search = $request->input('search');
+    $usuarioss = UsuarioModel::find($idUsuario);
 
-    $usuarios = DB::table('denuncias')
-        ->join('tb_usuario', 'denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
-        ->select(
-            'denuncias.idDenuncias as id',
-            'tb_usuario.nomeUsuario as nome',
-            'denuncias.motivoDenuncia as motivo',
-            'denuncias.descDenuncia as desc',
-            'denuncias.evidenciaDenuncia as evidencia',
-            'tb_usuario.statusUsuario as status',
-            DB::raw("'usuario' as origem")
-        )
-        ->when($search, function ($query, $search) {
-            return $query->where('tb_usuario.nomeUsuario', 'LIKE', "%{$search}%");
-        })
-        ->paginate(10);
+    if (Denuncias::exists()) {
+
         
-    return view('denuncias', compact('usuarios'));
+        UsuarioModel::where('idUsuario', '=', $idUsuario)
+                    ->update(['statusUsuario' => 'inativo']);
+
+
+        if (!empty($usuarioss->emailUsuario)) {
+            Mail::to($usuarioss->emailUsuario)
+                ->send(new UsuarioBanidoMail($usuarioss->nomeUsuario));
+        }
+
+        return redirect()->route('denuncias')
+                         ->with('success', 'Usuário banido com sucesso');
+    } else {
+        return redirect()->route('registro'); 
+    }
+}
+
+public function destroyFree($idProfissional)
+{
+    $usuarioss = ProfissionalModel::find($idProfissional);
+    
+    if (DenunciasFreeModel::exists()) {
+        ProfissionalModel::where('idProfissional', '=', $idProfissional)->update(['statusProfissional' => 'inativo']);
+       Mail::to($usuarioss->emailProfissional)->send(new FreeBanidoMail($usuarioss->nomeProfissional));
+        return redirect()->route('denuncias')
+                        ->with('success', 'Usuário banido com sucesso');
+    } else {
+        return redirect()->route('registro'); 
+    }
+}
+
+//DESBANIR USUARIO
+public function desbanirUsuario($idUsuario)
+{
+
+    
+    if (Denuncias::exists()) {
+        UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'ativo']);
+        Denuncias::where('idUsuario', '=', $idUsuario)->delete();
+        return redirect()->route('denuncias')
+                        ->with('success', 'Usuário desbanido com sucesso');
+    } else {
+        return redirect()->route('registro'); 
+    }
+}
+
+public function desbanirFree($idProfissional)
+{
+
+    
+    if (DenunciasFreeModel::exists()) {
+        ProfissionalModel::where('idProfissional', '=', $idProfissional)->update(['statusProfissional' => 'ativo']);
+        DenunciasFreeModel::where('idProfissional', '=', $idProfissional)->delete();
+        return redirect()->route('denuncias')
+                        ->with('success', 'Usuário desbanido com sucesso');
+    } else {
+        return redirect()->route('registro'); 
+    }
 }
 
 
-public function buscarDenuncia(Request $request)
-{
-    $q = $request->input('q');
+/*VER DENUCNIAS*/
+public function denuncias(){
 
-    $usuarios = \DB::table('denuncias')
-        ->join('tb_usuario', 'denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
-        ->select(
-             'denuncias.idDenuncias as id',
-             'tb_usuario.nomeUsuario as nome',
-             'denuncias.motivoDenuncia as motivo',
-             'denuncias.descDenuncia as desc',
-             'denuncias.evidenciaDenuncia as evidencia',
-             'tb_usuario.statusUsuario as status'
-        )
-        ->when($q, function ($query, $q) {
-            return $query->where('tb_usuario.nomeUsuario', 'LIKE', "%$q%");
-        })
-        ->paginate(10);
+    $usuarios = DB::table('denuncias')
+    ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
+    ->where('tb_usuario.statusUsuario', '=', 'ativo')
+    ->select(
+        'tb_usuario.idUsuario as id',
+        'tb_usuario.nomeUsuario as nome',
+        'denuncias.motivoDenuncia as motivo',
+        'denuncias.descDenuncia as desc',
+        'denuncias.evidenciaDenuncia as evidencia',
+        DB::raw("'usuario' as origem")
+    );
+
+    $profissionais = DB::table('tb_denuncias_free')
+    ->join('tb_profissional', 'tb_denuncias_free.idProfissional', '=', 'tb_profissional.idProfissional')
+    ->where('tb_profissional.statusProfissional', '=', 'ativo')
+    ->select(
+        'tb_profissional.idProfissional as id',
+        'tb_profissional.nomeProfissional as nome',
+        'tb_denuncias_free.motivoDenuncia as motivo',
+        'tb_denuncias_free.descDenuncia as desc',
+        'tb_denuncias_free.evidenciaDenuncia as evidencia',
+        DB::raw("'profissional' as origem")
+    );
+
+
+    $usuarios = $usuarios->unionAll($profissionais)
+    ->orderByDesc('id')
+    ->paginate(10);
+
+    return view('denuncias', compact('usuarios'));
+}
+
+//VER DENUNCIADOS
+ public function denunciados(){
+
+    $usuarios = DB::table('denuncias')
+    ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
+    ->where('tb_usuario.statusUsuario', '=', 'inativo')
+    ->select(
+        'tb_usuario.idUsuario as id',
+        'tb_usuario.nomeUsuario as nome',
+        'denuncias.motivoDenuncia as motivo',
+        'denuncias.descDenuncia as desc',
+        'denuncias.evidenciaDenuncia as evidencia',
+        DB::raw("'usuario' as origem")
+    );
+
+    $profissionais = DB::table('tb_denuncias_free')
+    ->join('tb_profissional', 'tb_denuncias_free.idProfissional', '=', 'tb_profissional.idProfissional')
+    ->where('tb_profissional.statusProfissional', '=', 'inativo')
+    ->select(
+        'tb_profissional.idProfissional as id',
+        'tb_profissional.nomeProfissional as nome',
+        'tb_denuncias_free.motivoDenuncia as motivo',
+        'tb_denuncias_free.descDenuncia as desc',
+        'tb_denuncias_free.evidenciaDenuncia as evidencia',
+        DB::raw("'profissional' as origem")
+    );
+
+
+    $usuarios = $usuarios->unionAll($profissionais)
+    ->orderByDesc('id')
+    ->paginate(10);
 
     return view('responder-denuncia', compact('usuarios'));
 }
 
 
+public function banir(){
+    return view('banir');
+}
+
+public function responder(){
+    return view('responder');
+}
     
 
     /*LOGIN ADM*/
@@ -270,23 +391,7 @@ public function buscarDenuncia(Request $request)
         return redirect('/');  
     }
 /* BANIR USUÁRIO */
-public function destroyUsuario($idUsuario)
-{
-    $usuario = UsuarioModel::find($idUsuario);
 
-    if (!$usuario) {
-        return back()->with('error', 'Usuário não encontrado.');
-    }
-
-    if (Denuncias::where('idUsuario', $idUsuario)->exists()) {
-        $this->aplicarBanUsuario($usuario);
-
-        return redirect()->route('denuncias')
-            ->with('success', 'Usuário banido com sucesso!');
-    }
-
-    return back()->with('error', 'Nenhuma denúncia encontrada para esse usuário.');
-}
 
 public function banirUsuario(Request $request)
 {
@@ -345,146 +450,22 @@ private function aplicarBanUsuario(UsuarioModel $usuario)
 
 
 /* BANIR PROFISSIONAL */
-public function destroyFree($idProfissional)
-{
-    $usuario = ProfissionalModel::find($idProfissional);
-
-    if (!$usuario) {
-        return back()->with('error', 'Profissional não encontrado.');
-    }
-
-    // Verifica se existe denúncia para esse profissional
-    if (DenunciasFreeModel::where('idProfissional', $idProfissional)->exists()) {
-
-        $usuario->update(['statusProfissional' => 'inativo']);
-
-        Mail::to($usuario->emailProfissional)
-            ->send(new FreeBanidoMail($usuario->nomeProfissional));
-
-        return redirect()->route('denunciados')
-                        ->with('success', 'Profissional banido com sucesso!');
-    }
-
-    return back()->with('error', 'Nenhuma denúncia encontrada para esse profissional.');
-}
 
 
 
 /* DESBANIR USUÁRIO */
-public function desbanirUsuario($idUsuario)
-{
-    if (Denuncias::where('idUsuario', $idUsuario)->exists()) {
 
-        UsuarioModel::where('idUsuario', $idUsuario)
-                    ->update(['statusUsuario' => 'ativo']);
-
-        Denuncias::where('idUsuario', $idUsuario)->delete();
-
-        return redirect()->route('denuncias')
-                        ->with('success', 'Usuário desbanido com sucesso!');
-    }
-
-    return back()->with('error', 'Nenhuma denúncia encontrada para esse usuário.');
-}
 
 
 
 /* DESBANIR PROFISSIONAL */
-public function desbanirFree($idProfissional)
-{
-    if (DenunciasFreeModel::where('idProfissional', $idProfissional)->exists()) {
-
-        ProfissionalModel::where('idProfissional', $idProfissional)
-                         ->update(['statusProfissional' => 'ativo']);
-
-        DenunciasFreeModel::where('idProfissional', $idProfissional)->delete();
-
-        return redirect()->route('denunciados')
-                        ->with('success', 'Profissional desbanido com sucesso!');
-    }
-
-    return back()->with('error', 'Nenhuma denúncia encontrada para esse profissional.');
-}
 
 
 /*VER DENUCNIAS*/
-    public function denuncias(){
-
-        $usuarios = DB::table('denuncias')
-        ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
-        ->where('tb_usuario.statusUsuario', '=', 'ativo')
-        ->select(
-            'tb_usuario.idUsuario as id',
-            'tb_usuario.nomeUsuario as nome',
-            'denuncias.motivoDenuncia as motivo',
-            'denuncias.descDenuncia as desc',
-            'denuncias.evidenciaDenuncia as evidencia',
-            DB::raw("'usuario' as origem")
-        );
-
-        $profissionais = DB::table('tb_denuncias_free')
-        ->join('tb_profissional', 'tb_denuncias_free.idProfissional', '=', 'tb_profissional.idProfissional')
-        ->where('tb_profissional.statusProfissional', '=', 'ativo')
-        ->select(
-            'tb_profissional.idProfissional as id',
-            'tb_profissional.nomeProfissional as nome',
-            'tb_denuncias_free.motivoDenuncia as motivo',
-            'tb_denuncias_free.descDenuncia as desc',
-            'tb_denuncias_free.evidenciaDenuncia as evidencia',
-            DB::raw("'profissional' as origem")
-        );
-
-
-        $usuarios = $usuarios->unionAll($profissionais)
-        ->orderByDesc('id')
-        ->paginate(10);
-
-        return view('denuncias', compact('usuarios'));
-    }
-
+   
     //VER DENUNCIADOS
-     public function denunciados(){
+    
 
-        $usuarios = DB::table('denuncias')
-        ->join('tb_usuario','denuncias.idUsuario', '=', 'tb_usuario.idUsuario')
-        ->where('tb_usuario.statusUsuario', '=', 'inativo')
-        ->select(
-            'tb_usuario.idUsuario as id',
-            'tb_usuario.nomeUsuario as nome',
-            'denuncias.motivoDenuncia as motivo',
-            'denuncias.descDenuncia as desc',
-            'denuncias.evidenciaDenuncia as evidencia',
-            DB::raw("'usuario' as origem")
-        );
-
-        $profissionais = DB::table('tb_denuncias_free')
-        ->join('tb_profissional', 'tb_denuncias_free.idProfissional', '=', 'tb_profissional.idProfissional')
-        ->where('tb_profissional.statusProfissional', '=', 'inativo')
-        ->select(
-            'tb_profissional.idProfissional as id',
-            'tb_profissional.nomeProfissional as nome',
-            'tb_denuncias_free.motivoDenuncia as motivo',
-            'tb_denuncias_free.descDenuncia as desc',
-            'tb_denuncias_free.evidenciaDenuncia as evidencia',
-            DB::raw("'profissional' as origem")
-        );
-
-
-        $usuarios = $usuarios->unionAll($profissionais)
-        ->orderByDesc('id')
-        ->paginate(10);
-
-        return view('responder-denuncia', compact('usuarios'));
-    }
-
-
-    public function banir(){
-        return view('banir');
-    }
-
-    public function responder(){
-        return view('responder');
-    }
    // enviar sms
 
     /*Funcões da API*/ 

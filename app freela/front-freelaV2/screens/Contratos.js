@@ -148,11 +148,7 @@ export default function Contratos({navigation}) {
 
       <View style={styles.conteudo}>
 
-      {ativos.length === 0 && (
-           
-               <Text style={styles.semContratos}>Nenhum contrato foi ativo ainda.</Text>
-  
-              )}
+    
         {abaAtiva === 0 && (
           <ScrollView
             contentContainerStyle={styles.conteudoScroll}

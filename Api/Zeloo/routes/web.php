@@ -2,58 +2,45 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Authenticate;
+use Illuminate\Auth\AuthenticationException;
 use App\Http\Controllers\ZelooController;
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
 
-// ===============================
-// ROTAS DE BANIMENTO / EXCLUSÃO
-// ===============================
-Route::delete('/excluirPerfil/{idUsuario}', [ZelooController::class, 'destroyUsuario']);
-Route::delete('/excluirPerfilFree/{idProfissional}', [ZelooController::class, 'destroyFree']);
-Route::delete('/desbanir/{idUsuario}', [ZelooController::class, 'desbanirUsuario']);
-Route::delete('/desbanirFree/{idProfissional}', [ZelooController::class, 'desbanirFree']);
 
-// ===============================
-// ROTAS PÚBLICAS
-// ===============================
-Route::get('/', [ZelooController::class, 'index']);
-Route::post('/login', [ZelooController::class, 'loginAdm']);
-Route::get('/logoutUser', [ZelooController::class, 'logoutUser']);
+Route::delete('/excluirPerfil/{idUsuario}','App\Http\Controllers\ZelooController@destroyUsuario');
+Route::delete('/excluirPerfilFree/{idProfissional}','App\Http\Controllers\ZelooController@destroyFree');
+Route::delete('/desbanir/{idUsuario}','App\Http\Controllers\ZelooController@desbanirUsuario');
+Route::delete('/desbanirFree/{idProfissional}','App\Http\Controllers\ZelooController@desbanirFree');
+Route::get('/','App\Http\Controllers\ZelooController@index');
+Route::get('/logoutUser','App\Http\Controllers\ZelooController@logoutUser');
+Route::get('/dashboard','App\Http\Controllers\ZelooController@dashboard')->middleware(Authenticate::class);
+Route::get('/responder','App\Http\Controllers\ZelooController@banir')->middleware(Authenticate::class);
+Route::get('/registro','App\Http\Controllers\ZelooController@registro')->middleware(Authenticate::class);
+Route::post('/login','App\Http\Controllers\ZelooController@loginAdm');
+Route::get('/banir','App\Http\Controllers\ZelooController@banir')->middleware(Authenticate::class);
+Route::get('/denuncias','App\Http\Controllers\ZelooController@denuncias')->name('denuncias')->middleware(Authenticate::class);
+Route::get('/denunciados','App\Http\Controllers\ZelooController@denunciados')->name('denunciados')->middleware(Authenticate::class);
 
-// ===============================
-// ROTAS COM LOGIN
-// ===============================
-Route::middleware([Authenticate::class])->group(function () {
+
+Route::middleware(Authenticate::class)->group(function () {
 
     Route::get('/dashboard', [ZelooController::class, 'dashboard']);
+
     Route::get('/dashboard-data', [ZelooController::class, 'DashboardData'])
         ->name('dashboard.data');
 
-    Route::get('/responder', [ZelooController::class, 'banir']);
-    Route::get('/banir', [ZelooController::class, 'banir']);
-    Route::get('/registro', [ZelooController::class, 'registro']);
+    Route::get('/admin/download-dashboard-pdf', [ZelooController::class, 'downloadDashboardPdf'])
+        ->name('download.dashboard.pdf');
 
-    // ============================
-    // TELA ANALISAR DENÚNCIAS
-    // ============================
-    Route::get('/denuncias', [ZelooController::class, 'pesquisa'])
-        ->name('denuncias');
-
-    Route::post('/banir-usuario', [ZelooController::class, 'banirUsuario'])
-        ->name('banir.usuario');
-
-    // ============================
-    // TELA ANALISAR RESPOSTAS
-    // ============================
-    Route::get('/denunciados', [ZelooController::class, 'buscarDenuncia'])
-        ->name('denunciados')
-        ->middleware(Authenticate::class);
-
-    // Rota usada pelo formulário da sua view
-    Route::get('/buscar-denuncia', [ZelooController::class, 'buscarDenuncia'])
-        ->name('buscarDenuncia');
+    // suas outras rotas protegidas
 });
-
-
-Route::get('/admin/download-dashboard-pdf',
-    [ZelooController::class, 'downloadDashboardPdf']
-)->name('download.dashboard.pdf');
+   

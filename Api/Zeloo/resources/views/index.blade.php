@@ -226,11 +226,9 @@ body {
                      <div class="card-body">
                          <div class="d-flex align-items-center">
                              <div class="flex-grow-1 ms-3">
-                                                                  <h6 class="card-title text-muted mb-1">Total de Reclamações</h6>
-                                  <h3 class="mb-0 fw-bold text-danger">847</h3>
-                                  <small class="text-danger">
-                                      <i class="bi bi-arrow-up me-1"></i>+12% este mês
-                                  </small>
+                             <h6 class="card-title text-muted mb-1">Total de Idosos</h6>
+                             <h3 class="mb-0 fw-bold text-primary" id="cardIdosos">0</h3>
+                                 
                              </div>
                          </div>
                      </div>
@@ -244,11 +242,26 @@ body {
                              <div class="flex-shrink-0">
                              </div>
                              <div class="flex-grow-1 ms-3">
-                                                                  <h6 class="card-title text-muted mb-1">Cuidadores Ativos</h6>
-                                  <h3 class="mb-0 fw-bold text-success">156</h3>
-                                  <small class="text-success">
-                                      <i class="bi bi-arrow-up me-1"></i>+8% este mês
-                                  </small>
+                             <h6 class="card-title text-muted mb-1">Total de Cuidadores</h6>
+                             <h3 class="mb-0 fw-bold text-success" id="cardCuidadores">0</h3>
+                                
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+
+             <div class="col-lg-6 col-md-6 mb-4">
+                 <div class="card stats-card border-0 shadow-sm h-100">
+                     <div class="card-body">
+                         <div class="d-flex align-items-center">
+                             <div class="flex-shrink-0">
+                             </div>
+                             <div class="flex-grow-1 ms-3">
+                             <h6 class="card-title text-muted mb-1">Atendimentos Realizados</h6>
+                             <h3 class="mb-0 fw-bold text-success" id="cardContratos">0</h3>
+                                
                              </div>
                          </div>
                      </div>
@@ -389,7 +402,26 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
         const response = await fetch("{{ url('/dashboard-data') }}");
         const data = await response.json();
+        const receitaCtx = document.getElementById('receitaChart');
 
+new Chart(receitaCtx, {
+    type: 'bar',
+    data: {
+        labels: ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'],
+        datasets: [{
+            label: 'Receita (R$)',
+            data: Object.values(data.meses),
+            backgroundColor: '#206bb6'
+        }]
+    },
+    options: { 
+        responsive: true, 
+        maintainAspectRatio: false 
+    }
+});
+        document.getElementById("cardIdosos").innerText = data.totalIdosos;
+        document.getElementById("cardCuidadores").innerText = data.totalCuidadores;
+        document.getElementById("cardContratos").innerText = data.contratos;
         if (data.semDados) {
             const aviso = document.createElement("div");
             aviso.innerText = "Sem dados disponíveis no momento.";
@@ -399,7 +431,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             document.body.prepend(aviso);
             return;
         }
-
+       
        
         const idososAtivosCtx = document.getElementById('idososAtivosChart');
         new Chart(idososAtivosCtx, {
@@ -474,20 +506,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
 
         // === Receita Mensal ===
-        const receitaCtx = document.getElementById('receitaChart');
-        new Chart(receitaCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Jan','Fev','Mar','Abr','Mai','Jun'],
-                datasets: [{
-                    label: 'Receita (R$)',
-                    data: data.receitaMensal,
-                    backgroundColor: '#206bb6'
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-
+    
         // === Rentabilidade Anual ===
         const rentabilidadeCtx = document.getElementById('rentabilidadeChart');
         new Chart(rentabilidadeCtx, {

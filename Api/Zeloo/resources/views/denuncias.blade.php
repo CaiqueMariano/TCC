@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard - Analisar Denúncias</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Analisar Denúncias</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <style>
@@ -102,8 +102,8 @@ body {
             <img src="{{url('images/zeloo-light.png')}}" alt="Zeloo" height="60">
         </div>
         <ul class="sidebar-menu">
-            <li><a href="{{url('/dashboard')}}" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-            <li><a href="{{url('denuncias')}}"><i class="bi bi-shield-exclamation"></i> Analisar Denúncias</a></li>
+            <li><a href="{{url('/dashboard')}}" ><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li><a href="{{url('denuncias')}}" class="active"><i class="bi bi-shield-exclamation"></i> Analisar Denúncias</a></li>
             <li><a href="{{url('denunciados')}}"><i class="bi bi-clipboard-check"></i> Analisar Respostas</a></li>
             <li class="logout"><a href="{{url('/logoutUser')}}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
     </ul>
@@ -119,130 +119,181 @@ body {
     </div>
 </div>
 
-<!-- Busca -->
-<div class="container mt-4">
-    <form action="{{ url('denuncias') }}" method="GET" class="d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Buscar denunciado pelo nome..." value="{{ request('search') }}">
-        <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+
+<div class="container my-4">
+    <form action="" method="GET" 
+          class="d-flex justify-content-center"
+          style="gap: 8px; max-width: 450px; margin: 0 auto;">
+        
+        <input type="text" name="q" 
+               class="form-control"
+               style="height: 38px; font-size: 14px;"
+               placeholder="Pesquisar por nome do usuário"
+               value="{{ request('q') }}">
+
+        <button class="btn btn-success" style="height: 38px; padding: 5px 12px; font-size: 14px; background-color:#206bb6; border-color:#28a745">
+            <i class="bi bi-search"></i>
+        </button>
     </form>
 </div>
+    <!--CARDS DO BIXOOO!!!-->
 
-<!-- Tabela -->
-@if($usuarios->isEmpty())
-<p class="text-center mt-4">Nenhuma denúncia encontrada.</p>
-@else
-<table class="table mt-4">
-    <thead>
+
+    @if($usuarios->isEmpty())
+    <p>Nenhuma denúncia encontrada.</p>
+    @else
+    <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Nome</th>
+      <th scope="col">Motivo Denúncia</th>
+      <th scope="col">Tipo de Usuario</th>
+      <th scope="col">Banir Usuario</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+   
+
+    @foreach ($usuarios as $usuario)
         <tr>
-            <th>ID</th>
-            <th>Nome</th>
-            <th>Motivo</th>
-            <th>Status</th>
-            <th>Banir</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach ($usuarios as $usuario)
-        <tr>
-            <td>{{ $usuario->id }}</td>
-            <td>{{ $usuario->nome }}</td>
-            <td>{{ $usuario->motivo }}</td>
-            <td>{{ $usuario->status }}</td>
+            <th scope="row">{{$usuario->id}}</th>
+            <td>{{$usuario->nome}}</td>
+            <td>{{$usuario->motivo}}</td>
+            <td>{{$usuario->origem}}</td>
             <td>
-                <a href="#" class="btn btn-primary" onclick="abrirModalBanir('{{ $usuario->id }}','{{ $usuario->nome }}','{{ $usuario->motivo }}','{{ $usuario->desc }}','{{ $usuario->evidencia }}','usuario')">Banir usuário</a>
-            </td>
-            <td>
-                <a href="#" class="btn btn-primary" onclick="abrirModalBanir('{{ $usuario->id }}','{{ $usuario->nome }}','{{ $usuario->motivo }}','{{ $usuario->desc }}','{{ $usuario->evidencia }}','profissional')">Banir profissional</a>
+                <a href="#" class="btn btn-primary"
+                onclick="abrirModalBanir(
+    '{{ $usuario->id }}',
+    '{{ $usuario->nome }}',
+    '{{ $usuario->motivo }}',
+    '{{ $usuario->desc }}',
+    '{{ $usuario->evidencia }}',
+    '{{ $usuario->origem }}'
+)">
+                   Banir
+                </a>
             </td>
         </tr>
-        @endforeach
-    </tbody>
-</table>
-<div class="d-flex justify-content-center">{{ $usuarios->links('pagination::bootstrap-5') }}</div>
+        <div class="d-flex justify-content-center">
+    {{ $usuarios->links('pagination::bootstrap-5') }}
+</div>
+    @endforeach
 @endif
+  </tbody>
+</table>
+    
 
-<!-- Modal -->
-<div class="modal fade" id="banUserModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title"><i class="bi bi-person-x"></i> Banir Usuário/Profissional</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="banForm" method="POST" action="{{ route('banir.usuario') }}">
-                    @csrf
-                    <input type="hidden" name="_method" id="banFormMethod" value="POST">
-                    <input type="hidden" name="origem" id="banFormOrigem" value="">
+ 
 
-                    <div class="row">
-                        <div class="col-md-6">
+    <!--MODAL DE BANIMENTO!!!-->
+    <div class="modal fade" id="banUserModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-person-x"></i> Banir Usuário
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="banForm" method="POST">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">ID do Usuário</label>
+                                        <input type="text" class="form-control" id="banUserId" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nome do Usuário</label>
+                                        <input type="text" class="form-control" id="banUserName" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de Usuário</label>
+                                        <input type="text" class="form-control" id="banUserOrigem" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                    <label class="form-label">Motivo do Banimento</label>
+                                    <input type="text" class="form-control" id="banUserMotivo" readonly>
+                                    </div>
+                            
                             <div class="mb-3">
-                                <label class="form-label">ID</label>
-                                <input type="text" id="banUserId" name="idUsuario" class="form-control" readonly>
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" id="banUserDesc" readonly></textarea>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Nome</label>
-                                <input type="text" id="banUserName" class="form-control" readonly>
+                            <label class="form-label">Evidências</label>
+                            <textarea class="form-control" id="banUserEvidencia" readonly></textarea>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Origem</label>
-                                <input type="text" id="banUserOrigem" class="form-control" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Motivo do banimento *</label>
-                                <textarea id="banUserMotivo" name="motivoDenuncia" class="form-control" rows="2" placeholder="Descreva o motivo principal" required></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Descrição detalhada *</label>
-                                <textarea id="banUserDesc" name="descDenuncia" class="form-control" rows="3" placeholder="Contextualize a denúncia" required></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Evidências</label>
-                                <textarea id="banUserEvidencia" name="evidenciaDenuncia" class="form-control" rows="3" placeholder="Links, prints ou outras provas"></textarea>
-                            </div>
-                        </div>
+                        </form>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-danger"><i class="bi bi-person-x"></i> Confirmar Banimento</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-info" id="backToDenunciaBtn" style="display: none;" onclick="backToDenuncia()">
+                            <i class="bi bi-arrow-left"></i> Voltar à Denúncia
+                        </button>
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-person-x"></i> Confirmar Banimento
+                        </button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-    </div>
-</div>
+    </div>         
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-const banirUsuarioRoute = "{{ route('banir.usuario') }}";
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
 
-function abrirModalBanir(id, nome, motivo, desc, evidencia, origem) {
-    const form = document.getElementById('banForm');
-    const methodInput = document.getElementById('banFormMethod');
-    const origemHidden = document.getElementById('banFormOrigem');
+        
+document.querySelector('input[name="q"]').addEventListener('keyup', function() {
+    let valor = this.value.trim();
+    let linhas = document.querySelectorAll("table tbody tr");
 
-    if (origem === 'usuario') {
-        form.action = banirUsuarioRoute;
-        methodInput.value = 'POST';
-    } else {
-        form.action = "/excluirPerfilFree/" + id;
-        methodInput.value = 'DELETE';
-    }
+    linhas.forEach(tr => {
+        let id = tr.querySelector("th").innerText;
 
-    document.getElementById('banUserId').value = id;
-    document.getElementById('banUserName').value = nome;
-    document.getElementById('banUserMotivo').value = motivo;
-    document.getElementById('banUserDesc').value = desc;
-    document.getElementById('banUserEvidencia').value = evidencia;
-    document.getElementById('banUserOrigem').value = origem;
-    origemHidden.value = origem;
+        if (id.includes(valor) || valor === "") {
+            tr.style.display = "";
+        } else {
+            tr.style.display = "none";
+        }
+    });
+});
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNavbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
 
-    new bootstrap.Modal(document.getElementById('banUserModal')).show();
-}
-</script>
+        function abrirModalBanir(id, nome, motivo, desc, evidencia, origem){
+            document.getElementById('banUserId').value = id;
+            document.getElementById('banUserName').value = nome;
+     
+            document.getElementById('banUserMotivo').value = motivo;
+            document.getElementById('banUserDesc').value = desc;
+            document.getElementById('banUserEvidencia').value = evidencia;
+           document.getElementById('banUserOrigem').value = origem;
 
+           let form = document.getElementById('banForm');
+
+                if (origem === 'usuario') {
+                    form.action = `/excluirPerfil/${id}`;
+                } else {
+                    form.action = `/excluirPerfilFree/${id}`;
+                }
+           
+            const modal = new bootstrap.Modal(document.getElementById('banUserModal'));
+            modal.show();
+        }
+    </script>
 </body>
 </html>
