@@ -42,6 +42,7 @@ export default function Pedidos({navigation}) {
   const {user} = useContext(UserContext);
   const [localizacao, setLocalizacao] = useState(null);
   const [erro, setErro] = useState(null);
+  const [oDistancia, setODistancia] = useState("");
   const [abaAtiva, setAbaAtiva] = useState(0);
   const [modalVisivel, setModalVisivel] = useState(false);
   const [modalAceitar, setModalAceitar] = useState(false);
@@ -60,13 +61,13 @@ export default function Pedidos({navigation}) {
   const precoParaBackend = (valor) => {
     if (!valor) return 0;
   
-    // Remove tudo que não é número
+  
     let numeros = valor.replace(/\D/g, "");
   
-    // Converte para decimal
+   
     let convertido = (Number(numeros) / 100).toFixed(2);
   
-    return convertido; // "12.50"
+    return convertido; 
   };
 useEffect(() => {
   const showSub = Keyboard.addListener("keyboardDidShow", () => {
@@ -105,6 +106,7 @@ const aceitar = async () => {
         tipoMensagens: "servico",
         idServico: itemSelecionado.idServico
       })
+      setModalVisivel(false);
       navigation.navigate("Conversas", { converSelecionada: conversa });
 
      
@@ -153,7 +155,7 @@ const aceitar = async () => {
 
 
   function calcularDistancia(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Raio da Terra em KM
+    const R = 6371; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
   
@@ -165,10 +167,10 @@ const aceitar = async () => {
   
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   
-    return R * c; // km
+    return R * c; 
   }
 
-  // animação do indicador
+
   useEffect(() => {
     Animated.spring(indicador, {
       toValue: abaAtiva * larguraAba,
@@ -198,23 +200,8 @@ const pegarServicos = async () =>{
     return () => clearInterval(interval);
   },[])
 
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    return (
-      <View style={{ flexDirection: 'row' }}>
-        {[...Array(fullStars)].map((_, i) => (
-          <Ionicons key={i} name="star" size={14} color="#b08cff" />
-        ))}
-        {hasHalfStar && <Ionicons name="star-half" size={14} color="#b08cff" />}
-        {[...Array(5 - Math.ceil(rating))].map((_, i) => (
-          <Ionicons key={i} name="star-outline" size={14} color="#b08cff" />
-        ))}
-      </View>
-    );
-  };
 
-  // filtra pedidos por aba (exemplo simples)
+
   const pedidosFiltrados = (tipo) => {
     return servicos.filter(s => s.tipoServico === tipo);
   };
@@ -248,7 +235,7 @@ const pegarServicos = async () =>{
       
           setDistancia(km.toFixed(1));
         } else {
-          console.log("Coordenadas não encontradas para:");
+          console.log("n achou:");
         }
       }
     
@@ -284,7 +271,7 @@ const pegarServicos = async () =>{
       backgroundColor: '#b08cff', 
       borderRadius: 8, 
       alignItems: 'center' }} 
-      onPress={() => { setItemSelecionado(item); setModalVisivel(true); }} > 
+      onPress={() => { setItemSelecionado(item); setODistancia(distancia); setModalVisivel(true); }} > 
       <Text style={{ color: '#fff', fontWeight: '600' }}>Ver Mais</Text> 
       </TouchableOpacity>
       </View>
@@ -293,6 +280,8 @@ const pegarServicos = async () =>{
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
+
+      
       {/* Modal */}
       <Modal
   visible={modalVisivel}
@@ -313,7 +302,7 @@ const pegarServicos = async () =>{
 
       <>
       <Text style={styles.rotuloFortaoKm}>Distância:</Text>
-      <Text style={styles.rotuloFortaoKmN}>{itemSelecionado.distancia}</Text>
+      <Text style={styles.rotuloFortaoKmN}>{oDistancia}</Text>
         <Image 
           source={{uri: `${API_URL}/storage/${itemSelecionado.fotoUsuario}` }}
           style={styles.modalImagem}
@@ -481,8 +470,17 @@ itemSelecionado
               </TouchableOpacity>
             ))}
           </View>
+
+          
         </View>
+        
       </View>
+
+      {servicos.length === 0 && (
+           
+           <Text style={styles.semContratos}>Nenhum pedido foi postado ainda</Text>
+
+          )}
 
       {/* Conteúdo das abas */}
       <ScrollView contentContainerStyle={{ padding: 12 }}>
@@ -513,6 +511,15 @@ const styles = StyleSheet.create({
    },
    valorInput:{
       flexDirection:"row",
+   },
+
+   semContratos:{
+    textAlign:'center',
+    textDecorationLine: 'underline',
+    fontStyle:'italic',
+    marginTop:'50%',
+    fontSize:23,
+    color:"gray"
    },
 
    barraAbas: {

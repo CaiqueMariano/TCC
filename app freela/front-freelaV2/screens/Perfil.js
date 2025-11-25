@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useContext } from 'react';
 import { UserContext } from './userContext';
 import { API_URL } from './link';
-import { Modal } from 'react-native';
-import {View,Text,StyleSheet,Image,TouchableOpacity,Animated,Dimensions,ScrollView,} from 'react-native';
+import { Alert, Modal } from 'react-native';
+import {View,Text,StyleSheet,Image,TouchableOpacity,Animated,Dimensions,ScrollView, TextInput} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 
@@ -18,6 +18,10 @@ const ABAS = [
 
 export default function PerfilCuidador({ navigation }) {
   const  {user} = useContext(UserContext);
+  const[nomeUsuario, setNomeUsuario] = useState('');
+  const[mostrarEdicao, setMostrarEdicao] = useState(false);
+  const [telefoneUsuario, setTelefoneUsuario] = useState("");
+  const [emailUsuario, setEmailUsuario] = useState("");
   const [abaAtiva, definirAbaAtiva] = useState(0);
   const indicador = useRef(new Animated.Value(0)).current;
   const [media, setMedia] = useState("");
@@ -72,8 +76,90 @@ const abrirModalExtrato = (item) => {
     }).start();
   }, [abaAtiva]);
 
+
+
+  const editarPerfilInfo = async () =>{
+    try{
+      const response = await axios.put(`${API_URL}/api/updateCuidador/${user.idProfissional}`, {
+        nomeUsuario, telefoneUsuario, emailUsuario
+        
+      });
+
+      if(response.data.success){
+        Alert.alert("Dados alterados!",
+          "Faça login novamente para ver as mudanças"
+        )
+        setMostrarEdicao(false);
+      }else{
+        console.log(response.data.message);
+      }
+
+
+    }catch(error){
+      console.log(error.response.data);
+    }
+  };
 return (
   <View style={styles.container}>
+
+<Modal
+          visible={mostrarEdicao}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setMostrarEdicao(false)}
+        >
+
+<View style={styles.modal}>
+    <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <View style={styles.modalView}>
+       
+      <Text style={styles.textInput}>Nome Inteiro:</Text>
+      <TextInput
+      style={styles.input}
+      placeholder="Nome Inteiro"
+      value={nomeUsuario}
+      onChangeText={setNomeUsuario}
+    />
+
+<Text style={styles.textInput}>Telefone:</Text>
+    <TextInput
+      style={styles.input}
+      placeholder="Telefone"
+      value={telefoneUsuario}
+      onChangeText={setTelefoneUsuario}
+    />
+
+<Text style={styles.textInput}>E-mail:</Text>
+  <TextInput
+      style={styles.input}
+      placeholder="E-mail"
+      value={emailUsuario}
+      onChangeText={setEmailUsuario}
+    />
+
+
+    <View style={styles.botoes}>
+      <TouchableOpacity style={styles.button} onPress={()=>setMostrarEdicao(false)}>
+        <Text style={styles.buttonText} >Voltar</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+  style={styles.button2}
+  onPress={() => {
+    editarPerfilInfo();
+    setMostrarEdicao(false);
+  }}
+>
+  <Text style={styles.buttonText}>Salvar</Text>
+</TouchableOpacity>
+
+    </View>
+
+
+      </View>
+    </ScrollView>
+  </View>
+
+  </Modal>
     <View style={styles.blocoTopo}>
       <Image
         source={{uri: `${API_URL}/storage/${user.fotoProfissional}`}}
@@ -132,7 +218,7 @@ return (
       {abaAtiva === 0 && (
         <ScrollView style={styles.conteudoScroll} showsVerticalScrollIndicator={false}>
 
-          <Text style={styles.tituloSecao}>Renda Mensal</Text>
+          <Text style={styles.tituloSecao}>Extrato</Text>
 
           <TouchableOpacity 
             style={styles.botaoVerExtrato}
@@ -141,19 +227,18 @@ return (
             <Text style={styles.textoBotaoVerExtrato}>Ver extratos</Text>
           </TouchableOpacity>
 
-          <Text style={styles.tituloSecao}>Histórico</Text>
-
-          <TouchableOpacity 
-            style={styles.botaoVerExtrato}
-            onPress={() => navigation.navigate("Historico")}
-          >
-            <Text style={styles.textoBotaoVerExtrato}>Ver Histórico</Text>
-          </TouchableOpacity>
+         
 
       
           <Text style={styles.tituloFeedback}>Últimos Feedbacks</Text>
+         
 
-            {avaliacao.map((item, index) => {
+            {avaliacao
+             .sort((a, b) =>
+              new Date(b.created_at.replace(" ", "T")) -
+              new Date(a.created_at.replace(" ", "T"))
+            )
+            .map((item, index) => {
 
                 const data = new Date(item.dataDoEnvio);
                 const m = data.getMonth() + 1;
@@ -187,7 +272,7 @@ return (
               </View>
               );
             })}
-        
+         <View style={styles.ViewCard}></View>
 
         </ScrollView>
       )}
@@ -196,39 +281,29 @@ return (
       {abaAtiva === 1 && (
         <ScrollView style={styles.conteudoScroll} showsVerticalScrollIndicator={false}>
 
-          <Text style={styles.tituloSecao}>Informações do Cuidador</Text>
+          <Text style={styles.tituloSecao2}>Informações Pessoais</Text>
 
             <Text style={styles.linhaInfo}>
-              <Text style={styles.rotulo}>Tempo de Experiência:</Text> 5 anos
+              <Text style={styles.rotulo}>Telefone:</Text> {user.telefoneProfissional}
             </Text>
 
             <Text style={styles.linhaInfo}>
-              <Text style={styles.rotulo}>Disponibilidade:</Text> Diurno e Noturno
+              <Text style={styles.rotulo}>Email:</Text> {user.emailProfissional}
             </Text>
 
             <Text style={styles.linhaInfo}>
-              <Text style={styles.rotulo}>Genêro:</Text> Mulher
+              <Text style={styles.rotulo}>Genêro:</Text> {user.generoProfissional}
             </Text>
 
-            <View style={styles.separador} />
+            <Text style={styles.linhaInfo}>
+              <Text style={styles.rotulo}>Data de Nascimento:</Text> {user.dataNascProfissional}
+            </Text>
 
-            <Text style={styles.tituloSecao}>Experiências</Text>
-
-            <Text style={styles.linhaInfo}> Idosos com Alzheimer</Text>
-            <Text style={styles.linhaInfo}> Idosos acamados</Text>
-            <Text style={styles.linhaInfo}> Idosos com comportamento agressivo</Text>
-
-            <View style={styles.separador} />
-
-            <Text style={styles.tituloSecao}>Especializações</Text>
-
-            <Text style={styles.linhaInfo}> Primeiros socorros</Text>
-            <Text style={styles.linhaInfo}> Administração de medicamentos</Text>
-            <Text style={styles.linhaInfo}> Cuidados pós-operatórios</Text>
+  
 
           <TouchableOpacity 
             style={styles.botaoEditar}
-            onPress={() => navigation.navigate("EditarPerfil")}
+            onPress={() => {setTelefoneUsuario(user.telefoneProfissional);setEmailUsuario(user.emailProfissional);setNomeUsuario(user.nomeProfissional);setMostrarEdicao(true)}}
           >
             <Text style={styles.textoBotaoEditar}>Editar Perfil</Text>
           </TouchableOpacity>
@@ -248,6 +323,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 
+  modal:{
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center'
+  },
+  modalView:{
+    paddingTop:20,
+    fontSize:20,
+    paddingLeft:21,
+    marginTop:200,
+    backgroundColor: '#fff', 
+    width:360,
+    borderRadius: 10, 
+
+  },
+
+  textInput:{
+    fontWeight:'500',
+    fontSize:20 ,
+  },
+
+  input: {
+    width:315,
+    minHeight: 50,
+    borderWidth: 1,
+    borderColor: "#202020",
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    marginBottom: 15,
+    fontSize: 16,
+    textAlignVertical: 'center',
+    backgroundColor: "#fff"
+  },
+
+
+  
+
+  ViewCard:{
+    marginBottom:80,
+  },
 
   estrela:{
     flexDirection:'row',
@@ -374,14 +488,57 @@ textoBotaoEditar: {
     flex: 1,
   },
 
+  
+ botoes: { 
+  flexDirection: "row", 
+  justifyContent: "space-between", 
+  width: 315, 
+  marginBottom: 15 
+},
+
+button: {
+  width: 100,
+  height: 50,
+  borderColor: '#b08cff',
+  borderWidth: 2,
+  
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 10,
+  marginTop: 10,
+},
+button2: {
+  width: 100,
+  height: 50,
+  borderColor: "#b08cff",
+  borderWidth: 2,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 10,
+  marginTop: 10,
+},
+buttonText: {
+  color:"#b08cff",
+  fontSize: 18,
+  fontWeight: '600',
+},
+
   conteudoScroll: {
     padding: 20,
+
   },
 
   tituloSecao: {
     fontSize: 22,
     fontWeight: '700',
-    marginTop:20,
+    marginTop:5,
+  },
+
+  tituloSecao2: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop:5,
+    marginBottom:20,
   },
 
   tituloExtrato: {
@@ -487,5 +644,10 @@ valorPositivo: {
     fontSize: 15,
     lineHeight: 20,
     color: '#333',
+  },
+
+  linhaInfo:{
+    fontSize:21,
+    marginBottom:10,
   },
 });

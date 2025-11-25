@@ -21,9 +21,14 @@ export default function Dashboard() {
     ])
     const [isLoading, setIsLoading] = useState(true);
     const [rendaMensal, setRendaMensal] = useState([]);
-    //const [dataAtual, setDataAtual]=useState("");
+    const [mediaDiaria, setMediaDiaria] = useState(""); 
     
-    
+    const mediaDiariaAPI = async () =>{
+        axios.get(`${API_URL}/api/mediaExtrato/${user.idProfissional}`)
+        .then(response =>{
+            setMediaDiaria(response.data.data);
+        })
+    }
     
     const [extrato, setExtrato] = useState([]);
     useEffect(() => {
@@ -41,7 +46,7 @@ export default function Dashboard() {
             console.log("RENDAAAAAAAAAAAA",rendaMensal);
 
         };
-    
+        mediaDiariaAPI();
         calcularData();
     }, []);
    
@@ -66,7 +71,7 @@ export default function Dashboard() {
                 </View>
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>Média Diária</Text>
-                    <Text style={styles.cardValue}>R$ </Text>
+                    <Text style={styles.cardValue}>R${mediaDiaria}</Text>
                 </View>
             </View>
 

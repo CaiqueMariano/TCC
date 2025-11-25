@@ -8,7 +8,7 @@ import ModalFinalizacao from './ModalFinalizacao';
 const ABAS = [
   { chave: 'ativos', titulo: 'Ativos' },
   { chave: 'pendentes', titulo: 'Pendentes' },
-  { chave: 'cancelado', titulo: 'Cancelados' },
+  { chave: 'finalizado', titulo: 'Finalizados' },
 ];
 
 export default function Contratos({navigation}) {
@@ -28,7 +28,7 @@ export default function Contratos({navigation}) {
   useEffect(() => {
     if (abaAtiva === 0) setStatus("ativo");
     if (abaAtiva === 1) setStatus("Aguardando Pagamento");
-    if (abaAtiva === 2) setStatus("Cancelado");
+    if (abaAtiva === 2) setStatus("finalizado");
   }, [abaAtiva]);
   
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function Contratos({navigation}) {
       .then(response => {
         if (status === "ativo") setAtivos(response.data.data);
       if (status === "Aguardando Pagamento") setPendentes(response.data.data);
-      if (status === "Cancelado") setCancelados(response.data.data);
+      if (status === "finalizado") setCancelados(response.data.data);
       })
       .catch(error => console.log("ERRO:", error));
   },[status])
@@ -147,6 +147,12 @@ export default function Contratos({navigation}) {
       </View>
 
       <View style={styles.conteudo}>
+
+      {ativos.length === 0 && (
+           
+               <Text style={styles.semContratos}>Nenhum contrato foi ativo ainda.</Text>
+  
+              )}
         {abaAtiva === 0 && (
           <ScrollView
             contentContainerStyle={styles.conteudoScroll}
@@ -159,15 +165,24 @@ export default function Contratos({navigation}) {
                const anoNasc = new Date(item.dataNasc).getFullYear();
                const anoAtual = new Date().getFullYear();
                const idade = anoAtual - anoNasc;
+
+               const data = new Date();
+               const a = data.getFullYear(item.dataServico)
+               const m = data.getMonth(item.dataServico);
+               const d = data.getDate(item.dataServico);
              
                return (
                 <View key={index} style={styles.cartaoIdoso}>
 
                 <View style={styles.cabecalhoIdoso}>
+                <TouchableOpacity onPress={()=> navigation.navigate("Perfil Idoso",{
+                    itemSelecionado:item
+                  })}>
                   <Image
                     source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
                     style={styles.fotoIdoso}
                   />
+                  </TouchableOpacity>
                   <View>
                     <Text style={styles.nomeIdoso}>{item.nomeUsuario}</Text>
                     <Text style={styles.subInfoIdoso}>Idade: {idade}</Text>
@@ -181,11 +196,11 @@ export default function Contratos({navigation}) {
                   </Text>
   
                   <Text style={styles.textoInfo}>
-                    <Text style={styles.rotuloInfo}>Dia: {item.dataServico}</Text>
+                    <Text style={styles.rotuloInfo}>Dia: {d}/{m}/{a}</Text>
                   </Text>
   
                   <Text style={styles.textoInfo}>
-                    <Text style={styles.rotuloInfo}>Horário: </Text>
+                    <Text style={styles.rotuloInfo}>Horário de Início: </Text>
                     {item.horaInicioServico}
                   </Text>
   
@@ -210,20 +225,30 @@ export default function Contratos({navigation}) {
           >
             <Text style={styles.titulo}>Pendentes</Text>
             <Text style={styles.subtitulo}>Contratos esperando o pagamento</Text>
-
+            {pendentes.length === 0 && (
+               <Text style={styles.semContratos}>Nenhum contrato pendente ainda.</Text>
+              )}
             {pendentes.map((item, index) => {
                const anoNasc = new Date(item.dataNasc).getFullYear();
                const anoAtual = new Date().getFullYear();
                const idade = anoAtual - anoNasc;
+               const data = new Date();
+               const a = data.getFullYear(item.dataServico)
+               const m = data.getMonth(item.dataServico);
+               const d = data.getDate(item.dataServico);
              
                return (
                 <View key={index} style={styles.cartaoIdoso}>
 
                 <View style={styles.cabecalhoIdoso}>
+                  <TouchableOpacity onPress={()=> navigation.navigate("Perfil Idoso",{
+                    itemSelecionado:item
+                  })}>
                   <Image
                     source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
                     style={styles.fotoIdoso}
                   />
+                  </TouchableOpacity>
                   <View>
                     <Text style={styles.nomeIdoso}>{item.nomeUsuario}</Text>
                     <Text style={styles.subInfoIdoso}>Idade: {idade}</Text>
@@ -237,11 +262,11 @@ export default function Contratos({navigation}) {
                   </Text>
   
                   <Text style={styles.textoInfo}>
-                    <Text style={styles.rotuloInfo}>Dia: {item.dataServico}</Text>
+                    <Text style={styles.rotuloInfo}>Dia: {d}/{m}/{a}</Text>
                   </Text>
   
                   <Text style={styles.textoInfo}>
-                    <Text style={styles.rotuloInfo}>Horário: </Text>
+                    <Text style={styles.rotuloInfo}>Horário de Início: </Text>
                     {item.horaInicioServico}
                   </Text>
   
@@ -265,22 +290,38 @@ export default function Contratos({navigation}) {
             contentContainerStyle={styles.conteudoScroll}
             showsVerticalScrollIndicator={false}
           >
-            <Text style={styles.titulo}>Cancelados</Text>
-            <Text style={styles.subtitulo}>Contratos cancelados</Text>
-
-            {cancelados.map((item, index) => {
+            <Text style={styles.titulo}>Finalizados</Text>
+            <Text style={styles.subtitulo}>Contratos Finalizados</Text>
+            {cancelados.length === 0 && (
+               <Text style={styles.semContratos}>Nenhum contrato finalizado ainda.</Text>
+              )}
+            {cancelados
+            .sort((a, b) =>
+              new Date(b.created_at.replace(" ", "T")) -
+              new Date(a.created_at.replace(" ", "T"))
+            )
+            .map((item, index) => {
                const anoNasc = new Date(item.dataNasc).getFullYear();
                const anoAtual = new Date().getFullYear();
                const idade = anoAtual - anoNasc;
+
+               const data = new Date();
+               const a = data.getFullYear(item.dataServico)
+               const m = data.getMonth(item.dataServico);
+               const d = data.getDate(item.dataServico);
              
                return (
             <View key={index} style={styles.cartaoIdoso}>
 
               <View style={styles.cabecalhoIdoso}>
+              <TouchableOpacity onPress={()=> navigation.navigate("Perfil Idoso",{
+                    itemSelecionado:item
+                  })}>
                 <Image
                   source={{uri: `${API_URL}/storage/${item.fotoUsuario}`}}
                   style={styles.fotoIdoso}
                 />
+                </TouchableOpacity>
                 <View>
                   <Text style={styles.nomeIdoso}>{item.nomeUsuario}</Text>
                   <Text style={styles.subInfoIdoso}>Idade: {idade}</Text>
@@ -294,13 +335,21 @@ export default function Contratos({navigation}) {
                 </Text>
 
                 <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Dia: {item.dataServico}</Text>
+                  <Text style={styles.rotuloInfo}>Dia: {d}/{m}/{a}</Text>
                 </Text>
 
                 <Text style={styles.textoInfo}>
-                  <Text style={styles.rotuloInfo}>Horário:</Text>
+                  <Text style={styles.rotuloInfo}>Horário de Início:</Text>
                   {item.horaInicioServico}
                 </Text>
+                {!item.jaAvaliou && (
+  <TouchableOpacity
+    style={styles.botaoM}
+    onPress={() => navigation.navigate("Avaliar", { contrato: item })}
+  >
+    <Text style={styles.mais}>Avaliar</Text>
+  </TouchableOpacity>
+)}
 
               </View>
             </View>
@@ -317,6 +366,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffffff',
+  },
+
+ 
+  semContratos:{
+    textAlign:'center',
+    textDecorationLine: 'underline',
+    fontStyle:'italic',
+    marginTop:'50%',
+    fontSize:23,
+    color:"gray"
   },
   botaoM: {
     marginRight:10,  

@@ -89,20 +89,17 @@ export default function telaPagamento({ route, navigation }) {
     >
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Serviço Terminado!</Text>
+          <Text style={styles.modalText}>Contrato pago!</Text>
 
-          <Text style={styles.modalText}>
-            Aguarde o Pagamento
-          </Text>
 
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+            style={[styles.actionButton, { backgroundColor: colors.azul }]}
             onPress={()=>navigation.navigate("Avaliar",{servico})}
           >
             <Text style={styles.buttonText}>Avaliar Cuidador</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: '#9575CD' }]}
+            style={[styles.actionButton, { backgroundColor: colors.azul }]}
             onPress={()=>navigation.navigate("Home")}
           >
             <Text style={styles.buttonText}>Fechar</Text>
@@ -155,7 +152,7 @@ export default function telaPagamento({ route, navigation }) {
         {/* 🔹 Botão perfil */}
         <TouchableOpacity
           style={styles.perfilButton}
-          onPress={() => navigation.navigate('perfilProfissional', { servico })}
+          onPress={() => navigation.navigate('Perfil Profissional', { servico })}
         >
           <Text style={styles.perfilButtonText}>Olhar Perfil do Cuidador</Text>
         </TouchableOpacity>
@@ -198,6 +195,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.branco,
+  },
+
+  buttonText:{
+    fontWeight:'600',
   },
 
   nav: {

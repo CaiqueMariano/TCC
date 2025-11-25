@@ -132,15 +132,19 @@ axios.post(`${API_URL}/api/perguntas`,{
   doencas: diagnosticos,
   comportamento: Comportamento, 
   emocional:rEmocional
-}).catch(error => {
+})
+.then(response =>{
+  navigation.navigate("Home")
+})
+.catch(error => {
   if (error.response) {
-    // Erro vindo do backend (status 400, 500, etc.)
+  
     console.log("ERRO DO SERVIDOR:", error.response.data);
   } else if (error.request) {
-    // Não chegou resposta (servidor offline, bloqueio de rede...)
+    
     console.log("ERRO DE REDE:", error.request);
   } else {
-    // Erro interno do axios ou do código
+    
     console.log("ERRO AXIOS/CÓDIGO:", error.message);
   }
 });

@@ -54,15 +54,31 @@ export default function Favoritos({ navigation }) {
 
   const renderItem = ({ item }) => (
     <View style={styles.cardRow}>
+      <TouchableOpacity onPress={()=> navigation.navigate("Perfil Profissional",{
+        servico:item
+      })}>
       <Image
                       source={{ uri: `${API_URL}/storage/${item.fotoProfissional}` }}
                       style={styles.foto}
                     />
+      </TouchableOpacity>
       <View style={{ flex: 1 }}>
         <Text style={styles.nome}>{item.nomeProfissional || 'Nome sobrenome'}</Text>
-        <Text style={styles.mensagem}>Entrar no perfil</Text>
-      </View>
 
+        <View style={styles.botoes}>
+        <TouchableOpacity onPress={()=> navigation.navigate("Perfil Profissional",{
+        servico:item
+      })}>
+        <Text style={styles.mensagem}>Entrar no perfil</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={()=> navigation.navigate("ServicoFav",{
+        favorito:item
+      })}>
+        <Text style={styles.mensagem2}>Pedir Serviço</Text>
+        </TouchableOpacity>
+      </View>
+      </View>
       <TouchableOpacity onPress={() => confirmarDesfavoritar(item.idProfissional)}>
         <Ionicons name="heart" size={28} color="red" />
       </TouchableOpacity>
@@ -101,9 +117,7 @@ export default function Favoritos({ navigation }) {
           />
         </View>
 
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterText}>Filtrar</Text>
-        </TouchableOpacity>
+      
       </View>
 
       {/* LISTA */}
@@ -162,6 +176,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
   },
+
+  botoes:{
+    flexDirection:"row",
+  },  
   foto: {
     width: 70,
     height: 70,
@@ -239,8 +257,16 @@ const styles = StyleSheet.create({
     color: colors.preto,
   },
   mensagem: {
+    marginTop:10,
+    marginRight:10,
     fontSize: 14,
     color: '#666',
+  },
+  mensagem2: {
+    marginTop:10,
+    
+    fontSize: 14,
+    fontWeight:'600'
   },
   soundButton: {
     position: 'absolute',

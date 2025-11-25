@@ -5,13 +5,17 @@ import {
     StyleSheet, 
     ScrollView, 
     Image,
+    TextInput,
     TouchableOpacity,
+    Platform,
     ActivityIndicator,
     Dimensions 
 } from 'react-native';
 import axios from 'axios';
+import { Ionicons } from '@expo/vector-icons';
 import { API_URL } from './link';
 import { UserContext } from './userContext';
+import colors from './colors';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -23,6 +27,7 @@ export default function ListaConversas({navigation}) {
     ])
     const [isLoading, setIsLoading] = useState(true);
     const [rendaMensal, setRendaMensal] = useState([]);
+    const [pesquisa, setPesquisa] = useState('');
     const[converSelecionada, setConversaSelecionada] = useState([]);
     //const [dataAtual, setDataAtual]=useState("");
     
@@ -49,45 +54,82 @@ export default function ListaConversas({navigation}) {
           return () => clearInterval(interval);
     }, []);
    
+  const filtrados = conversas.filter((item) =>
+    item.nomeProfissional?.toLowerCase().includes(pesquisa.toLowerCase())
+  );
+
    
     return (
-        <ScrollView style={styles.container}>       
-
-            <View style={styles.cardsGanhos}>
-            {conversas
-            .sort((a, b) => new Date(`${b.horaConversa}T${b.horaConversa}`) - new Date(`${a.horaConversa}T${a.horaConversa}`))
-            .map((item, index) => {
-
-                const data = new Date(item.horaConversa);
-                const h= data.getHours();
-                const m = data.getMinutes();
+        <ScrollView style={styles.container}>    
 
 
+<View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <Ionicons name="arrow-back-outline" size={28} color={colors.preto} />
+        </TouchableOpacity>
 
-            return (
-                <TouchableOpacity onPress={()=>{
-                    setConversaSelecionada(item);
-                    
-                    navigation.navigate("Conversas",{ converSelecionada: item })}}>
-                <View style={styles.cardG} key={index}>
-                    
-                    <View style={styles.mensagem}>
-                        <Image
-                            source={{uri: `${API_URL}/storage/${item.fotoProfissional}`}}
-                            style={styles.foto}
-                            />   
-                        <Text style={styles.titulo}>{item.nomeProfissional}</Text>
-                    </View>
-                    <Text style={styles.data}>{h}h:{m}</Text>
-                    <Text style={styles.horario}>{item.conteudoMensagens}</Text>
-                    
+        <Text style={styles.title}>Conversas</Text>
+
+        <TouchableOpacity onPress={() => navigation.navigate('configuracoes')}>
+          <Ionicons name="settings-outline" size={28} color={colors.preto} />
+        </TouchableOpacity>
+      </View>
         
-                </View>
-                </TouchableOpacity>
-            );
-            })}
-                
+        <View style={styles.searchContainer}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search-outline" size={20} color="#555" style={{ marginHorizontal: 8 }} />
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquise"
+            placeholderTextColor="#666"
+            value={pesquisa}
+            onChangeText={setPesquisa}
+          />
+        </View>
+
+        {filtrados.length === 0 && (
+           
+           <Text style={styles.semContratos}>Nenhuma conversa foi encontrada.</Text>
+
+          )}
+
+
+       
+      </View>   
+
+      <View style={styles.cardsGanhos}>
+  {filtrados
+    .sort((a, b) => new Date(b.horaConversa) - new Date(a.horaConversa))
+    .map((item, index) => {
+
+      const data = new Date(item.horaConversa);
+      const h = data.getHours();
+      const m = data.getMinutes();
+
+      return (
+        <TouchableOpacity
+          key={index}
+          onPress={() => {
+            setConversaSelecionada(item);
+            navigation.navigate("Conversas", { converSelecionada: item });
+          }}
+        >
+          <View style={styles.cardG}>
+            <View style={styles.mensagem}>
+              <Image
+                source={{ uri: `${API_URL}/storage/${item.fotoProfissional}` }}
+                style={styles.foto}
+              />
+              <Text style={styles.titulo}>{item.nomeProfissional}</Text>
             </View>
+
+            <Text style={styles.data}>{h}h:{m}</Text>
+            <Text style={styles.horario}>{item.conteudoMensagens}</Text>
+          </View>
+        </TouchableOpacity>
+      );
+    })}
+</View>
             
             
             
@@ -104,9 +146,75 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
-        padding: 10,
-        paddingTop: 40, 
+       
     },
+
+    semContratos:{
+        textAlign:'center',
+        textDecorationLine: 'underline',
+        fontStyle:'italic',
+        marginTop:'50%',
+        fontSize:23,
+        color:"gray"
+       },
+
+    header: {
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: colors.azul,
+        paddingHorizontal: 20,
+        paddingVertical: Platform.OS === 'web' ? 20 : 35,
+      },
+      title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: colors.preto,
+      },
+
+
+    searchContainer: {
+        width: '90%',
+        alignItems: 'center',
+        marginLeft:20,
+        marginBottom:30,
+        marginTop: 15,
+      },
+      searchBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#d9f5f2',
+        width: '100%',
+        height: 45,
+      },
+      input: {
+        flex: 1,
+        fontSize: 16,
+        color: '#000',
+      },
+      filterButton: {
+        marginTop: 10,
+        backgroundColor: '#a4e9e5',
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 25,
+        borderWidth: 1,
+        borderColor: '#000',
+      },
+      filterText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: colors.preto,
+      },
+
+
+
+
+
     foto: { 
         width: 80, 
         height: 80,
