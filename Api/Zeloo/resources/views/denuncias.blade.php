@@ -97,22 +97,22 @@ body {
 <body>
 
 <!-- Sidebar -->
-<div class="sidebar">
-    <div class="sidebar-header">
-        <img src="{{url('images/zeloo-light.png')}}" alt="Zeloo" height="60">
-    </div>
-    <ul class="sidebar-menu">
-        <li><a href="{{url('/dashboard')}}" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-        <li><a href="{{url('denuncias')}}"><i class="bi bi-shield-exclamation"></i> Analisar Denúncias</a></li>
-        <li><a href="{{url('denunciados')}}"><i class="bi bi-clipboard-check"></i> Analisar Respostas</a></li>
-        <li class="logout"><a href="{{url('/logoutUser')}}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="{{url('images/zeloo-light.png')}}" alt="Zeloo" height="60">
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{{url('/dashboard')}}" class="active"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            <li><a href="{{url('denuncias')}}"><i class="bi bi-shield-exclamation"></i> Analisar Denúncias</a></li>
+            <li><a href="{{url('denunciados')}}"><i class="bi bi-clipboard-check"></i> Analisar Respostas</a></li>
+            <li class="logout"><a href="{{url('/logoutUser')}}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
     </ul>
 </div>
 
 <!-- Header -->
 <div class="container-fluid py-3" style="background-color: #206bb6;">
     <div class="container">
-        <h2 class="h4 mb-0 text-white">
+        <h2 class="h4 mb-0   text-white">
             <i class="bi bi-shield-exclamation me-2"></i> Denúncias
         </h2>
         <p class="mb-0 mt-1" style="color: #e6e6e6;">Gerencie e analise todas as denúncias do sistema</p>
