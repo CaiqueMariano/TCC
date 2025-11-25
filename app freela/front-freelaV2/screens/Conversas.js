@@ -9,7 +9,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import * as ImagePicker from "expo-image-picker";
 import { useAccessibility } from "./AccessibilityContext";
-
+import * as Notifications from 'expo-notifications';
 export default function Conversas({ navigation, route }) {
   const{converSelecionada} = route.params;
   const conversaInfo = Array.isArray(converSelecionada) 
@@ -39,7 +39,26 @@ const [gravacaoURI, setGravacaoURI] = useState(null);
   const [mensagem, setMensagem] = useState("");
   const [conversa, setConversa] = useState([]);
   const [servicos, setServicos] = useState([]);
-
+  const progressoAudio = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    servicos.forEach((s) => {
+      if (s.statusServico === "aceito") {
+        enviarNotificacao();
+      }
+    });
+  }, [servicos]);
+  async function enviarNotificacao() {
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Proposta Aceita!",
+        body: "Clique para ver os detalhes",
+        data: {
+          tela: "Contratos",  
+        }
+      },
+      trigger: null
+    });
+  }
   const precoParaBackend = (valor) => {
     if (!valor) return 0;
   
@@ -291,9 +310,18 @@ const formatarPreco = (valor) => {
   
       
       sound.setOnPlaybackStatusUpdate((status) => {
+
+        if (status.isLoaded && status.durationMillis) {
+      
+          const progresso = status.positionMillis / status.durationMillis;
+      
+          progressoAudio.setValue(progresso); 
+        }
+      
         if (status.didJustFinish) {
           setAudioTocandoId(null);
           setSomAtual(null);
+          progressoAudio.setValue(0); 
         }
       });
   
@@ -689,12 +717,33 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
     audioTocandoId === item.idMensagens && styles.audioTocando
   ]}
 >
-        {item.tipoMensagens === "audio" ? (
-          <TouchableOpacity 
-          onPress={() => tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)}
-        >
-            <Ionicons name="play-circle" size={32 * scale} color="#fff" />
-          </TouchableOpacity>
+{item.tipoMensagens === "audio" ? (
+  <View>
+    <TouchableOpacity 
+      onPress={() => tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)}
+      style={{ flexDirection: "row", alignItems: "center" }}
+    >
+      <Ionicons name="play-circle" size={32 * scale} color="#fff" />
+    </TouchableOpacity>
+
+    {audioTocandoId === item.idMensagens && (
+      <Animated.View
+        style={{
+          height: 4,
+          backgroundColor: "#584680",
+          
+          width: progressoAudio.interpolate({
+            inputRange: [0, 1],
+            outputRange: ["0%", "80%"],}),
+          borderRadius: 10,
+          position:'absolute',
+          top:15,
+          left: 30
+        
+        }}
+      />
+    )}
+  </View>
         ) : item.tipoMensagens === "imagem" ? (
           <Image
             source={{ uri: `${API_URL}/storage/${item.arquivoMensagens}` }}
@@ -713,6 +762,13 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             <Text style={styles.infoText}>{item.nomeServico}</Text>
           </View>
           
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Descrição:</Text>
+          
+          </View>
+          <View style={styles.label}>
+            <Text style={styles.infoText}>{item.descServico}</Text>
+          </View>
 
           <View style={styles.label}>
             <Text style={styles.labelText}>Data: </Text>
@@ -775,6 +831,11 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             <Text style={styles.labelText}>Tipo:</Text>
             <Text style={styles.infoText}>{item.nomeServico}</Text>
           </View>
+
+          <View style={styles.label}>
+            <Text style={styles.labelText}>Descrição: </Text>   
+          </View>
+          <Text style={styles.infoText}>{item.descServico}</Text>
           
 
           <View style={styles.label}>
@@ -785,6 +846,11 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
           <View style={styles.label}>
             <Text style={styles.labelText}>Horário Início: </Text>
             <Text style={styles.infoText}>{item.horaInicioServico}</Text>
+          </View>
+
+          <View style={styles.label}>
+          <Text style={styles.labelText}>Horário Término: </Text>
+          {(!item.horaTerminoServico || item.horaTerminoServico === "") ? (<Text style={styles.infoText}>Não Especificado</Text>): (<Text style={styles.infoText}>{item.horaTerminoServico}</Text>)}
           </View>
 
           <View style={styles.label}>
@@ -820,9 +886,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
             <Text style={styles.infoTextS}>{item.nomeServico}</Text>
           </View>
           <View style={styles.label}>
-            <Text style={styles.labelTextS}>Descrição: </Text>
-          
-           
+            <Text style={styles.labelTextS}>Descrição: </Text>   
           </View>
           <Text style={styles.infoTextS}>{item.descServico}</Text>
           <View style={styles.label}>
@@ -872,13 +936,7 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                       <Ionicons name="trash-outline" size={32 * scale} color="red" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={tocarPrevia}>
-                      <Ionicons
-                        name={ouvindoPrevia ? "pause-circle" : "play-circle"}
-                        size={54 * scale}
-                        color={"#b08cff"}
-                      />
-                    </TouchableOpacity>
+              
 
                     <TouchableOpacity onPress={enviarGravacao}>
                       <Ionicons name="send" size={32 * scale} color={"#b08cff"} />
@@ -979,7 +1037,7 @@ const styles = StyleSheet.create({
 
   labelText:{
     color:"#fff",
-    
+    fontWeight:'600',
   },
 
   infoText:{
@@ -1130,9 +1188,9 @@ detalhes:{
   },
 
   audioTocando: {
-    borderWidth: 2,
-    borderColor: "#6a4cff",
-    backgroundColor: "#dcd2ff",
+    width: 200,
+    
+   
   },
 
   nav: {

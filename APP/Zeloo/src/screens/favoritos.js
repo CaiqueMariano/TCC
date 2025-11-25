@@ -54,13 +54,27 @@ export default function Favoritos({ navigation }) {
 
   const renderItem = ({ item }) => (
     <View style={styles.cardRow}>
+      <TouchableOpacity onPress={()=> navigation.navigate("Perfil Profissional",{
+        servico:item
+      })}>
       <Image
                       source={{ uri: `${API_URL}/storage/${item.fotoProfissional}` }}
                       style={styles.foto}
                     />
+      </TouchableOpacity>
       <View style={{ flex: 1 }}>
         <Text style={styles.nome}>{item.nomeProfissional || 'Nome sobrenome'}</Text>
+        <TouchableOpacity onPress={()=> navigation.navigate("Perfil Profissional",{
+        servico:item
+      })}>
         <Text style={styles.mensagem}>Entrar no perfil</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={()=> navigation.navigate("ServicoFav",{
+        favorito:item
+      })}>
+        <Text style={styles.mensagem}>Pedir Serviço</Text>
+        </TouchableOpacity>
       </View>
 
       <TouchableOpacity onPress={() => confirmarDesfavoritar(item.idProfissional)}>

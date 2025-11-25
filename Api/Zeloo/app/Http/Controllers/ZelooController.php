@@ -556,10 +556,64 @@ public function desbanirFree($idProfissional)
     public function mediaAvaliarCuidador($id){
         $media = AvaliacaoCuidadorModel::where('idProfissional', $id)->avg('notaAvaliacao');
         $media = round($media, 1);
+        $total = AvaliacaoCuidadorModel::where('idProfissional', $id)->count('idAvaliacaoCuidador');
+
 
         return response()->json([
-            'data' => $media
+            'data' => $media,
+            'total' => $total
+        ]);
+    }
 
+
+
+    //Mandar servico Favorito
+
+    public function mandarServicoFav(Request $request)
+    {
+        $idUsuario = $request->idUsuario;
+        $idoso = IdosoModel::where('idUsuario', $idUsuario)->first();
+        $familia = IdosoFamiliaModel::where('idIdoso', $idoso->idIdoso)->first();
+    
+
+        $servico = new servicoModel();
+        $servico -> nomeServico =$request ->nomeServico;
+        $servico->idIdosoFamilia = $familia->idIdosoFamilia;
+        $servico -> tipoServico = $request -> tipoServico;
+        $servico -> descServico = $request -> descServico;
+        $servico -> dataServico = $request -> dataServico;
+        $servico -> generoServico = $request-> generoServico;
+        $servico -> horaInicioServico = $request -> horaInicioServico;
+        $servico -> horaTerminoServico = $request -> horaTerminoServico;
+        $servico -> idEndereco= $request -> idEndereco;
+        $servico -> statusServico = "nAceito";
+
+        $servico->save();
+
+
+        $conversaE = ConversaModel::where('idProfissional', $request->idProfissional)
+        ->where('idIdosoFamilia', $familia->idIdosoFamilia)
+        ->first();
+
+
+        $mandar = new ServicoMensagemModel();
+        $mandar->idConversa = $conversaE->idConversa;
+        $mandar->idServico = $servico->idServico;
+
+        $mandar->save();
+
+        $mensagem = new MensagensModel();
+        $mensagem->idConversa = $conversaE->idConversa;
+        $mensagem-> remententeConversa = "idoso";
+        $mensagem->tipoMensagens = "servico";
+        $mensagem->idServico = $servico->idServico;
+
+        $mensagem->save();
+
+        return response()->json([
+            'success' => true,
+            'message'=> 'criou-se com sucesso! eba!',
+            'code' =>200
         ]);
     }
 
@@ -870,6 +924,23 @@ public function desbanirFree($idProfissional)
         'data' => $total
     ]);
 }
+
+    public function mediaExtrato($idProfissional)
+{
+
+    $hoje = now()->toDateString();
+    $total = ExtratoModel::where('idProfissional', $idProfissional)
+        ->whereDate('dataExtrato', $hoje)
+        ->avg('valor');
+
+        $total = round($total, 1);
+
+    return response()->json([
+        'hoje' => $hoje,
+        'data' => $total
+    ]);
+}
+
 
     //CRIAR ENDERECO!
     public function storeEnderecoUsuario(Request $request){
@@ -1353,6 +1424,25 @@ public function desbanirFree($idProfissional)
 
     }
 
+    
+    public function updateCuidador(Request $request, $idProfissional){
+        ProfissionalModel::where('idProfissional', $idProfissional)->update([
+            'nomeProfissional' => $request->nomeUsuario,
+            'telefoneProfissional' => $request-> telefoneUsuario,
+            'emailProfissional' => $request-> emailUsuario,
+
+        ]);
+
+        return response()->json([
+            'message'=> 'Dados alterados com sucesso',
+            'success' => true,
+            'code'=>200]
+        );
+
+
+    }
+
+
 
     //Alterar servico
     public function updateServico(Request $request, $idServico){
@@ -1378,6 +1468,20 @@ public function desbanirFree($idProfissional)
     public function destroyPerfil($idUsuario)
     {
         UsuarioModel::where('idUsuario','=',$idUsuario)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message'=> 'Dados excluídos com sucesso',
+            'code'=>200]
+        );
+    }
+
+
+    //Cancelar pedido
+
+    public function destroyPedido($idServico)
+    {
+        servicoModel::where('idServico','=',$idServico)->delete();
 
         return response()->json([
             'success' => true,
@@ -1510,10 +1614,11 @@ public function vizualizarContratos($idUsuario, $status){
     $contratos = DB::table('tb_contrato')
     ->join('tb_profissional_servico', 'tb_contrato.idProfissionalServico', '=', 'tb_profissional_servico.idProfissionalServico')
     ->join('tb_servico', 'tb_profissional_servico.idServico', '=' ,'tb_servico.idServico')
+    ->join('tb_endereco', 'tb_servico.idEndereco', '=', 'tb_endereco.idEndereco')
     ->join('tb_profissional', 'tb_profissional_servico.idProfissional', '=', 'tb_profissional.idProfissional')
     ->where('tb_servico.idIdosoFamilia', $familia->idIdosoFamilia)
     ->where('tb_contrato.statusContrato', $status)
-    ->select('tb_contrato.*', 'tb_servico.*', 'tb_profissional.*', 'tb_profissional_servico.*')
+    ->select('tb_contrato.*', 'tb_servico.*', 'tb_profissional.*', 'tb_profissional_servico.*', 'tb_endereco.*')
     ->get();
 
 

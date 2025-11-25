@@ -18,6 +18,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//cancelar servico
+Route::delete('/destroyPedido/{idServico}','App\Http\Controllers\ZelooController@destroyPedido');
+//mandarServicoFav
+Route::post('/mandarServicoFav','App\Http\Controllers\ZelooController@mandarServicoFav');
+//alterar cuidador
+Route::put('/updateCuidador/{idProfissional}','App\Http\Controllers\ZelooController@updateCuidador');
+
+//Media diaria cuidador
+Route::get('/mediaExtrato/{idProfissional}','App\Http\Controllers\ZelooController@mediaExtrato');
+
 //Media Idoso
 Route::get('/mediaAvaliarIdoso/{id}','App\Http\Controllers\ZelooController@mediaAvaliarIdoso');
 //Media Cuidador

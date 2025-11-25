@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, Image,  ScrollView, SafeAreaView, Animated, TextInput,  Modal } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, Image,  ScrollView, SafeAreaView, Animated, TextInput,  Modal, Alert } from "react-native";
 import colors from './colors';
 import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
@@ -25,7 +25,8 @@ export default function avaliacoescuidador({ navigation, route }) {
       comentAvaliacao:note,
       notaAvaliacao:rating
     }).then(response =>{
-      alert("avaliado");
+      Alert.alert("Avaliação enviada", "Agredeçemos sua avaliação!",);
+      navigation.navigate("Home")
     }).catch(error=>{
       console.log(error.response.data);
     })

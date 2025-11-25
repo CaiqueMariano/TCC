@@ -70,7 +70,14 @@ export default function Contrato({ navigation }) {
         {servicos.length === 0 ? (
   <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
 ) : (
-  servicos.map((servico, index) => (
+  servicos.map((servico, index) => {
+
+    const data = new Date(servico.dataServico);
+    const m = data.getMonth();
+    const d = data.getDate();
+    const a = data.getFullYear();
+
+    return(
     
     <>
      
@@ -101,7 +108,7 @@ export default function Contrato({ navigation }) {
             <Text style={styles.contractStatus}>
               Status: <Text style={styles.contractPaid}> </Text>
             </Text>
-            <Text style={styles.contractPaid}>Esperando pagamento</Text>
+            <Text style={styles.contractPaid}>Aguardando pagamento</Text>
           </View>
         </View>
 
@@ -110,10 +117,9 @@ export default function Contrato({ navigation }) {
         <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
 
         <View style={{ width: '100%', paddingLeft: 20 }}>
-          <Text style={styles.detalhes}>Dia: {servico.dataServico}</Text>
-          <Text style={styles.detalhes}>Preço: {servico.precoPersonalizado}</Text>
-          <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
-
+          <Text style={styles.detalhes}><Text style={styles.titulo}>Dia:</Text> {d}/{m}/{a}</Text>
+          <Text style={styles.detalhes}><Text style={styles.titulo}>Tipo:</Text> {servico.nomeServico}</Text>
+          <Text style={styles.detalhes}><Text style={styles.titulo}>Total:</Text> <Text style={styles.preco}>R${servico.precoPersonalizado}</Text></Text>
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={()=> navigation.navigate("telaPagamento", {servico})}>
               <Text style={styles.buttonText}>Pagar</Text>
@@ -124,7 +130,8 @@ export default function Contrato({ navigation }) {
         
       </View>
     </>
-  ))
+    );
+})
 )}
 
 
@@ -141,6 +148,11 @@ title: {
   fontSize: 25,
   fontWeight: 'bold',
   color: colors.preto,
+},
+
+preco:{
+  fontWeight: '600',
+  color:'green'
 },
 subtitle: {
   fontSize: 20,
@@ -223,6 +235,7 @@ content: {
     width: 300,
     height: 70,
     marginBottom: 8,
+    marginTop:15,
   },
   
   contractIcon: {
@@ -232,6 +245,9 @@ content: {
     resizeMode: 'contain',
   },
   
+  titulo:{
+    fontWeight:'600',
+  },
   contractName: {
     fontSize: 20,
     color: '#000',
@@ -248,13 +264,13 @@ content: {
   },
   detalhestitulo: {
     fontSize: 20,
-    color: '#000',
-    textAlign: 'center',   // ✅ centraliza o texto
-    marginVertical: 10,    // (opcional, dá espaço acima/abaixo)
+    fontWeight:'600',
+    textAlign: 'center',   
+    marginVertical: 10, 
   },
   
   contractPaid: {
-  
+    color: 'orange',
     fontWeight: 'bold',
     fontSize: 15,
   },

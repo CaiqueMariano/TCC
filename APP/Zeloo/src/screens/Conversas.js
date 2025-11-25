@@ -13,11 +13,11 @@ export default function Conversas({ navigation, route }) {
   const{converSelecionada} = route.params;
   const {user} = useContext(UserContext);
   const { scale } = useAccessibility();
-  const [gravando, setGravando] = useState(null);  // objeto recording
-const [gravacaoURI, setGravacaoURI] = useState(null); // uri do audio
+  const [gravando, setGravando] = useState(null);  
+const [gravacaoURI, setGravacaoURI] = useState(null); 
   const [somPrevia, setSomPrevia] = useState(null);
   const [audioTocandoId, setAudioTocandoId] = useState(null);
-
+  const progressoAudio = useRef(new Animated.Value(0)).current;
   const [somAtual, setSomAtual] = useState(null);
   const [ouvindoPrevia, setOuvindoPrevia] = useState(false);
   const [imagem, setImagem] = useState(null);
@@ -66,7 +66,7 @@ const confirmarContrato = async (item) =>{
   
     if (resultado.canceled) return;
   
-    const uri = resultado.assets[0].uri; // ← Pegue direto daqui
+    const uri = resultado.assets[0].uri; 
   
     const formData = new FormData();
     formData.append("idConversa", converSelecionada.idConversa);
@@ -87,7 +87,7 @@ const confirmarContrato = async (item) =>{
       headers: { "Content-Type": "multipart/form-data" },
     });
   
-    pegarMensagens(); // Atualiza a tela
+    pegarMensagens();
   };
 
     //AUDIOO
@@ -142,7 +142,7 @@ const confirmarContrato = async (item) =>{
       if (!gravando) return;
   
       await gravando.stopAndUnloadAsync();
-      const uri = gravando.getURI();  // ← pega o áudio gravado
+      const uri = gravando.getURI(); 
       setGravacaoURI(uri);
       setGravando(null);
   
@@ -163,7 +163,7 @@ const confirmarContrato = async (item) =>{
     try {
       console.log("Tocando:", uri);
   
-      // Se já existe um áudio tocando, parar ele antes
+      
       if (somAtual) {
         await somAtual.stopAsync();
         await somAtual.unloadAsync();
@@ -176,13 +176,22 @@ const confirmarContrato = async (item) =>{
       );
   
       setSomAtual(sound);
-      setAudioTocandoId(id); // <-- salva qual áudio está tocando agora
-  
-      // Reseta quando terminar
+      setAudioTocandoId(id); 
+      
+
       sound.setOnPlaybackStatusUpdate((status) => {
+
+        if (status.isLoaded && status.durationMillis) {
+      
+          const progresso = status.positionMillis / status.durationMillis;
+      
+          progressoAudio.setValue(progresso); 
+        }
+      
         if (status.didJustFinish) {
           setAudioTocandoId(null);
           setSomAtual(null);
+          progressoAudio.setValue(0); 
         }
       });
   
@@ -304,10 +313,14 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
                     <Ionicons name="arrow-back" size={28 * scale} color="#202020" />
                   </TouchableOpacity>
                   <View style={styles.navInfo}>
+                    <TouchableOpacity onPress={()=> navigation.navigate("Perfil Profissional",{
+                      servico: converSelecionada
+                    })}>
                     <Image
                       source={{uri: `${API_URL}/storage/${converSelecionada.fotoProfissional}`}}
                       style={styles.perfilFree}
                     />
+                    </TouchableOpacity>
                     <Text style={styles.freeNome}>{converSelecionada.nomeProfissional}</Text>
                   </View>
                   <Ionicons
@@ -350,13 +363,32 @@ const keyboardHeight = useRef(new Animated.Value(0)).current; //guarda o valor d
         ]}
       >
         {item.tipoMensagens === "audio" ? (
-          <TouchableOpacity 
-            onPress={() =>
-              tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)
-            }
-          >
-            <Ionicons name="play-circle" size={32 * scale} color="#fff" />
-          </TouchableOpacity>
+  <View>
+    <TouchableOpacity 
+      onPress={() => tocarAudio(`${API_URL}/storage/${item.arquivoMensagens}`, item.idMensagens)}
+      style={{ flexDirection: "row", alignItems: "center" }}
+    >
+      <Ionicons name="play-circle" size={32 * scale} color="#fff" />
+    </TouchableOpacity>
+
+    {audioTocandoId === item.idMensagens && (
+      <Animated.View
+        style={{
+          height: 4,
+          backgroundColor: "#584680",
+          
+          width: progressoAudio.interpolate({
+            inputRange: [0, 1],
+            outputRange: ["0%", "80%"],}),
+          borderRadius: 10,
+          position:'absolute',
+          top:15,
+          left: 30
+        
+        }}
+      />
+    )}
+  </View>
         ) : item.tipoMensagens === "imagem" ? (
           <Image
             source={{ uri: `${API_URL}/storage/${item.arquivoMensagens}` }}
@@ -575,9 +607,7 @@ const styles = StyleSheet.create({
 
 
   audioTocando: {
-    borderWidth: 2,
-    borderColor: "#6a4cff",
-    backgroundColor: "#dcd2ff",
+   width:200,
   },
 
   previaContainer: {

@@ -5,11 +5,14 @@ import {
     StyleSheet, 
     ScrollView, 
     Image,
+    TextInput,
+    
     TouchableOpacity,
     ActivityIndicator,
     Dimensions 
 } from 'react-native';
 import axios from 'axios';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { API_URL } from './link';
 import { UserContext } from './userContext';
 const screenWidth = Dimensions.get('window').width;
@@ -22,6 +25,7 @@ export default function ListaConversas({navigation}) {
     ])
     const [isLoading, setIsLoading] = useState(true);
     const [rendaMensal, setRendaMensal] = useState([]);
+    const [pesquisa, setPesquisa] = useState('');
     const[converSelecionada, setConversaSelecionada] = useState([]);
     //const [dataAtual, setDataAtual]=useState("");
     
@@ -50,12 +54,38 @@ export default function ListaConversas({navigation}) {
         
           return () => clearInterval(interval);
     }, []);
+
+    const filtrados = conversas.filter((item) =>
+        item.nomeUsuario?.toLowerCase().includes(pesquisa.toLowerCase())
+      );
    
     return (
-        <ScrollView style={styles.container}>       
+        <ScrollView style={styles.container}>   
+
+
+<View style={styles.searchContainer}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search-outline" size={20} color="#555" style={{ marginHorizontal: 8 }} />
+          <TextInput
+            style={styles.input}
+            placeholder="Pesquise"
+            placeholderTextColor="#666"
+            value={pesquisa}
+            onChangeText={setPesquisa}
+          />
+        </View>
+
+        {filtrados.length === 0 && (
+           
+           <Text style={styles.semContratos}>Nenhuma conversa foi encontrada.</Text>
+
+          )}
+
+       
+      </View> 
 
             <View style={styles.cardsGanhos}>
-            {conversas
+            {filtrados
             .sort((a, b) => new Date(`${b.horaConversa}T${b.horaConversa}`) - new Date(`${a.horaConversa}T${a.horaConversa}`))
             .map((item, index) => {
 
@@ -105,6 +135,40 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingTop: 40, 
     },
+
+    semContratos:{
+        textAlign:'center',
+        textDecorationLine: 'underline',
+        fontStyle:'italic',
+        marginTop:'50%',
+        fontSize:23,
+        color:"gray"
+       },
+
+    searchContainer: {
+        width: '90%',
+        alignItems: 'center',
+        marginLeft:20,
+        marginBottom:30,
+        marginTop: 15,
+      },
+      searchBox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#b08cff',
+        width: '100%',
+        height: 45,
+      },
+      input: {
+        flex: 1,
+        fontSize: 16,
+        color: '#000',
+      },
+
+
     foto: { 
         width: 80, 
         height: 80,

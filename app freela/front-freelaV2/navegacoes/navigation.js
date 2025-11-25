@@ -1,4 +1,4 @@
-import React, { useContext, useRef} from "react";
+import React, { useContext, useRef, useEffect} from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -28,11 +28,19 @@ import Conversas from "../screens/Conversas";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from "react-native-vector-icons/Feather";
 import Icons from "react-native-vector-icons/AntDesign";
-
+import * as Notifications from 'expo-notifications';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+import { createNavigationContainerRef } from '@react-navigation/native';
 
-
+export const navigationRef = createNavigationContainerRef();
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 function AppTabs() {
 
@@ -112,13 +120,43 @@ function AppTabs() {
 }
 
 export default function App() {
+
+
   const { user } = useContext(UserContext);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+  
+      if (data?.tela) {
+        navigationRef.current?.navigate(data.tela, data?.params || {});
+      }
+    });
+  
+    return () => subscription.remove();
+  }, []);
+
+
+
+  useEffect(() => {
+    solicitarPermissao();
+  }, []);
+  async function solicitarPermissao() {
+    const { status } = await Notifications.getPermissionsAsync();
+  
+    if (status !== 'granted') {
+      const { status: novoStatus } = await Notifications.requestPermissionsAsync();
+      return novoStatus === 'granted';
+    }
+  
+    return true;
+  }
   return (
     
     <AccessibilityProvider userId={user?.idProfissional || 0}>
 <UserProvider>
     <ThemeProvider> 
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
     <Stack.Navigator initialRouteName="BemVindo">
       <Stack.Screen name="BemVindo" component={BemVindo} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />

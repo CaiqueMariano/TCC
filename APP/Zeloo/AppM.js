@@ -15,9 +15,11 @@ import { UserContext } from './src/screens/userContext';
 import Login from "./src/screens/Login";
 import BemVindo from "./src/screens/BemVindo";
 import Cadastro from "./src/screens/Cadastro";
+import ServicoFav from './src/screens/ServicoFav';
 import Home from "./src/screens/Home";
 import Ativos from "./src/screens/Ativos";
 import Apagar from "./src/screens/Apagar";
+import Config from './src/screens/config';
 import Pendente from "./src/screens/Pendente";
 import avaliacoescuidador from './src/screens/avaliacoescuidador';
 import favoritos from "./src/screens/favoritos";
@@ -81,6 +83,7 @@ export default function AppM() {
             <Stack.Screen name="Conta" component={Conta} />
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen name="Servico" component={Servico} />
+            <Stack.Screen name="ServicoFav" component={ServicoFav} />
             <Stack.Screen name="homeFamiliar" component={HomeFamiliar} />
             <Stack.Screen name="Apagar" component={Apagar} />
             <Stack.Screen name="Perfil Profissional" component={perfilProfissional} options={{ headerShown: true }}/>

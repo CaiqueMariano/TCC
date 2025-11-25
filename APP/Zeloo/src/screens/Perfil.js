@@ -28,7 +28,7 @@ export default function Perfil({navigation}) {
   const a = dta.getFullYear();
   const m = dta.getMonth() + 1;
   const d = dta.getDate() +1;
-
+  const progressoAudio = useRef(new Animated.Value(0)).current;
   const [editFoto, setEditFoto] = useState(false);
   const[mostrarEdicao, setMostrarEdicao] = useState(false);
   const[mostrarExcluir, setMostrarExcluir] = useState(false);
@@ -74,8 +74,9 @@ export default function Perfil({navigation}) {
       });
 
       if(response.data.success){
-        setUser(response.data.data);
-        navigation.replace("Perfil");
+        Alert.alert("Mudanças feitas!",
+          "Faça o login novamente para ver as mudanças."
+        )
         setMostrarEdicao(false);
       }else{
         console.log(response.data.message);

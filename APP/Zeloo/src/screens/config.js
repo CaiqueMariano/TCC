@@ -10,8 +10,9 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { API_URL } from './link';
 
-export default function Configuracoes() {
+export default function Config() {
   const [darkMode, setDarkMode] = useState(false);
 
   return (
@@ -26,7 +27,7 @@ export default function Configuracoes() {
       <View style={styles.optionTop}>
         <TouchableOpacity style={styles.optionBox}>
           <Image
-            source={require('/assets/perfil.png')}
+            source={{uri: `${API_URL}/storage/${user.fotoUsuario}`}}
             style={styles.imagePerfil}
           />
           <Text style={styles.optionText}>Editar Perfil</Text>

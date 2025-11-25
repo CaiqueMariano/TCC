@@ -82,7 +82,13 @@ export default function Ativos({ navigation }) {
             Nenhum contrato ativo encontrado.
           </EscalarText>
         ) : (
-          servicos.map((servico, index) => (
+          servicos.map((servico, index) => {
+            const data = new Date(servico.dataServico);
+            const m = data.getMonth();
+            const d = data.getDate();
+            const a = data.getFullYear();
+
+            return(
             <React.Fragment key={index}>
               <EscalarCard style={styles.cardcontratro} maxScale={1.2}>
                 <View style={styles.contractInfo}>
@@ -106,21 +112,21 @@ export default function Ativos({ navigation }) {
                 <View style={styles.separator}></View>
 
                 <EscalarText style={styles.detalhestitulo}>
-                  Detalhes do contrato
+                <Text style={styles.titulo}>Detalhes do contrato</Text>
                 </EscalarText>
 
                 <View style={{ width: '100%', paddingLeft: 20 }}>
                   <EscalarText style={styles.detalhes}>
-                    Dia: {servico.dataServico}
+                  <Text style={styles.titulo}>Dia:</Text> {d}/{m}/{a}
                   </EscalarText>
                   <EscalarText style={styles.detalhes}>
-                    Horário: {servico.horaInicioServico}
+                  <Text style={styles.titulo}>Horário:</Text> {servico.horaInicioServico}
                   </EscalarText>
                   <EscalarText style={styles.detalhes}>
-                    Tipo: {servico.nomeServico}
+                  <Text style={styles.titulo}>Tipo:</Text> {servico.nomeServico}
                   </EscalarText>
                   <EscalarText style={styles.detalhes}>
-                    Endereço: {servico.ruaEndereco ?? 'Não informado'}
+                  <Text style={styles.titulo}>Endereço:</Text> {servico.ruaUsuario ?? 'Não informado'}
                   </EscalarText>
                 </View>
 
@@ -136,7 +142,9 @@ export default function Ativos({ navigation }) {
                 </TouchableOpacity>
               </EscalarCard>
             </React.Fragment>
-          ))
+
+          );      
+          })
         )}
       </ScrollView>
     </View>
@@ -153,6 +161,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.azul,
     paddingHorizontal: 20,
     paddingVertical: Platform.OS === 'web' ? 20 : 35,
+  },
+
+  titulo:{
+    fontWeight:'600',
   },
 
   title: {
@@ -217,14 +229,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginBottom: 8,
+   
   },
 
   foto: {
     width: 80,
     height: 80,
     borderRadius: 55,
-    marginBottom: 14,
+   
     borderWidth: 2,
     borderColor: '#ccc',
     marginRight: 20,

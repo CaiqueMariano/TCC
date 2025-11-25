@@ -24,6 +24,7 @@ const enviarLogin = async () => {
       if (response.data.success) {
         setUser(response.data.data);
         navigation.replace("Tabs");
+      setMensagem("");
       } else {
         console.log(response.data.message)
         setMensagem('E-mail ou senha incorretos');
@@ -41,7 +42,9 @@ const enviarLogin = async () => {
       </View>
       <View style={styles.container}>
         <View style={styles.loginBox}>
+         
           <Text style={styles.loginTitle}>Login</Text>
+          <Text style={styles.mensagemText}>{mensagem}</Text>
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -168,5 +171,10 @@ const styles = StyleSheet.create({
   },
   buttonTextSecondary: {
     color: '#fff',
+  },
+
+  mensagemText:{
+    fontSize: 19,
+      color:'red',
   },
 });

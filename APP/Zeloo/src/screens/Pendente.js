@@ -1,5 +1,5 @@
 import React, { useState, useEffect,useContext } from 'react';
-import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity,Dimensions, FlatList, TextInput,Platform, StyleSheet, Image, ScrollView,Alert } from 'react-native';
 import colors from './colors';
 import axios from 'axios';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +16,22 @@ export default function Pendente({ navigation }) {
         .then(response => setProfissional(response.data.data))
         .catch(error => console.log("ERRO", error));
       },[])*/
+
+
+      const apagar = async (servico) => {
+        axios.delete(`${API_URL}/api/destroyPedido/${servico.idServico}`)
+        .then(response => {
+          Alert.alert("Cancelado!",
+            "Pedido cancelado com sucesso."
+          );
+          navigation.replace("Pendente");
+          
+        })
+        .catch(error=>{
+          console.log(error.response.data)
+        
+        })
+      }
 
 
       useEffect(()=>{
@@ -96,7 +112,7 @@ export default function Pendente({ navigation }) {
           <Text style={styles.detalhes}>Horário: {servico.horaInicioServico}</Text>
           <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
 
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={() => apagar(servico)}>
             <Text style={styles.buttonText}>Cancelar</Text>
           </TouchableOpacity>
         </View>

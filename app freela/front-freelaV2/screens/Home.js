@@ -17,7 +17,6 @@ export default function Home() {
     try {
       const response = await axios.get(`${API_URL}/api/vizualizarContratosFree/${user.idProfissional}/Ativo`);
       if (response.data.data && response.data.data.length > 0) {
-        // Pega o último contrato da lista
         setUltimoContrato(response.data.data[0]);
       }
     } catch (error) {
@@ -50,13 +49,17 @@ export default function Home() {
 
 {ultimoContrato && (
           <View style={styles.cartao}>
-            <Text style={styles.tituloSecao}>Contrato ativo mais recente</Text>
+            <Text style={styles.tituloSecao}>Último contrato ativo</Text>
             
             <View style={styles.cabecalhoIdoso}>
+              <TouchableOpacity onPress={()=> navigation.navigate("Perfil Idoso", {
+                itemSelecionado:ultimoContrato
+              })}>
               <Image
                 source={{ uri: `${API_URL}/storage/${ultimoContrato.fotoUsuario}` }}
                 style={styles.fotoIdoso}
               />
+              </TouchableOpacity>
               <View>
                 <Text style={styles.nomeIdoso}>{ultimoContrato.nomeUsuario}</Text>
                 <Text style={styles.subInfoIdoso}>Preço: R${ultimoContrato.precoPersonalizado}</Text>
