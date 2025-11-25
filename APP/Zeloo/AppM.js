@@ -19,7 +19,7 @@ import ServicoFav from './src/screens/ServicoFav';
 import Home from "./src/screens/Home";
 import Ativos from "./src/screens/Ativos";
 import Apagar from "./src/screens/Apagar";
-import Config from './src/screens/config';
+//import Config from './src/screens/config';
 import Pendente from "./src/screens/Pendente";
 import avaliacoescuidador from './src/screens/avaliacoescuidador';
 import favoritos from "./src/screens/favoritos";
