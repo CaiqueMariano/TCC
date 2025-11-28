@@ -21,6 +21,7 @@ export default function Cadastro() {
   const [emailProfissional, setEmailProfissional] = useState('');
   const [telefoneProfissional, setTelefoneProfissional] = useState('');
   const [senhaProfissional, setSenhaProfissional] = useState('');
+  const [senhaRepetida, setSenhaRepetida] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [biografia, setBiografia] = useState('');
   const [valorMinimo, setValorMinimo] = useState('');
@@ -258,7 +259,6 @@ const validarTelefone = (telefone) => {
 
   return true;
 };
-
 const avancarEtapa = () => {
 
 
@@ -303,26 +303,39 @@ const avancarEtapa = () => {
       Alert.alert("Campo obrigatório", "Digite sua senha.");
       return;
     }
-  }
 
- if (etapa === 2) {
-  if (!validarEtapa2()) return;
-}
+    if (senhaProfissional !== senhaRepetida) {
+      Alert.alert("Erro", "As senhas não são iguais!");
+      return;
+    }
 
-if (etapa === 3) {
-  if (!imagem) {
-    Alert.alert("Campo obrigatório", "Adicione uma foto para continuar.");
+   
+    setEtapa(2);
     return;
   }
-}
 
-  if (etapa < 3) {
-    setEtapa(etapa + 1);
-  } else {
-    Alert.alert('Sucesso', 'Cadastro concluído!');
+
+  if (etapa === 2) {
+    if (!validarEtapa2()) {
+      Alert.alert("Campos obrigatórios", "Preencha todos os campos antes de continuar.");
+      return;
+    }
+
+    setEtapa(3);
+    return;
+  }
+
+
+  if (etapa === 3) {
+    if (!imagem) {
+      Alert.alert("Campo obrigatório", "Adicione uma foto para continuar.");
+      return;
+    }
+
+    Alert.alert("Sucesso", "Cadastro concluído!");
     navigation.goBack();
   }
-}
+};
 
   return (
     <Background>
@@ -367,23 +380,42 @@ if (etapa === 3) {
                   value={telefoneProfissional}
                   onChangeText={formatarTelefone}
                 />
-              <View style={styles.senhaContainer}>
-                <TextInput
-                  style={styles.senhaInput}
-                  placeholder="Senha"
-                  placeholderTextColor="#444"
-                  secureTextEntry={!mostrarSenha}
-                  value={senhaProfissional}
-                  onChangeText={setSenhaProfissional}
-                />
-                <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
-                  <Ionicons 
-                    name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
-                    size={25} 
-                    color="#444" 
-                  />
-                </TouchableOpacity>
-              </View>
+           <View style={styles.senhaContainer}>
+  <TextInput
+    style={styles.senhaInput}
+    placeholder="Senha"
+    placeholderTextColor="#444"
+    secureTextEntry={!mostrarSenha}
+    value={senhaProfissional}
+    onChangeText={setSenhaProfissional}
+  />
+  <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+    <Ionicons 
+      name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
+      size={25} 
+      color="#444" 
+    />
+  </TouchableOpacity>
+</View>
+
+<View style={styles.senhaContainer}>
+  <TextInput
+    style={styles.senhaInput}
+    placeholder="Repita sua Senha"
+    placeholderTextColor="#444"
+    secureTextEntry={!mostrarSenha}
+    value={senhaRepetida}   // ✔ CORRIGIDO
+    onChangeText={setSenhaRepetida}
+  />
+  <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+    <Ionicons 
+      name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
+      size={25} 
+      color="#444" 
+    />
+  </TouchableOpacity>
+</View>
+
             </ScrollView>
           )}
 
