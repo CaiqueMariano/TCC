@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image, Platform, Alert, Dimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Modal, TouchableOpacity, Image, Platform, Alert, Dimensions, ScrollView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../temas/ThemeContext';
@@ -14,8 +14,20 @@ const { width } = Dimensions.get("window");
 export default function Cadastro() {
   const navigation = useNavigation();
   const { theme } = useTheme();
+
+ const [mostrarModal, setMostrarModal] = useState(false);
+  const [modalTitulo, setModalTitulo] = useState("");
+  const [modalMensagem, setModalMensagem] = useState("");
+
+  const abrirModal = (titulo, mensagem) => {
+    setModalTitulo(titulo);
+    setModalMensagem(mensagem);
+    setMostrarModal(true);
+  };
+
   
   // Estados para controle das etapas e dados
+
   const [etapa, setEtapa] = useState(1);
   const [nomeProfissional, setNomeProfissional] = useState('');
   const [emailProfissional, setEmailProfissional] = useState('');
@@ -39,6 +51,7 @@ export default function Cadastro() {
 ]);
   const [dataNasc, setDataNascUsuario] = useState(null);
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
+
 
   //cpf
   const validarCPF = (cpf) => {
@@ -151,6 +164,7 @@ const validarTelefone = (telefone) => {
   // celular: 11 dígitos e começando com 9
   if (apenasNumeros.length === 11 && apenasNumeros[2] === '9') return true;
 
+
   return false;
 };
 
@@ -173,7 +187,8 @@ const validarTelefone = (telefone) => {
     const galeria = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (camera.status !== 'granted' || galeria.status !== 'granted') {
-      Alert.alert('Negado', 'Permissão negada.');
+      abrirModal("Negado', 'Permissão negada.");
+
       return false;
     }
     return true;
@@ -229,17 +244,18 @@ const validarTelefone = (telefone) => {
   const validarEtapa2 = () => {
 
   if (!value) {
-    Alert.alert("Campo obrigatório", "Selecione seu gênero.");
+    abrirModal("Campo obrigatório", "Selecione seu gênero.");
+
     return false;
   }
 
   if (!dataNasc) {
-    Alert.alert("Campo obrigatório", "Selecione sua data de nascimento.");
+    abrirModal("Campo obrigatório", "Selecione sua data de nascimento.");
     return false;
   }
 
   if (typeof dataNasc === "string" && !validarData(dataNasc)) {
-    Alert.alert("Data inválida", "Escolha uma data de nascimento válida.");
+    abrirModal("Data inválida", "Escolha uma data de nascimento válida.");
     return false;
   }
 
@@ -252,7 +268,7 @@ const validarTelefone = (telefone) => {
     const idadeFinal = mes < 0 || (mes === 0 && dia < 0) ? idade - 1 : idade;
 
     if (idadeFinal < 18) {
-      Alert.alert("Idade inválida", "Você deve ter pelo menos 18 anos.");
+      abrirModal("Idade inválida", "Você deve ter pelo menos 18 anos.");
       return false;
     }
   }
@@ -265,47 +281,47 @@ const avancarEtapa = () => {
   if (etapa === 1) {
 
     if (!nomeProfissional.trim()) {
-      Alert.alert("Campo obrigatório", "Digite seu nome completo.");
+      abrirModal("Campo obrigatório", "Digite seu nome completo.");
       return;
     }
 
     if (!cpf.trim()) {
-      Alert.alert("Campo obrigatório", "Digite seu CPF.");
+      abrirModal("Campo obrigatório", "Digite seu CPF.");
       return;
     }
 
     if (!validarCPF(cpf)) {
-      Alert.alert("CPF inválido", "Digite um CPF válido.");
+      abrirModal("CPF inválido", "Digite um CPF válido.");
       return;
     }
 
     if (!emailProfissional.trim()) {
-      Alert.alert("Campo obrigatório", "Digite seu e-mail.");
+      abrirModal("Campo obrigatório", "Digite seu e-mail.");
       return;
     }
 
     if (!validarEmail(emailProfissional)) {
-      Alert.alert("E-mail inválido", "Digite um e-mail válido.");
+      abrirModal("E-mail inválido", "Digite um e-mail válido.");
       return;
     }
 
     if (!telefoneProfissional.trim()) {
-      Alert.alert("Campo obrigatório", "Digite seu telefone.");
+      abrirModal("Campo obrigatório", "Digite seu telefone.");
       return;
     }
 
     if (!validarTelefone(telefoneProfissional)) {
-      Alert.alert("Telefone inválido", "Digite um telefone válido.");
+      abrirModal("Telefone inválido", "Digite um telefone válido.");
       return;
     }
 
     if (!senhaProfissional.trim()) {
-      Alert.alert("Campo obrigatório", "Digite sua senha.");
+      abrirModal("Campo obrigatório", "Digite sua senha.");
       return;
     }
 
     if (senhaProfissional !== senhaRepetida) {
-      Alert.alert("Erro", "As senhas não são iguais!");
+      abrirModal("Erro", "As senhas não são iguais!");
       return;
     }
 
@@ -316,10 +332,36 @@ const avancarEtapa = () => {
 
 
   if (etapa === 2) {
-    if (!validarEtapa2()) {
-      Alert.alert("Campos obrigatórios", "Preencha todos os campos antes de continuar.");
-      return;
+  
+  if (!value) {
+    abrirModal("Campo obrigatório", "Selecione seu gênero.");
+
+    return false;
+  }
+
+  if (!dataNasc) {
+    abrirModal("Campo obrigatório", "Selecione sua data de nascimento.");
+    return false;
+  }
+
+  if (typeof dataNasc === "string" && !validarData(dataNasc)) {
+    abrirModal("Data inválida", "Escolha uma data de nascimento válida.");
+    return false;
+  }
+
+  if (dataNasc instanceof Date) {
+    const hoje = new Date();
+    const idade = hoje.getFullYear() - dataNasc.getFullYear();
+    const mes = hoje.getMonth() - dataNasc.getMonth();
+    const dia = hoje.getDate() - dataNasc.getDate();
+
+    const idadeFinal = mes < 0 || (mes === 0 && dia < 0) ? idade - 1 : idade;
+
+    if (idadeFinal < 18) {
+      abrirModal("Idade inválida", "Você deve ter pelo menos 18 anos.");
+      return false;
     }
+  }
 
     setEtapa(3);
     return;
@@ -328,11 +370,11 @@ const avancarEtapa = () => {
 
   if (etapa === 3) {
     if (!imagem) {
-      Alert.alert("Campo obrigatório", "Adicione uma foto para continuar.");
+      abrirModal("Campo obrigatório", "Adicione uma foto para continuar.");
       return;
     }
 
-    Alert.alert("Sucesso", "Cadastro concluído!");
+    abrirModal("Sucesso", "Cadastro concluído!");
     navigation.goBack();
   }
 };
@@ -381,40 +423,40 @@ const avancarEtapa = () => {
                   onChangeText={formatarTelefone}
                 />
            <View style={styles.senhaContainer}>
-  <TextInput
-    style={styles.senhaInput}
-    placeholder="Senha"
-    placeholderTextColor="#444"
-    secureTextEntry={!mostrarSenha}
-    value={senhaProfissional}
-    onChangeText={setSenhaProfissional}
-  />
-  <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
-    <Ionicons 
-      name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
-      size={25} 
-      color="#444" 
-    />
-  </TouchableOpacity>
-</View>
+            <TextInput
+              style={styles.senhaInput}
+              placeholder="Senha"
+              placeholderTextColor="#444"
+              secureTextEntry={!mostrarSenha}
+              value={senhaProfissional}
+              onChangeText={setSenhaProfissional}
+            />
+            <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+              <Ionicons 
+                name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
+                size={25} 
+                color="#444" 
+              />
+            </TouchableOpacity>
+          </View>
 
-<View style={styles.senhaContainer}>
-  <TextInput
-    style={styles.senhaInput}
-    placeholder="Repita sua Senha"
-    placeholderTextColor="#444"
-    secureTextEntry={!mostrarSenha}
-    value={senhaRepetida}   // ✔ CORRIGIDO
-    onChangeText={setSenhaRepetida}
-  />
-  <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
-    <Ionicons 
-      name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
-      size={25} 
-      color="#444" 
-    />
-  </TouchableOpacity>
-</View>
+          <View style={styles.senhaContainer}>
+            <TextInput
+              style={styles.senhaInput}
+              placeholder="Repita sua Senha"
+              placeholderTextColor="#444"
+              secureTextEntry={!mostrarSenha}
+              value={senhaRepetida}   // ✔ CORRIGIDO
+              onChangeText={setSenhaRepetida}
+            />
+            <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+              <Ionicons 
+                name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
+                size={25} 
+                color="#444" 
+              />
+            </TouchableOpacity>
+          </View>
 
             </ScrollView>
           )}
@@ -501,6 +543,27 @@ const avancarEtapa = () => {
           </View>
         <StatusBar style="light" />
       </View>
+
+        <Modal visible={mostrarModal} transparent animationType="fade">
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              
+              <Text style={styles.modalTitulo}>{modalTitulo}</Text>
+
+              <Text style={styles.modalMensagem}>{modalMensagem}</Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setMostrarModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Entendi</Text>
+              </TouchableOpacity>
+
+            </View>
+          </View>
+        </Modal>
+
+
     </Background>
   );
 }
@@ -719,6 +782,44 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
+
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  width: '75%',
+  backgroundColor: '#fff',
+  padding: 20,
+  borderRadius: 12,
+  alignItems: 'center'
+},
+modalTitulo: {
+  fontSize: 20,
+  fontWeight: '700',
+  marginBottom: 10,
+  color: '#b08cff'
+},
+modalMensagem: {
+  fontSize: 16,
+  textAlign: 'center',
+  marginBottom: 20,
+  color: '#333'
+},
+modalButton: {
+  backgroundColor: '#b08cff',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 8
+},
+modalButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600'
+}
+
 });
 
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, Alert, TouchableOpacity, Image, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Alert, Modal, TouchableOpacity, Image, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/native';
 import Background from '../components/Background';
@@ -8,6 +8,15 @@ export default function Login() {
   const navigation = useNavigation();
   const [emailProfissional, setEmailProfissional] = useState('');
   const [senhaProfissional, setSenhaProfissional] = useState('');
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modalTitulo, setModalTitulo] = useState("");
+  const [modalMensagem, setModalMensagem] = useState("");
+
+  const abrirModal = (titulo, mensagem) => {
+    setModalTitulo(titulo);
+    setModalMensagem(mensagem);
+    setMostrarModal(true);
+  };
 
   //EMAIL
 const validarEmail = (email) => {
@@ -51,12 +60,12 @@ const validarEmail = (email) => {
                 style={[styles.button, styles.buttonPrimary]}
                 onPress={() => {
                   if (!validarEmail(emailProfissional)) {
-                    Alert.alert("E-mail inválido", "Digite um e-mail válido.");
+                    abrirModal("E-mail inválido", "Digite um e-mail válido.");
                     return;
                   }
 
                   if (!senhaProfissional.trim()) {
-                    Alert.alert("Senha inválida", "Digite sua senha.");
+                    abrirModal("Senha inválida", "Digite sua senha.");
                     return;
                   }
 
@@ -70,6 +79,24 @@ const validarEmail = (email) => {
         </View>
         <StatusBar style="light" />
       </View>
+        <Modal visible={mostrarModal} transparent animationType="fade">
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              
+              <Text style={styles.modalTitulo}>{modalTitulo}</Text>
+
+              <Text style={styles.modalMensagem}>{modalMensagem}</Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setMostrarModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Entendi</Text>
+              </TouchableOpacity>
+
+            </View>
+          </View>
+        </Modal>
     </Background>
   );
 }
@@ -161,6 +188,42 @@ const styles = StyleSheet.create({
   buttonTextSecondary: {
     color: '#fff',
   },
+overlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  width: '75%',
+  backgroundColor: '#fff',
+  padding: 20,
+  borderRadius: 12,
+  alignItems: 'center'
+},
+modalTitulo: {
+  fontSize: 20,
+  fontWeight: '700',
+  marginBottom: 10,
+  color: '#b08cff'
+},
+modalMensagem: {
+  fontSize: 16,
+  textAlign: 'center',
+  marginBottom: 20,
+  color: '#333'
+},
+modalButton: {
+  backgroundColor: '#b08cff',
+  paddingVertical: 10,
+  paddingHorizontal: 20,
+  borderRadius: 8
+},
+modalButtonText: {
+  color: '#fff',
+  fontSize: 16,
+  fontWeight: '600'
+}
 });
 
 
