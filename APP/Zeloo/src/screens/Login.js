@@ -129,7 +129,7 @@ const { narrar } = useAccessibility();
     </View>
 
         <View style={styles.botoes}>
-                  <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText} 
             onPress={() =>{
              navigation.navigate('Home')
@@ -147,6 +147,24 @@ const { narrar } = useAccessibility();
           </TouchableOpacity>
         </View>
       </View>
+        <Modal visible={mostrarModal} transparent animationType="fade">
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              
+              <Text style={styles.modalTitulo}>Atenção!</Text>
+
+              <Text style={styles.modalMensagem}>{modalTitulo}</Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setMostrarModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Entendi</Text>
+              </TouchableOpacity>
+
+            </View>
+          </View>
+        </Modal>
     </View>
       
   );
