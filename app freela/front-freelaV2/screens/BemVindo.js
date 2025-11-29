@@ -52,6 +52,10 @@ export default function BemVindo({ navigation }) {
             <View style={{ width, height }}>
               <Image source={item.imagem} style={styles.backgroundImage} />
               <View style={styles.overlay} />
+                <Image
+                  source={require('../assets/logo.png')}
+                  style={{ width: 130, height: 130 }}
+                />
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.title}</Text>
                 {item.subtitle ? <Text style={styles.subtitle}>{item.subtitle}</Text> : null}
