@@ -92,9 +92,36 @@ body {
 .card-text {
     color: red;
 }
+
+
+.mensagem{
+    font-style: italic;
+    text-decoration: underline;
+    margin-top:10%;
+    text-align: center;
+}
 </style>
 </head>
 <body>
+
+
+
+<div class="modal" id="meuModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Usúario Banido!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>O usuário foi banido com sucesso</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Sidebar -->
     <div class="sidebar">
@@ -104,7 +131,7 @@ body {
         <ul class="sidebar-menu">
             <li><a href="{{url('/dashboard')}}" ><i class="bi bi-speedometer2"></i> Dashboard</a></li>
             <li><a href="{{url('denuncias')}}" class="active"><i class="bi bi-shield-exclamation"></i> Analisar Denúncias</a></li>
-            <li><a href="{{url('denunciados')}}"><i class="bi bi-clipboard-check"></i> Analisar Respostas</a></li>
+            <li><a href="{{url('denunciados')}}"><i class="bi bi-clipboard-check"></i> Reativação</a></li>
             <li class="logout"><a href="{{url('/logoutUser')}}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
     </ul>
 </div>
@@ -140,7 +167,7 @@ body {
 
 
     @if($usuarios->isEmpty())
-    <p>Nenhuma denúncia encontrada.</p>
+    <p class="mensagem">Nenhuma denúncia encontrada.</p>
     @else
     <table class="table">
   <thead>
@@ -244,7 +271,19 @@ body {
                 </div>
             </div>
         </div>
-    </div>         
+    </div>  
+
+    
+    
+
+    @if(session('mostrarModal'))
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var myModal = new bootstrap.Modal(document.getElementById('meuModal'));
+        myModal.show();
+    });
+</script>
+@endif
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script>

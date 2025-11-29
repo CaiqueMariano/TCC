@@ -210,9 +210,36 @@
             .logout{
                 color:red;
             }
+
+            .mensagem{
+    font-style: italic;
+    text-decoration: underline;
+    margin-top:10%;
+    text-align: center;
+}
         </style>
     </head>
     <body>
+
+
+      <!--MJODAL DE CONFIRMAÇÃO-->
+
+      <div class="modal" id="meuModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Usúario Reativado!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>O usuário foi reativado com sucesso</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
     
     <!-- Sidebar -->
     <div class="sidebar">
@@ -233,7 +260,7 @@
             </li>
             <li>
                 <a href="{{url('denunciados')}}" class="active">
-                    <i class="bi bi-clipboard-check"></i> Analisar Respostas
+                    <i class="bi bi-clipboard-check"></i> Reativação
                 </a>
             </li>
             <li class="logout">
@@ -252,9 +279,9 @@
             <div class="container">
               <h2 class="h4 mb-0 text-white">
                     <i class="bi bi-shield-exclamation me-2"></i>
-                    Denúncias
+                    Reativação
                 </h2>
-                 <p class="mb-0 mt-1" style="color: #e6e6e6;">Gerencie e analise todas as denúncias do sistema</p>
+                 <p class="mb-0 mt-1" style="color: #e6e6e6;">Análise e reative todos os usuários banidos</p>
             </div>
         </div>
 
@@ -281,7 +308,7 @@
 
 
     @if($usuarios->isEmpty())
-    <p>Nenhuma denúncia encontrada.</p>
+    <p class="mensagem">Nenhum usuário encontrado</p>
     @else
     <table class="table">
   <thead>
@@ -379,8 +406,20 @@
                 </div>
             </div>
         </div>
-    </div>         
+    </div>    
+    
+    
+  
 
+
+@if(session('mostrarModal'))
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var myModal = new bootstrap.Modal(document.getElementById('meuModal'));
+        myModal.show();
+    });
+</script>
+@endif
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 
