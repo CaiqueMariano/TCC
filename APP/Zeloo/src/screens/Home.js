@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, Image,  ScrollView, SafeAreaView, Animated } from "react-native";
+import { View, Text, StyleSheet, Modal, TouchableOpacity, Platform, Dimensions, Image,  ScrollView, SafeAreaView, Animated } from "react-native";
 import colors from './colors';
 import { EscalarText, EscalarTouchable, EscalarImage, EscalarCard, EscalarSeparator, useAccessibility } from './AccessibilityContext';
 import { UserContext } from "./userContext";
@@ -13,6 +13,7 @@ const { width, height } = Dimensions.get("window");
 
 export default function Home ({ navigation,AccessibilitySettings}) {
 const { increaseScale, decreaseScale, resetScale,scale } = useAccessibility();
+const [mostrarModalSucesso, setMostrarModalSucesso] = useState(false);
 
   //FAMILIAR CONSTS
   // 🔹 Componente Bolinha Animada
@@ -189,12 +190,34 @@ const ActionButton = ({ iconName, onPress, text, iconStyle = {} }) => (
           <EscalarText style={styles.cardText}>Conversas</EscalarText>
         </EscalarTouchable>
 
-        <EscalarTouchable style={styles.card}>
+        <EscalarTouchable style={styles.card}  onPress={() => setMostrarModalSucesso(true)}>
           <EscalarImage source={require('../../assets/images/faleconosco.png')} style={styles.icon} />
           <EscalarText style={styles.cardText}>Fale Conosco</EscalarText>
         </EscalarTouchable>
       </View>
     </ScrollView>
+      <Modal
+        visible={mostrarModalSucesso}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitulo}>Dados alterados!</Text>
+            <Text style={styles.modalMensagem}>
+              Faça login novamente para ver as mudanças.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.botaoModal}
+              onPress={() => setMostrarModalSucesso(false)}
+            >
+              <Text style={styles.textoBotaoModal}>Entendi</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
   </View>
 );
 }
@@ -465,4 +488,47 @@ volumeIconContainer: {
   alignSelf: 'center',
   marginTop: 20,
 },
+overlay: {
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+modalContainer: {
+  width: "80%",
+  backgroundColor: "#fff",
+  padding: 20,
+  borderRadius: 12,
+  alignItems: "center",
+  elevation: 10,
+},
+
+modalTitulo: {
+  fontSize: 20,
+  fontWeight: "bold",
+  marginBottom: 10,
+  color: "#333",
+},
+
+modalMensagem: {
+  fontSize: 16,
+  textAlign: "center",
+  marginBottom: 20,
+  color: "#555",
+},
+
+botaoModal: {
+  backgroundColor: "#0066cc",
+  paddingVertical: 10,
+  paddingHorizontal: 25,
+  borderRadius: 8,
+},
+
+textoBotaoModal: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "bold",
+},
+
 });
