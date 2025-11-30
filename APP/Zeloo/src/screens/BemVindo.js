@@ -1,8 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import {View,Text,StyleSheet,TouchableWithoutFeedback,Dimensions,Image,FlatList,} from "react-native";
 import colors from "./colors";
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 
 const { width, height } = Dimensions.get("window");
 
@@ -33,21 +31,6 @@ export default function BemVindo({ navigation }) {
     flatListRef.current?.scrollToIndex({ index: novoIndex, animated: true });
     setIndexAtual(novoIndex);
   };
-  
-  /*
-  useEffect(() => {
-    const pedirPermissao = async () => { 
-      const { status } = await Notifications.requestPermissionsAsync();
-  
-      if (status !== 'granted') {
-        alert('Você negou a permissão de notificações.');
-      } else {
-        console.log("Permissão concedida!");
-      }
-    };
-  
-    pedirPermissao();
-  }, []);*/
 
   useEffect(() => {
     const intervalo = setInterval(irProximoSlide, 4000);
@@ -55,9 +38,13 @@ export default function BemVindo({ navigation }) {
   }, [indexAtual]);
 
   return (
+
+    
     //Detecta toques na tela isso aqui
     <TouchableWithoutFeedback onPress={irProximoSlide}> 
       <View style={styles.Container}>
+
+
         <FlatList
           ref={flatListRef}
           data={slides}
@@ -70,9 +57,14 @@ export default function BemVindo({ navigation }) {
             <View style={{ width, height }}>
               <Image source={item.imagem} style={styles.backgroundImage} />
               <View style={styles.overlay} />
+                <Image
+                  source={require('../../assets/images/logo.png')}
+                  style={{ width: 130, height: 130 }}
+                />
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.title}</Text>
                 <Text style={styles.subtitle}>{item.subtitle}</Text>
+                
               </View>
             </View>
           )} //cada item desse renderItem ai vai ter as coisa dentro, cada slide, no caso
@@ -81,6 +73,8 @@ export default function BemVindo({ navigation }) {
             setIndexAtual(novoIndex); //contentOffset.x é a posiçao atual do slide, ele pega isso ae e calcula pra atualiza a indexAtual e manter as coisa (textos e tals?) sincronizada
           }}
         />
+
+
 
         <View style={styles.mainButtons}>
           <TouchableWithoutFeedback onPress={() => navigation.navigate("Login")}>
