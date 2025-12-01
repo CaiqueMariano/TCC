@@ -100,6 +100,10 @@ body {
     margin-top:10%;
     text-align: center;
 }
+
+.modal{
+    margin-top: 10%,
+}
 </style>
 </head>
 <body>

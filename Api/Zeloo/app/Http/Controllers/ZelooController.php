@@ -471,6 +471,9 @@ private function aplicarBanUsuario(UsuarioModel $usuario)
    // enviar sms
 
     /*Funcões da API*/ 
+
+
+
     
 
     //AVALIAR IDOSO
@@ -490,6 +493,28 @@ private function aplicarBanUsuario(UsuarioModel $usuario)
             'data' => $avaliar
 
         ],200);
+    }
+
+    public function cancelar($id){
+        $cancelar  = DB::table('tb_contrato')
+        ->where('idContrato', $id)
+        ->update(['statusContrato' => 'cancelado']);
+
+        $servico = DB::table('tb_servico')
+        ->join('tb_profissional_servico', 'tb_servico.idServico', '=', 'tb_profissional_servico.idServico')
+        ->join('tb_contrato', 'tb_profissional_servico.idProfissionalServico', '=', 'tb_contrato.idProfissionalServico')
+        ->where('tb_contrato.idContrato', $id)
+        ->update([
+            'statusServico' => 'nAceito'
+        ]);
+
+        return response()->json([
+
+            'success' => true,
+            'message' => 'contrato cancelado'
+        ], 200);
+
+
     }
 
     public function avaliarCuidador(Request $request){

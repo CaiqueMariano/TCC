@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { API_URL } from './link';
 import { UserContext } from './userContext';
-import {View,Text,ScrollView,Platform,TouchableOpacity,Animated,Dimensions,StyleSheet, Image,} from 'react-native';
+import {View,Text,ScrollView,Platform,TouchableOpacity,Animated,Dimensions,StyleSheet, Image, Modal} from 'react-native';
 import CustomModal from './Modal';
 import ModalFinalizacao from './ModalFinalizacao';
 const ABAS = [
@@ -19,8 +19,10 @@ export default function Contratos({navigation}) {
   const [precoModal, setPrecoModal] = useState(0);
   const [ativos, setAtivos] = useState([]);
   const [pendentes, setPendentes] = useState([]);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [mostrarCModal, setMostrarCModal] = useState(false);
   const [cancelados, setCancelados] = useState([]);
-  
+  const [itemSelecionado, setItemSelcionado] = useState([]);
   const indicador = useRef(new Animated.Value(0)).current;
   const { width } = Dimensions.get('window');
   const larguraAba = width / ABAS.length;
@@ -52,6 +54,17 @@ export default function Contratos({navigation}) {
       })
       .catch(error => console.log("ERRO:", error));
   },[status])
+
+
+  const cancelar = async (itemSelecionado) => {
+
+    await axios.put (`${API_URL}/api/cancelar/${itemSelecionado.idContrato}`)
+    .then(response =>{
+      setMostrarModal(false);
+      setMostrarCModal(true);
+    })
+
+  }
 
   const finalizar = async (item) => {
     try {
@@ -103,6 +116,59 @@ export default function Contratos({navigation}) {
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
       />
+
+
+<Modal visible={mostrarModal} transparent animationType="fade">
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              
+              <Text style={styles.modalTitulo}>Atenção</Text>
+
+              <Text style={styles.modalMensagem}>Você deseja mesmo cancelar?</Text>
+
+
+              <View style={styles.botoes}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setMostrarModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Voltar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalButtonC}
+                onPress={() => cancelar(itemSelecionado)}
+              >
+                <Text style={styles.modalButtonText}>Confirmar</Text>
+              </TouchableOpacity>
+              </View>
+
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={mostrarCModal} transparent animationType="fade">
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              
+              <Text style={styles.modalTitulo}>Confirmado</Text>
+
+              <Text style={styles.modalMensagem}>Contrato cancelado com sucesso!</Text>
+
+
+              <View style={styles.botoes}>
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setMostrarCModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Voltar</Text>
+              </TouchableOpacity>
+
+              </View>
+
+            </View>
+          </View>
+        </Modal>
      
 
       <View accessibilityRole="tablist" style={styles.barraAbas}>
@@ -202,9 +268,15 @@ export default function Contratos({navigation}) {
   
     
 
+              <View style={styles.botoes}>
                   <TouchableOpacity style={styles.botaoM} onPress={()=>finalizar(item)}> 
                     <Text style={styles.mais}>Terminar</Text>
                   </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.botaoM} onPress={()=>{setMostrarModal(true); setItemSelcionado(item)}}> 
+                    <Text style={styles.mais}>Cancelar</Text>
+                  </TouchableOpacity>
+                  </View>
                 </View>
               </View>
                );
@@ -383,6 +455,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 10,
   },
+
+
+
   mais: { 
     color: '#b08cff',
     alignSelf: 'center', 
@@ -522,5 +597,52 @@ const styles = StyleSheet.create({
 
   botoes:{
     flexDirection:'row',
+
+  },
+
+
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '75%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center'
+  },
+  modalTitulo: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 10,
+    color: '#b08cff'
+  },
+  modalMensagem: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333'
+  },
+  modalButton: {
+    marginRight: 15,
+    backgroundColor: '#b08cff',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8
+  },
+
+  modalButtonC: {
+    backgroundColor: '#FF3449',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600'
   }
 });

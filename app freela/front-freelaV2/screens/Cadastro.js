@@ -25,6 +25,7 @@ export default function Cadastro() {
   const [senhaProfissional, setSenhaProfissional] = useState('');
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [biografia, setBiografia] = useState('');
+  const [senhaRepetida, setSenhaRepetida] = useState("");
   const [valorMinimo, setValorMinimo] = useState('');
   const [areaAtuacao, setAreaAtuacao] = useState('');
   const [mostrarDropdownArea, setMostrarDropdownArea] = useState(false);
@@ -375,6 +376,11 @@ const avancarEtapa = () => {
       Alert.alert("Campo obrigatório", "Digite sua senha.");
       return;
     }
+
+    if (senhaProfissional !== senhaRepetida) {
+      Alert.alert("Erro", "As senhas não são iguais!");
+      return;
+    }
   }
 
  if (etapa === 2) {
@@ -455,6 +461,24 @@ if (etapa === 3) {
                   />
                 </TouchableOpacity>
               </View>
+
+              <View style={styles.senhaContainer}>
+            <TextInput
+              style={styles.senhaInput}
+              placeholder="Repita sua Senha"
+              placeholderTextColor="#444"
+              secureTextEntry={!mostrarSenha}
+              value={senhaRepetida} 
+              onChangeText={setSenhaRepetida}
+            />
+            <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
+              <Ionicons 
+                name={mostrarSenha ? "eye-outline" : "eye-off-outline"} 
+                size={25} 
+                color="#444" 
+              />
+            </TouchableOpacity>
+          </View>
             </ScrollView>
           )}
 
@@ -479,7 +503,7 @@ if (etapa === 3) {
             onPress={() => setMostrarCalendario(true)}
           >
             <Text style={{ color: dataNasc ? '#202020' : '#444', marginTop: 10, fontSize: 16}}>
-              {dataNasc ? dataNasc.toLocaleDateString() : "data de nascimento"}
+              {dataNasc ? dataNasc.toLocaleDateString() : "Data de Nascimento"}
             </Text>
           </TouchableOpacity>
 

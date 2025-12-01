@@ -17,6 +17,9 @@ export default function perfilProfissional({route, navigation}) {
   const [avaliacao, setAvaliacao] = useState([]);
   const [desc, setDesc] = useState("");
   const [media, setMedia] = useState("");
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [modalTitulo, setModalTitulo] = useState("Favoritado");
+  const [modalMensagem, setModalMensagem] = useState("Cuidador favoritado com sucesso!");
   const [total, setTotal] = useState("");
   const [evidencia, setEvidencia] = useState("");
   const ano = hoje.getFullYear();
@@ -58,7 +61,7 @@ export default function perfilProfissional({route, navigation}) {
       setMotivo("");
       setDesc("");
       setEvidencia("");
-      alert("Denúncia enviada!");
+      
       setModalDenuncia(false);
     }).catch(error => {
       console.log("Erro:", error.response.data);
@@ -71,14 +74,34 @@ export default function perfilProfissional({route, navigation}) {
       idProfissional:servico.idProfissional
     })
     .then(
-      alert('Favoritado!')
+      setMostrarModal(true)
       
     );
-    navigation.navigate("favoritos")
+   
     
   }
   return (
     <View style={styles.container}>
+
+
+<Modal visible={mostrarModal} transparent animationType="fade">
+  <View style={styles.overlay}>
+    <View style={styles.modalContainer}>
+      
+      <Text style={styles.modalTitulo}>{modalTitulo}</Text>
+
+      <Text style={styles.modalMensagem}>{modalMensagem}</Text>
+
+      <TouchableOpacity
+        style={styles.modalButton}
+        onPress={() => {setMostrarModal(false);  navigation.navigate("favoritos")}}
+      >
+        <Text style={styles.modalButtonText}>Entendi</Text>
+      </TouchableOpacity>
+
+    </View>
+  </View>
+</Modal>
 
 <Modal
       animationType="fade"
@@ -521,4 +544,30 @@ const styles = StyleSheet.create({
     borderRadius:10,
     marginBottom:20,
   },
+
+  modalTitulo: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 10,
+   
+  },
+  modalMensagem: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+    color: '#333'
+  },
+  modalButton: {
+    marginLeft: 80,
+    width:100,
+    backgroundColor: colors.azul,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8
+  },
+  modalButtonText: {
+   
+    fontSize: 16,
+    fontWeight: '600'
+  }
 });

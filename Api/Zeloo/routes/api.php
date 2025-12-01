@@ -18,6 +18,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+
+//Cancelar
+Route::put('/cancelar/{id}','App\Http\Controllers\ZelooController@cancelar');
 //cancelar servico
 Route::delete('/destroyPedido/{idServico}','App\Http\Controllers\ZelooController@destroyPedido');
 //mandarServicoFav

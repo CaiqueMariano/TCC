@@ -6,18 +6,18 @@ const { width, height } = Dimensions.get("window");
 const slides = [
   {
     imagem: require("../assets/fundo2.jpg"),
-    title: "bem vindo ao zeloo para cuidadores.",
-    subtitle: ""
+    title: "Bem Vindo! ",
+    subtitle: " Seja bem vindo ao Zeloo para cuidadores."
   },
   {
     imagem: require("../assets/fundo.jpg"),
-    title: "encontre cliente,de suas propostas,controle seus ganhos tudo no mesmo lugar.",
-    subtitle: ""
+    title: "Trabalhe conosco",
+    subtitle: "Encontre clientes, dê suas propostas, controle seus ganhos tudo no mesmo lugar."
   },
   {
     imagem: require("../assets/fundo1.jpg"),
-    title: "trabalhe e ganhe o justo e o ideal para ambas as partes.",
-    subtitle: ""
+    title: "Bom para ambas as partes",
+    subtitle: "Trabalhe e ganhe o justo e o ideal para ambas as partes."
   }
 ];
 
@@ -52,6 +52,10 @@ export default function BemVindo({ navigation }) {
             <View style={{ width, height }}>
               <Image source={item.imagem} style={styles.backgroundImage} />
               <View style={styles.overlay} />
+                <Image
+                  source={require('../assets/logo.png')}
+                  style={{ width: 130, height: 130 }}
+                />
               <View style={styles.textContainer}>
                 <Text style={styles.title}>{item.title}</Text>
                 {item.subtitle ? <Text style={styles.subtitle}>{item.subtitle}</Text> : null}
@@ -128,4 +132,3 @@ const styles = StyleSheet.create({
     fontWeight: "600" 
   }
 });
-

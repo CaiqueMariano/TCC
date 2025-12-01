@@ -217,6 +217,8 @@
     margin-top:10%;
     text-align: center;
 }
+
+
         </style>
     </head>
     <body>
@@ -355,7 +357,7 @@
                 <div class="modal-content">
                     <div class="modal-header bg-danger text-white">
                         <h5 class="modal-title">
-                            <i class="bi bi-person-x"></i> Banir Usuário
+                            <i class="bi bi-person-x"></i> Reativar Usuário
                         </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
@@ -400,7 +402,7 @@
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-person-x"></i> Confirmar Desbanimento
+                            <i class="bi bi-person-x"></i> Confirmar Reativação
                         </button>
                     </div>
                 </div>
