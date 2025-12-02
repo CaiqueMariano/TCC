@@ -121,15 +121,17 @@ $meses = array_fill(1, 12, 0);
 foreach ($dados as $d) {
     $meses[$d->mes] = (float) $d->total;
 }
-
-
-
-   
-  $idososAtivos = DB::table('tb_idoso')
+ // grafico idoso 
+    $idososMes = DB::table('tb_idoso')
     ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
     ->groupBy('mes')
     ->orderBy('mes')
-    ->pluck('total');
+    ->pluck ('total')
+    ->toArray();
+   if (empty($idosoAtivos)) {
+        $idososAtivos = array_fill(0, 12, 0);
+    }
+
 
     $reclamacoesPorMes = DB::table('denuncias')
         ->selectRaw('MONTH(created_at) as mes, COUNT(*) as total')
@@ -204,10 +206,11 @@ public function downloadDashboardPdf()
     // Buscar dados que você deseja mostrar no PDF
     $totalReclamacoes = Denuncias::count();
     $totalCuidadores = ProfissionalModel::count();
+    $totalIdosos = DB::table('tb_idoso')->count();
     $totalServicos = servicoModel::count();
 
 
-    $dados = compact('totalReclamacoes', 'totalCuidadores', 'totalServicos');
+    $dados = compact('totalReclamacoes', 'totalCuidadores', 'totalServicos', 'totalIdosos');
 
     $pdf = Pdf::loadView('dashboard_pdf', $dados);
 

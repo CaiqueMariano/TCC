@@ -77,7 +77,9 @@
             <div class="info">
                 <p><strong>Total de Reclamações:</strong> {{ $totalReclamacoes }}</p>
                 <p><strong>Total de Cuidadores:</strong> {{ $totalCuidadores }}</p>
+                <p><strong>Total de Idosos:</strong> {{ $totalIdosos }}</p>
                 <p><strong>Total de Serviços:</strong> {{ $totalServicos }}</p>
+
             </div>
         </div>
 
