@@ -93,7 +93,13 @@ export default function Pendente({ navigation }) {
   {servicos.length === 0 ? (
     <Text style={{ marginTop: 20 }}>Nenhum serviço pendente encontrado.</Text>
   ) : (
-    servicos.map((servico, index) => (
+    servicos.map((servico, index) => {
+
+      const data = new Date();
+               const a = data.getFullYear(servico.dataServico)
+               const m = data.getMonth(servico.dataServico);
+               const d = data.getDate(servico.dataServico);
+      return(
       <View key={index} style={styles.cardcontratro}>
         <View style={styles.contractInfo}>
           <View>
@@ -108,7 +114,7 @@ export default function Pendente({ navigation }) {
         <Text style={styles.detalhestitulo}>Detalhes do contrato</Text>
 
         <View style={{ width: '100%', paddingLeft: 20 }}>
-          <Text style={styles.detalhes}>Dia: {servico.dataServico}</Text>
+          <Text style={styles.detalhes}>Dia: {d}/{m}/{a}</Text>
           <Text style={styles.detalhes}>Horário: {servico.horaInicioServico}</Text>
           <Text style={styles.detalhes}>Tipo: {servico.nomeServico}</Text>
 
@@ -127,7 +133,7 @@ export default function Pendente({ navigation }) {
           />
         </TouchableOpacity>
       </View>
-    ))
+    )})
   )}
 </ScrollView>
     </View>

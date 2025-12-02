@@ -21,6 +21,7 @@ const { width, height } = Dimensions.get("window");
 export default function Perfil({navigation}) {
   const { user } = useContext(UserContext);
   const [abrir, setAbrir] = useState(false);
+  const [ mostrarModalSucesso, setMostrarModalSucesso] = useState(false);
   const [abaAtiva, definirAbaAtiva] = useState(0);
   const indicador = useRef(new Animated.Value(0)).current;
   const [valor, setValor] = useState(null);
@@ -74,9 +75,7 @@ export default function Perfil({navigation}) {
       });
 
       if(response.data.success){
-        Alert.alert("Mudanças feitas!",
-          "Faça o login novamente para ver as mudanças."
-        )
+        setMostrarModalSucesso(true);
         setMostrarEdicao(false);
       }else{
         console.log(response.data.message);
@@ -152,6 +151,28 @@ export default function Perfil({navigation}) {
 
   return (
     <View style={styles.Container}>
+
+<Modal
+        visible={mostrarModalSucesso}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitulo}>Dados alterados!</Text>
+            <Text style={styles.modalMensagem}>
+              Faça login novamente para ver as mudanças.
+            </Text>
+
+            <TouchableOpacity
+              style={styles.botaoModal}
+              onPress={() => setMostrarModalSucesso(false)}
+            >
+              <Text style={styles.textoBotaoModal}>Entendi</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
 <Modal
           visible={mostrarEdicao}
@@ -1029,5 +1050,48 @@ paddingHorizontal: 15,
 marginBottom: 20,
 fontSize: 16,
 alignSelf: 'center', 
+},
+
+modalMensagem: {
+  fontSize: 16,
+  textAlign: "center",
+  marginBottom: 20,
+  color: "#555",
+},
+
+modalTitulo: {
+  fontSize: 20,
+  fontWeight: "bold",
+  marginBottom: 10,
+  color: "#333",
+},
+
+
+botaoModal: {
+  backgroundColor: colors.azul,
+  paddingVertical: 10,
+  paddingHorizontal: 25,
+  borderRadius: 8,
+},
+
+textoBotaoModal: {
+  fontSize: 16,
+  fontWeight: "bold",
+},
+
+overlay: {
+  flex: 1,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  justifyContent: "center",
+  alignItems: "center",
+},
+
+modalContainer: {
+  width: "80%",
+  backgroundColor: "#fff",
+  padding: 20,
+  borderRadius: 12,
+  alignItems: "center",
+  elevation: 10,
 },
 });

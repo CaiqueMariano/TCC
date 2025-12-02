@@ -111,7 +111,7 @@ export const completarCadastro = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Complete seu cadastro!",
-        body: "Preencha informações ",
+        body: "Preencha informações relevantes para sua conta!",
         sound: true
       },trigger: { seconds: 10 }
     });

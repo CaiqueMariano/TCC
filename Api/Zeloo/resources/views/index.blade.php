@@ -191,7 +191,7 @@ body {
 
         <li>
             <a href="{{url('denunciados')}}">
-                <i class="bi bi-clipboard-check"></i> Analisar Respostas
+                <i class="bi bi-clipboard-check"></i> Reativação
             </a>
         </li>
 

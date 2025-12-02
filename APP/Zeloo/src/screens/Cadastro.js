@@ -24,6 +24,7 @@ export default function Cadastro({ navigation }) {
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
   const [senhaUsuario, setSenhaUsuario] = useState("");
   const [senhaRepetida, setSenhaRepetida] = useState("");
+  const [carregando, setCarregando] = useState(false);
   const [tipoUsuario, setTipoUsuario] = useState('');
   const [dataNasc, setDataNascUsuario] = useState(null);
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
@@ -142,7 +143,7 @@ export default function Cadastro({ navigation }) {
   const enviarDados = async () => {
     try{
 
-
+      setCarregando(true);
       let dataString;
       if (dataNasc instanceof Date) {
         dataString = dataNasc.toLocaleDateString("pt-BR");
@@ -187,7 +188,7 @@ export default function Cadastro({ navigation }) {
         navigation.navigate("Login")
         completarCadastro();
       }else{
-     
+        setCarregando(false)
         console.log("Erro", response.data.message);
         
       
@@ -469,12 +470,16 @@ export default function Cadastro({ navigation }) {
         </Modal>
 
         <View style={styles.botoes}>
-          <TouchableOpacity style={styles.bFoto} onPress={() => setEtapa(2)}>
+          <TouchableOpacity style={styles.bFoto} 
+          
+          
+          onPress={() => setEtapa(2)}>
             <Text style={styles.buttonText}>Voltar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.bFoto, { opacity: imagem ? 1 : 0.5 }]}
+          <TouchableOpacity style={[styles.bFoto, {opacity: carregando ? 0.5 : imagem ? 1 : 0.5,},]}
                 onPress={enviarDados}
+                disabled={carregando || !imagem}
               >
             
             <Text style={styles.buttonText}>Finalizar</Text>

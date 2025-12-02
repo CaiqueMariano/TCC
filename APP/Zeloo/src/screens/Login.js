@@ -24,6 +24,7 @@ const { narrar } = useAccessibility();
 
   const [abrir, setAbrir] = useState(false);
   const [valor, setValor] = useState(null);
+  const [carregando, setCarregando] = useState(false);
   const [telefoneUsuario, setTelefoneUsuario] = useState("");
   const [senhaUsuario,setSenhaUsuario] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
@@ -59,6 +60,7 @@ const { narrar } = useAccessibility();
 
   const enviarLogin = async () => {
     try {
+      setCarregando(true);
       const telefoneLimpo = telefoneUsuario.replace(/\D/g, "");
       const response = await axios.post(`${API_URL}/api/login`, {
         telefoneUsuario:telefoneLimpo,
@@ -67,6 +69,7 @@ const { narrar } = useAccessibility();
    
   
       if (response.data.success) {
+        setCarregando(false);
         const usuario = response.data.data;
         setUser(usuario);
         navigation.navigate("Home");
@@ -74,13 +77,13 @@ const { narrar } = useAccessibility();
 
         
       } else {
-       
+        setCarregando(false);
         setMensagem('Telefone ou senha incorretos');
         console.log(error);
       }
   
     } catch (error) {
-     
+      setCarregando(false);
       setMensagem('Telefone ou senha incorretos');
       console.error(error);
     }
@@ -149,7 +152,9 @@ const { narrar } = useAccessibility();
     </View>
 
       <View style={styles.botoes}>
-        <TouchableOpacity style={styles.button} onPress={enviarLogin}>
+        <TouchableOpacity style={[styles.button, { opacity: carregando ? 0.5 : 1 }]} onPress={enviarLogin}
+        disabled={carregando}
+        >
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button2}>

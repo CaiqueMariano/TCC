@@ -6,6 +6,27 @@ scrcpy -s RQ8N2098ZZW
 scrcpy -s a3a366b6
 
 
+MODAL
+
+        <Modal visible={mostrarModal} transparent animationType="fade">
+          <View style={styles.overlay}>
+            <View style={styles.modalContainer}>
+              
+              <Text style={styles.modalTitulo}>Atenção</Text>
+
+              <Text style={styles.modalMensagem}>Você deseja mesmo cancelar?</Text>
+
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setMostrarModal(false)}
+              >
+                <Text style={styles.modalButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+
+            </View>
+          </View>
+        </Modal>
+
 Criar migration
 
   

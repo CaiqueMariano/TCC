@@ -103,7 +103,7 @@ class ZelooController extends Controller
     return $response;
 }*/
 
-// Deixando o grafico mais interativo com dados dinamicos 
+
 public function DashboardData()
 {
 
@@ -200,10 +200,10 @@ $totalCuidadores = DB::table('tb_profissional')->count();
         return view('login');
     }
 
-    // Função para gerar PDF do Dashboard
+   
 public function downloadDashboardPdf()
 {
-    // Buscar dados que você deseja mostrar no PDF
+    
     $totalReclamacoes = Denuncias::count();
     $totalCuidadores = ProfissionalModel::count();
     $totalIdosos = DB::table('tb_idoso')->count();
@@ -214,10 +214,10 @@ public function downloadDashboardPdf()
 
     $pdf = Pdf::loadView('dashboard_pdf', $dados);
 
-    // Retornar download do PDF
+   
     return $pdf->download('dashboard.pdf');
 }
-// pesquisa por nome
+
 /*BANIR USUARIO*/
 public function destroyUsuario($idUsuario)
 {
@@ -236,9 +236,10 @@ public function destroyUsuario($idUsuario)
         }
 
         return redirect()->route('denuncias')
+                    ->with('mostrarModal', true)
                          ->with('success', 'Usuário banido com sucesso');
     } else {
-        return redirect()->route('registro'); 
+        return redirect()->route('denuncias'); 
     }
 }
 
@@ -252,7 +253,7 @@ public function destroyFree($idProfissional)
         return redirect()->route('denuncias')
                         ->with('success', 'Usuário banido com sucesso');
     } else {
-        return redirect()->route('registro'); 
+        return redirect()->route('denuncias'); 
     }
 }
 
@@ -264,10 +265,11 @@ public function desbanirUsuario($idUsuario)
     if (Denuncias::exists()) {
         UsuarioModel::where('idUsuario', '=', $idUsuario)->update(['statusUsuario' => 'ativo']);
         Denuncias::where('idUsuario', '=', $idUsuario)->delete();
-        return redirect()->route('denuncias')
+        return redirect()->route('denunciados')
+                    ->with('mostrarModal', true)
                         ->with('success', 'Usuário desbanido com sucesso');
     } else {
-        return redirect()->route('registro'); 
+        return redirect()->route('denunciados'); 
     }
 }
 
@@ -278,10 +280,10 @@ public function desbanirFree($idProfissional)
     if (DenunciasFreeModel::exists()) {
         ProfissionalModel::where('idProfissional', '=', $idProfissional)->update(['statusProfissional' => 'ativo']);
         DenunciasFreeModel::where('idProfissional', '=', $idProfissional)->delete();
-        return redirect()->route('denuncias')
+        return redirect()->route('denunciados')
                         ->with('success', 'Usuário desbanido com sucesso');
     } else {
-        return redirect()->route('registro'); 
+        return redirect()->route('denunciados'); 
     }
 }
 
@@ -358,7 +360,7 @@ public function denuncias(){
 
 
 public function banir(){
-    return view('banir');
+    return view('responder-denuncia');
 }
 
 public function responder(){
@@ -472,6 +474,9 @@ private function aplicarBanUsuario(UsuarioModel $usuario)
    // enviar sms
 
     /*Funcões da API*/ 
+
+
+
     
 
     //AVALIAR IDOSO
@@ -491,6 +496,28 @@ private function aplicarBanUsuario(UsuarioModel $usuario)
             'data' => $avaliar
 
         ],200);
+    }
+
+    public function cancelar($id){
+        $cancelar  = DB::table('tb_contrato')
+        ->where('idContrato', $id)
+        ->update(['statusContrato' => 'cancelado']);
+
+        $servico = DB::table('tb_servico')
+        ->join('tb_profissional_servico', 'tb_servico.idServico', '=', 'tb_profissional_servico.idServico')
+        ->join('tb_contrato', 'tb_profissional_servico.idProfissionalServico', '=', 'tb_contrato.idProfissionalServico')
+        ->where('tb_contrato.idContrato', $id)
+        ->update([
+            'statusServico' => 'nAceito'
+        ]);
+
+        return response()->json([
+
+            'success' => true,
+            'message' => 'contrato cancelado'
+        ], 200);
+
+
     }
 
     public function avaliarCuidador(Request $request){
