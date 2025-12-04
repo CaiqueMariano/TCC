@@ -9,8 +9,8 @@ class DenunciasSeeder extends Seeder
 {
     public function run(): void
     {
-        Denuncias::create(['idUsuario' => 1, 'motivoDenuncia' => 'Abandono', 'descDenuncia' => 'Descrição 1', 'evidenciaDenuncia' => 'evi1.jpg']);
-        Denuncias::create(['idUsuario' => 2, 'motivoDenuncia' => 'Agressão', 'descDenuncia' => 'Descrição 2', 'evidenciaDenuncia' => 'evi2.jpg']);
+        Denuncias::create(['idUsuario' => 3, 'motivoDenuncia' => 'Abandono', 'descDenuncia' => 'Descrição 1', 'evidenciaDenuncia' => 'evi1.jpg']);
+        Denuncias::create(['idUsuario' => 3, 'motivoDenuncia' => 'Agressão', 'descDenuncia' => 'Descrição 2', 'evidenciaDenuncia' => 'evi2.jpg']);
         Denuncias::create(['idUsuario' => 3, 'motivoDenuncia' => 'Negligência', 'descDenuncia' => 'Descrição 3', 'evidenciaDenuncia' => 'evi3.jpg']);
         Denuncias::create(['idUsuario' => 4, 'motivoDenuncia' => 'Maus-tratos', 'descDenuncia' => 'Descrição 4', 'evidenciaDenuncia' => 'evi4.jpg']);
         Denuncias::create(['idUsuario' => 5, 'motivoDenuncia' => 'Risco à saúde', 'descDenuncia' => 'Descrição 5', 'evidenciaDenuncia' => 'evi5.jpg']);

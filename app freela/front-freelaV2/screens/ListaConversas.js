@@ -106,7 +106,7 @@ export default function ListaConversas({navigation}) {
                             />   
                         <Text style={styles.titulo}>{item.nomeUsuario}</Text>
                     </View>
-                    <Text style={styles.data}>{h}h:{m}</Text>
+                    <Text style={styles.data}>{h}h{m}</Text>
                     <Text style={styles.horario}>{item.conteudoMensagens}</Text>
                     
         
